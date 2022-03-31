@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-21gq37$c05r)+*@_ss4l(axwdfjnr4v8i^7+*j4@hs@1eu#-b5
 DEBUG = True
 
 ALLOWED_HOSTS = ['neetechs.azurewebsites.net']
-ALLOWED_HOSTS = ['neetechs.azurewebsites.net','.herokuapp.com','127.0.0.1','www.neetechs.com','neetechs.com']
+ALLOWED_HOSTS = ['.azurewebsites.net','neetechs.azurewebsites.net','www.neetechs.azurewebsites.net','.herokuapp.com','127.0.0.1','www.neetechs.com','neetechs.com']
 CORS_ORIGIN_WHITELIST = [
     'https://palimago-c15eb.web.app',
     'https://palimago-c15eb.firebaseapp.com',
