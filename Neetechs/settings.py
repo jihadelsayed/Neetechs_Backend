@@ -27,7 +27,56 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['neetechs.azurewebsites.net']
 ALLOWED_HOSTS = ['neetechs.azurewebsites.net','.herokuapp.com','127.0.0.1','www.neetechs.com','neetechs.com']
-
+CORS_ORIGIN_WHITELIST = [
+    'https://palimago-c15eb.web.app',
+    'https://palimago-c15eb.firebaseapp.com',
+    'www.neetechs.azurewebsites.net',
+    'neetechs.azurewebsites.net',
+    'https://www.neetechs.com',
+    'https://neetechs.com',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+    'http://127.0.0.1:4200',
+    'http://localhost:4200',
+    'http://127.0.0.1:8100',
+    'http://localhost:8100',
+]
+# If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
+CORS_ORIGIN_REGEX_WHITELIST = [
+    'https://palimago-c15eb.web.app',
+    'https://palimago-c15eb.firebaseapp.com',
+    'neetechs.azurewebsites.net',
+    'www.neetechs.azurewebsites.net',
+    'https://www.neetechs.com',
+    'https://neetechs.com',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+    'http://127.0.0.1:4200',
+    'http://localhost:4200',
+    'http://127.0.0.1:8100',
+    'http://localhost:8100',
+    ]
+"""
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+"""
 
 # Application definition
 
