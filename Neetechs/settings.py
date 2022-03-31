@@ -27,6 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['neetechs.azurewebsites.net']
 ALLOWED_HOSTS = ['.azurewebsites.net','neetechs.azurewebsites.net','www.neetechs.azurewebsites.net','.herokuapp.com','127.0.0.1','www.neetechs.com','neetechs.com']
+CHAT_WS_SERVER_HOST = 'localhost' or 'palimago-c15eb.web.app' or 'palimago-c15eb.firebaseapp.com' or 'neetechs.com' or 'www.neetechs.com'
+CHAT_WS_SERVER_PORT = 5002
+CHAT_WS_SERVER_PROTOCOL = 'ws' or 'wss'
+CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
+CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'https://palimago-c15eb.web.app',
     'https://palimago-c15eb.firebaseapp.com',
