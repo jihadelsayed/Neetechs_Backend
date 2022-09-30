@@ -9,15 +9,18 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+import os
 
 from pathlib import Path
+from decouple import config
+from datetime import timedelta
+from firebase_admin import credentials
+from rest_framework.settings import api_settings
+from firebase_admin import initialize_app
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
+BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-21gq37$c05r)+*@_ss4l(axwdfjnr4v8i^7+*j4@hs@1eu#-b5'
@@ -25,7 +28,7 @@ SECRET_KEY = 'django-insecure-21gq37$c05r)+*@_ss4l(axwdfjnr4v8i^7+*j4@hs@1eu#-b5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['neetechs.azurewebsites.net']
+#ALLOWED_HOSTS = ['neetechs.azurewebsites.net']
 ALLOWED_HOSTS = ['.azurewebsites.net','neetechs.azurewebsites.net','www.neetechs.azurewebsites.net','.herokuapp.com','127.0.0.1','www.neetechs.com','neetechs.com']
 CHAT_WS_SERVER_HOST = 'localhost' or 'palimago-c15eb.web.app' or 'palimago-c15eb.firebaseapp.com' or 'neetechs.com' or 'www.neetechs.com'
 CHAT_WS_SERVER_PORT = 5002
@@ -86,18 +89,43 @@ CORS_ALLOW_HEADERS = [
 # Application definition
 
 INSTALLED_APPS = [
+    # main
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # json converter
+    'rest_framework',
+    'rest_framework.authtoken',
+    # authontication
+    #'dj_rest_auth',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.twitter',
+    'knox',
+    'knox_allauth.apps.KnoxAllauthConfig',
+
+    # websocket
+    'channels',
+
+    # app
+    'chat',
+    'Checkout',
+
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -122,22 +150,84 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Neetechs.wsgi.application'
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'knox.auth.TokenAuthentication',
+    ),    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 17,
+}
+#ASGI_APPLICATION = "routing.application"
+
+ASGI_APPLICATION = 'Neetechs.routing.application'
+#WSGI_APPLICATION = 'Neetechs.wsgi.application'
+
+
+REST_AUTH_TOKEN_MODEL = 'knox.models.AuthToken'
+REST_AUTH_TOKEN_CREATOR = 'knox_allauth.utils.create_knox_token'
+
+
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'knox_allauth.serializer.UserSerializer',
+    'TOKEN_SERIALIZER': 'knox_allauth.serializer.KnoxSerializer',
+}
 
 # Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
+# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+#CHANNEL_LAYERS = {
+ #   "default": {
+  #      "BACKEND": "channels_redis.core.RedisChannelLayer",
+   #     "CONFIG": {
+    #        "hosts": [os.environ.get("REDIS_URL", 'redis://localhost:6379')],
+     #   },
+      #  "OPTIONS": {
+       #     "CLIENT_CLASS":"django_redis.client.DefaultClient"
+        #}
+# },
+#}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
     }
 }
 
+DATABASES = {
+   # 'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+   #     #'NAME': BASE_DIR / 'db.sqlite3',#django 3
+    #    'NAME': str(os.path.join(BASE_DIR, "db.sqlite3"))
+
+    #}
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'neetechsdb',
+       # 'USER': 'jm',
+        'USER': 'postgres',
+        'PASSWORD': 'bipMGU7DajN2Sfn#1996',
+        'HOST': 'db.neetechs.com',
+        'PORT': '5432'
+        #'OPTIONS': {
+         #   'driver': 'ODBC Driver 17 for SQL Server',
+        #},
+    }
+}
+# set this to False if you want to turn off pyodbc's connection pooling
+DATABASE_CONNECTION_POOLING = False
 
 # Password validation
-# https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -156,7 +246,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/4.0/topics/i18n/
+# https://docs.djangoproject.com/en/3.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -164,15 +254,107 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
+USE_L10N = True
+
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.0/howto/static-files/
+# https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = 'static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
+#STATICFILES_DIRS = [
+#    os.path.join(BASE_DIR, 'static'),
+#    os.path.join(BASE_DIR, 'media'),
+#]
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+##########static##########################
+STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "staticss"),
+)
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+############media###############    #
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media_cdn')
+MEDIA_URL = '/media/'
+
+#TEMP = os.path.join(BASE_DIR, 'temp')
+
+#os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+
+#os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="credentials.json"
+
+
+SITE_ID = 1
+AUTH_USER_MODEL = 'knox_allauth.CustomUser'
+AUTH_USERName_MODEL = 'knox_allauth.CustomUser.username'
+AUTH_SiteId_MODEL = 'knox_allauth.CustomUser.site_id'
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_USERNAME_REQUIRED = False
+
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # During development only
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 
+
+DATE_INPUT_FORMATS = ['%Y-%m-%d %I:%M %p']
+
+AWS_S3_HOST = "s3.eu-north-1.amazonaws.com" 
+AWS_S3_REGION_NAME="eu-north-1"
+AWS_ACCESS_KEY_ID = 'AKIA54ACSLZPCYZWKGVY'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'palimagos3'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+
+# stops IK checking S3 all the time - main reason to use IK v2 for me
+IMAGEKIT_DEFAULT_IMAGE_CACHE_BACKEND = 'imagekit.imagecache.NonValidatingImageCacheBackend' 
+
+EMAIL_USE_TLS = False
+EMAIL_HOST = 'smtp.titan.email'
+EMAIL_HOST_USER = 'noreply@swapynet.com'
+DEFAULT_FROM_EMAIL = 'noreply@swapynet.com'
+SERVER_EMAIL = 'noreply@swapynet.com'
+EMAIL_HOST_PASSWORD = 'Free48palestine#'
+EMAIL_PORT = 465
+
+EMAIL_USE_SSL = True
+
+STRIPE_PUBLIC_KEY = "pk_test_51IwTvvIR19rXEZpRWoj9M4BGNy5nJ1GQOsXUZXHRD0PS3QGexQQSVNQR0vMB8jMoONQtO4RNQ30pC3N5BdgiGstB00shA8ejRI"
+STRIPE_SECRET_KEY = "sk_test_51IwTvvIR19rXEZpRwwwDByofI7ZaWyPsGUW5hGIWKxdtD3Mg2ZAmM9xBvZ1kptffFUQSX0Lp6rW9US3EIz37A9tl00HcDB0vJz"
+STRIPE_WEBHOOK_SECRET = ""
+#STRIPE_LIVE_MODE = False  # Change to True in production
+#DJSTRIPE_WEBHOOK_SECRET = ""
+#DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
+#STRIPE_TEST_SECRET_KEY = "sk_test_51IwTvvIR19rXEZpRwwwDByofI7ZaWyPsGUW5hGIWKxdtD3Mg2ZAmM9xBvZ1kptffFUQSX0Lp6rW9US3EIz37A9tl00HcDB0vJz"
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=604800',
+}
+
+REST_KNOX = {
+  #'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
+  #'AUTH_TOKEN_CHARACTER_LENGTH': 64,
+  'TOKEN_TTL': timedelta(hours=100),
+  #'USER_SERIALIZER': 'knox.serializers.UserSerializer',
+  #'TOKEN_LIMIT_PER_USER': None,
+  #'AUTO_REFRESH': False,
+ # 'EXPIRY_DATETIME_FORMAT': api_settings.DATETME_FORMAT,
+}
+
+DRF_RECAPTCHA_SECRET_KEY = "6LcCZTkbAAAAAJZgnFuDO8LOv9YyXtXuAhORmZdl"
+
+SOCIAL_AUTH_TWITTER_KEY = 'gS3cTehMYgqyaGM8XRzmn7hzs'
+SOCIAL_AUTH_TWITTER_SECRET = '7G45UCpjFZOYEK916Vd6GjSpewVCMM4Xd58g9vE1Qdn32vBG9q'
+SOCIAL_AUTH_TWITTER_TOKEN = 'AAAAAAAAAAAAAAAAAAAAAIgHRAEAAAAACRBSw%2BqI7jZrGPcqLixn481Y1wo%3D6wvAJYwtlIplhHxJFLDL0zuvje8nEq6LTEsuAtVAlNuu151opP'
+
+DEFAULT_AUTO_FIELD='django.db.models.AutoField' 
+#6LcCZTkbAAAAAP-DG83osmudRcjDkVGVdC08pega
+#6LcCZTkbAAAAAJZgnFuDO8LOv9YyXtXuAhORmZdl

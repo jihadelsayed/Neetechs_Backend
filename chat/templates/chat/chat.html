@@ -1,0 +1,44 @@
+{% extends 'chat/base.html' %}
+
+{% block content %}
+    <h3>You: {{me.username}}</h3>
+    <h3>Thread: {{user.username}}</h3>
+    <ul>
+        {% for message in messages %}
+        <li>[{{message.sender.username}}]: {{message.text}}</li>
+        {% endfor %}
+    </ul>
+    <form id="message-form">
+        {% csrf_token %}
+        <input type="text" name="message" id="message" required>
+        <input type="submit" value="Send" class="btn">
+    </form>
+{% endblock content %}
+{% block custom_javascript %}
+<script>
+    const url = 'ws://localhost:8000/ws/chat/';
+    const ws = new WebSocket(url)
+    ws.onopen = function(event){
+        console.log("connection is open");
+        ws.send("thanks for connection");
+    }
+    ws.onmessage = function(event){
+        console.log(event);
+        console.log("connection is recived");
+    }
+    ws.onclose = function(event){
+        console.log("connection is close");
+    }
+    ws.onerror = function(event){
+        console.log("something goes wrong");
+    }
+    const messageForm = document.getElementById('message-form')
+    messageForm.addEventListener('submit', sendmessage)
+    function sendmessage(e){
+        if (e.preventDefult) e.preventDefult();
+        ws.send(document.getElementById('message').value);
+        messageForm.reset()
+        return false;
+    }
+</script>
+{% endblock custom_javascript %}
