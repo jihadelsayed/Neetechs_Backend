@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<style type="text/css">
+	
+	.card {
+		max-width: 700px;
+	}
+
+	.container{
+		padding: 20px;
+	}
+</style>
+
+
+<div class="container">
+	<div class="row">
+		
+		<!-- Service post -->
+		<div class="card m-auto">
+			<img class="card-img-top" src="{{service_post.image.url}}">
+			<div class="card-body my-2">
+				<h2 class="card-title">{{service_post.title}}</h2>
+				<p class="card-text">{{service_post.body|linebreaksbr}}</p>
+				<p>
+					{% if service_post.author == request.user %}
+						<a href="{% url 'service:edit' service_post.slug %}" class="btn btn-primary">Update</a>
+					{% endif %}
+				</p>
+				
+			</div>
+			<div class="card-footer text-muted">
+				Updated on {{service_post.date_updated}} by {{service_post.author}}
+			</div>
+		</div>
+		<!-- end Service post -->
+
+	</div>
+</div>
+
+{% endblock content %}

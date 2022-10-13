@@ -1,32 +1,29 @@
-from rest_framework.generics import get_object_or_404
-from rest_framework.views import APIView
+import stripe
 from allauth.account.models import EmailAddress
 from django.http.response import JsonResponse
-from rest_framework.exceptions import APIException
-from knox_allauth.models import CustomUser
-from Profile.serializer import ProfileSerializer
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import APIException
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from knox_allauth.models import CustomUser
 from Neetechs import settings
+from Profile.serializer import ProfileSerializer
 
-import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
-from dj_rest_auth.views import LoginView
-from dj_rest_auth.registration.views import RegisterView
-
-from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from dj_rest_auth.registration.views import SocialLoginView
-
-from allauth.account.utils import complete_signup, send_email_confirmation
 from allauth.account import app_settings as allauth_settings
+from allauth.account.utils import complete_signup, send_email_confirmation
+from allauth.socialaccount.providers.facebook.views import \
+    FacebookOAuth2Adapter
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from dj_rest_auth.registration.views import RegisterView, SocialLoginView
+from dj_rest_auth.views import LoginView
+from django.conf import settings
 
 from .serializer import KnoxSerializer, UserSerializer
 from .utils import create_knox_token
-
-
-from django.conf import settings
 
 
 class KnoxLoginView(LoginView):
@@ -65,13 +62,13 @@ class KnoxRegisterView(RegisterView):
         instance = self.get_object(self.request.data['email'])
         #if not self.request.data._mutable:
          #   self.request.data._mutable = True
-        data =self.request.data
-        #_mutable = self.request.data._mutable
-        #self.request.data._mutable = True
+        data = self.request.data
+        _mutable = data._mutable
+        data._mutable = True
         data['stripeCustomerId'] = customer.id
-        data['name'] = data['first_name']
+        #data['name'] = data['first_name']
        # self.request.data._mutable = False
-        #self.request.data._mutable = _mutable
+        data._mutable = _mutable
 
         
         serializer1 = ProfileSerializer(instance,data=data, partial=True)

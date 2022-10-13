@@ -1,17 +1,17 @@
-from django.db.models.signals import pre_save
+import os
 import random
 import string
-
-
 from binascii import hexlify
-import os
-from django.db import models
-from django.utils import timezone
-from django.contrib.auth.models import AbstractUser, BaseUserManager ## A new class is imported. ##
-from django.utils.translation import gettext_lazy  as _
+
+from django.contrib.auth.models import (  # # A new class is imported. ##
+    AbstractUser, BaseUserManager)
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from django.db.models.signals import pre_save
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from imagekit.models.fields import ProcessedImageField
-from imagekit.processors import ResizeToFill#, ResizeToFill
+from imagekit.processors import ResizeToFill  # , ResizeToFill
 
 
 def _createHash():
@@ -28,17 +28,16 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('The given email must be set')
         email = self.normalize_email(email)
-        a_string = self.normalize_email(email)
-        split_string = a_string.split("@", 1)
+        #a_string = self.normalize_email(email)
+        #split_string = a_string.split("@", 1)
 
-        site_id = split_string + ''.join(random.SystemRandom()
+        site_id = ''.join(random.SystemRandom()
                             .choice(string.ascii_letters + string.digits) 
-                            for _ in range(6))
+                            for _ in range(10))
         if_exist_already = CustomUser.objects.filter(site_id=site_id).count() > 0
-        print(if_exist_already)
         while if_exist_already:
             print(if_exist_already)
-            site_id = split_string + ''.join(random.SystemRandom()
+            site_id = ''.join(random.SystemRandom()
                                 .choice(string.ascii_letters + string.digits) 
                                 for _ in range(6))
             if_exist_already = CustomUser.objects.filter(site_id=site_id).count() > 0
@@ -53,7 +52,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', False)
         return self._create_user(email, password, name, phone, **extra_fields)
 
-    def create_superuser(self, email, password, name, phone, **extra_fields):
+    def create_superuser(self, email, password, phone, name=None, **extra_fields):
         """Create and save a SuperUser with the given email and password."""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -63,7 +62,7 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self._create_user(email, password, name, phone,**extra_fields)
+        return self._create_user(email, password, phone, name, **extra_fields)
 
 def upload_path(instance, filname):
     return '/'.join(['pictures/', str(instance.site_id)+'.'+filname.split('.')[-1]])
@@ -87,8 +86,8 @@ class CustomUser(AbstractUser):
             },
         )
     email = models.EmailField(_('email address'), unique=True)
-    name = models.CharField(_('first_name'),max_length=50)
-    first_name = models.CharField(_('first_name'),max_length=50)
+    name = models.CharField(_('name'),max_length=50)
+    first_name = models.CharField(_('name'),max_length=50)
     #name = models.CharField(max_length=50)
     phone = models.CharField(max_length=15, blank=True, null=True)
     sms = models.CharField(max_length=15, blank=True, null=True)
@@ -105,14 +104,14 @@ class CustomUser(AbstractUser):
     profession = models.CharField(max_length=100)
     location = models.CharField(max_length=50) #Name of city, change it to location maybe?
     member_since = models.DateTimeField(default=timezone.now, null=True) #Do something about it
-    picture = ProcessedImageField(format='PNG', processors=[ResizeToFill(512, 512)], options={'quality': 70},upload_to=upload_path, null=False, blank=False, default='ProfileDefaultImage.jpg')
-  #  picture_medium = models.ImageField(upload_to=upload_path, null=False, blank=False, default='ProfileDefaultImage.jpg')
-   # picture_small = models.ImageField(upload_to=upload_path, null=False, blank=False, default='ProfileDefaultImage.jpg')
-    #picture_tag = models.ImageField(upload_to=upload_path, null=False, blank=False, default='ProfileDefaultImage.jpg')
-    #picture_large = ProcessedImageField(format='PNG',source='picture', processors=[ResizeToFill(512, 512)], options={'quality': 70},upload_to=upload_path, null=False, blank=False, default='ProfileDefaultImage.jpg')
-    picture_medium = ProcessedImageField(format='PNG', processors=[ResizeToFill(256, 256)], options={'quality': 70},upload_to=upload_path, blank=False, default='ProfileDefaultImage.jpg')
-    picture_small = ProcessedImageField(format='PNG', processors=[ResizeToFill(128, 128)], options={'quality': 70},upload_to=upload_path, blank=False, default='ProfileDefaultImage.jpg')
-    picture_tag = ProcessedImageField(format='PNG', processors=[ResizeToFill(28, 28)], options={'quality': 70},upload_to=upload_path, blank=False, default='ProfileDefaultImage.jpg')
+    picture = ProcessedImageField(format='PNG', processors=[ResizeToFill(512, 512)], options={'quality': 70},upload_to=upload_path, null=False, blank=False, default='ProfileDefaultImage.png')
+  #  picture_medium = models.ImageField(upload_to=upload_path, null=False, blank=False, default='ProfileDefaultImage.png')
+   # picture_small = models.ImageField(upload_to=upload_path, null=False, blank=False, default='ProfileDefaultImage.png')
+    #picture_tag = models.ImageField(upload_to=upload_path, null=False, blank=False, default='ProfileDefaultImage.png')
+    #picture_large = ProcessedImageField(format='PNG',source='picture', processors=[ResizeToFill(512, 512)], options={'quality': 70},upload_to=upload_path, null=False, blank=False, default='ProfileDefaultImage.png')
+    picture_medium = ProcessedImageField(format='PNG', processors=[ResizeToFill(256, 256)], options={'quality': 70},upload_to=upload_path, blank=False, default='ProfileDefaultImage.png')
+    picture_small = ProcessedImageField(format='PNG', processors=[ResizeToFill(128, 128)], options={'quality': 70},upload_to=upload_path, blank=False, default='ProfileDefaultImage.png')
+    picture_tag = ProcessedImageField(format='PNG', processors=[ResizeToFill(28, 28)], options={'quality': 70},upload_to=upload_path, blank=False, default='ProfileDefaultImage.png')
  
     address1 = models.CharField(verbose_name="Address line 1", max_length=1024, blank=True, null=True)
     address2 = models.CharField(verbose_name="Address line 2", max_length=1024, blank=True, null=True)

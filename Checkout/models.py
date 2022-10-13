@@ -1,8 +1,9 @@
 
 
-from chat.models import Thread
 from django.db import models
-#from Palimago import settings
+
+from chat.models import Thread
+
 #from Service.models import ServicePost
 
 class PostObjects(models.Manager):

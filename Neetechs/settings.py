@@ -10,14 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
-
-from pathlib import Path
-from decouple import config
 from datetime import timedelta
-from firebase_admin import credentials
-from rest_framework.settings import api_settings
-from firebase_admin import initialize_app
+from pathlib import Path
 
+from decouple import config
+from firebase_admin import credentials, initialize_app
+from rest_framework.settings import api_settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -30,14 +28,12 @@ DEBUG = True
 
 #ALLOWED_HOSTS = ['neetechs.azurewebsites.net']
 ALLOWED_HOSTS = ['.azurewebsites.net','neetechs.azurewebsites.net','www.neetechs.azurewebsites.net','.herokuapp.com','127.0.0.1','www.neetechs.com','neetechs.com']
-CHAT_WS_SERVER_HOST = 'localhost' or 'palimago-c15eb.web.app' or 'palimago-c15eb.firebaseapp.com' or 'neetechs.com' or 'www.neetechs.com'
+CHAT_WS_SERVER_HOST = 'localhost' or 'neetechs.com' or 'www.neetechs.com'
 CHAT_WS_SERVER_PORT = 5002
 CHAT_WS_SERVER_PROTOCOL = 'ws' or 'wss'
 CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
-    'https://palimago-c15eb.web.app',
-    'https://palimago-c15eb.firebaseapp.com',
     'www.neetechs.azurewebsites.net',
     'neetechs.azurewebsites.net',
     'https://www.neetechs.com',
@@ -51,8 +47,6 @@ CORS_ORIGIN_WHITELIST = [
 ]
 # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
 CORS_ORIGIN_REGEX_WHITELIST = [
-    'https://palimago-c15eb.web.app',
-    'https://palimago-c15eb.firebaseapp.com',
     'neetechs.azurewebsites.net',
     'www.neetechs.azurewebsites.net',
     'https://www.neetechs.com',
@@ -96,13 +90,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     # json converter
     'rest_framework',
     'rest_framework.authtoken',
     # authontication
     #'dj_rest_auth',
-
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -111,14 +103,17 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.twitter',
     'knox',
     'knox_allauth.apps.KnoxAllauthConfig',
-
     # websocket
     'channels',
-
+    "fcm_django",
     # app
     'chat',
+    'stripe',
+    'Profile',
+    'Service',
     'Checkout',
-
+    'home',
+    'report', 
 ]
 
 MIDDLEWARE = [
@@ -306,9 +301,9 @@ DATE_INPUT_FORMATS = ['%Y-%m-%d %I:%M %p']
 
 AWS_S3_HOST = "s3.eu-north-1.amazonaws.com" 
 AWS_S3_REGION_NAME="eu-north-1"
-AWS_ACCESS_KEY_ID = 'AKIA54ACSLZPCYZWKGVY'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'palimagos3'
+AWS_ACCESS_KEY_ID = 'AKIAXKYIZE7KCBD2Y3YD'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'neetechss3'
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 
@@ -320,9 +315,9 @@ IMAGEKIT_DEFAULT_IMAGE_CACHE_BACKEND = 'imagekit.imagecache.NonValidatingImageCa
 
 EMAIL_USE_TLS = False
 EMAIL_HOST = 'smtp.titan.email'
-EMAIL_HOST_USER = 'noreply@swapynet.com'
-DEFAULT_FROM_EMAIL = 'noreply@swapynet.com'
-SERVER_EMAIL = 'noreply@swapynet.com'
+EMAIL_HOST_USER = 'noreply@neetechs.com'
+DEFAULT_FROM_EMAIL = 'noreply@neetechs.com'
+SERVER_EMAIL = 'noreply@neetechs.com'
 EMAIL_HOST_PASSWORD = 'Free48palestine#'
 EMAIL_PORT = 465
 

@@ -1,0 +1,54 @@
+<style type="text/css">
+	.card{
+		max-width: 700px;
+		width: 100%;
+	}
+	.card-body{
+		padding: 20px;
+
+	}
+</style>
+
+{% if service_post %}
+<div class="container">
+	<div class="row">
+
+		
+		<!-- Service Post -->
+		<div class="card m-auto">
+			<a href="{% url 'service:detail' post.slug %}">
+				<img class="card-img-top" src="{{service_post.image.url}}">
+			</a>
+			
+			<div class="card-body mt-2 mb-2">
+				<a href="{% url 'service:detail' post.slug %}">
+					<h2 class="card-title">{{service_post.title}}</h2>
+				</a>
+				<p class="card-text">{{service_post.body|linebreaksbr|truncatechars:250}}</p>
+				{% if service_post.author == request.user %}
+					<a href="{% url 'service:edit' service_post.slug %}" class="btn btn-primary">Update</a>
+				{% endif %}
+			</div>
+			<div class="card-footer text-muted">
+			  Updated on {{service_post.date_updated}} by {{service_post.author}}
+			</div>
+		</div>
+		
+	</div>
+</div>
+
+{% else %}
+
+<div class="container"> 
+	<div class="row">
+		<div class="card m-auto">
+			<div class="card-body mt-2 mb-2">
+				<h2 class="card-title">
+					No results
+				</h2>
+				<p class="card-text">There were no results matching your search: "{{query}}".</p>
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}

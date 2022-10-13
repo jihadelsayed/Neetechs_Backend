@@ -122,8 +122,8 @@ def api_pawn_Money_view(request):
             #print(data)
             checkout_session = stripe.checkout.Session.create(
                 mode='payment',
-                success_url= 'https://www.swapynet.com/CheckoutSuccess',
-                cancel_url= 'https://www.swapynet.com/CheckoutUnsuccess',
+                success_url= 'https://www.neetechs.com/CheckoutSuccess',
+                cancel_url= 'https://www.neetechs.com/CheckoutUnsuccess',
                 payment_method_types=['card'],
                 line_items=[
                     {
@@ -164,8 +164,8 @@ def api_renew_service_view(request):
                 customer= request.user.stripeCustomerId,
                # customer_email= request.user.email,
                 mode='payment',
-                success_url= 'https://www.swapynet.com/viewservice/'+data['slug'],
-                cancel_url= 'https://www.swapynet.com/CheckoutUnsuccess',
+                success_url= 'https://www.neetechs.com/viewservice/'+data['slug'],
+                cancel_url= 'https://www.neetechs.com/CheckoutUnsuccess',
                 payment_method_types=['card'],
                 line_items=[
                         {
@@ -189,7 +189,7 @@ def api_customer_portal_view(request):
            # print(request.user.stripeCustomerId)
             session = stripe.billing_portal.Session.create(
                 customer=request.user.stripeCustomerId,
-                return_url='https://www.swapynet.com/',
+                return_url='https://www.neetechs.com/',
             )
             return Response({session.url})
         except ServiceOrder.DoesNotExist:
@@ -214,8 +214,8 @@ def api_subscription_view(request):
                         customer= request.user.stripeCustomerId,
                        # customer_email= request.user.email,
                         mode='subscription',
-                        success_url= 'https://www.swapynet.com/CheckoutSuccess',
-                        cancel_url= 'https://www.swapynet.com/CheckoutUnsuccess',
+                        success_url= 'https://www.neetechs.com/CheckoutSuccess',
+                        cancel_url= 'https://www.neetechs.com/CheckoutUnsuccess',
                         payment_method_types=['card'],
                         line_items=[
                             {
