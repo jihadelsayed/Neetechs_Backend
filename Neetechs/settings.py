@@ -208,7 +208,6 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'neetechsdb',
-       # 'USER': 'jm',
         'USER': 'postgres',
         'PASSWORD': 'bipMGU7DajN2Sfn#1996',
         'HOST': 'db.neetechs.com',
