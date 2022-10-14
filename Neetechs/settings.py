@@ -26,6 +26,9 @@ SECRET_KEY = 'django-insecure-21gq37$c05r)+*@_ss4l(axwdfjnr4v8i^7+*j4@hs@1eu#-b5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# this choese will allow access to admin page but lets not activated it
+#CSRF_TRUSTED_ORIGINS = ['https://neetechs.azurewebsites.net/']
+
 #ALLOWED_HOSTS = ['neetechs.azurewebsites.net']
 ALLOWED_HOSTS = ['neetechs.us-east-1.elasticbeanstalk.com','.azurewebsites.net','neetechs.azurewebsites.net','.herokuapp.com','127.0.0.1','api.neetechs.com','neetechs.com']
 CHAT_WS_SERVER_HOST = 'localhost' or 'neetechs.com' or 'www.neetechs.com'

@@ -87,12 +87,4 @@ sqlparse==0.4.2
 stripe==4.2.0
 toml==0.10.1
 Twisted==22.2.0
-twisted-iocpsupport==1.0.2
-txaio==22.2.1
-typing_extensions==4.1.1
-tzdata==2022.1
-uritemplate==4.1.1
-urllib3==1.26.9
 websockets==8.1
-wrapt==1.12.1
-zope.interface==5.4.0
