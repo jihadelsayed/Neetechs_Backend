@@ -76,7 +76,7 @@ zope.interface==5.2.0
 #django-pyodbc-azure==2.1.0.0
 #pyodbc==4.0.30
 #pymssql==2.2.1.0
-psycopg2==2.9.1
+psycopg2-binary==2.9.4
 #django-mssql-backend==4.0.30.0
 
 django-appconf==1.0.4.0
