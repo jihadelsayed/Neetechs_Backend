@@ -7,7 +7,7 @@
 
 # PROJECT_APP = os.path.basename(BASE_DIR)
 # cred = Credentials.Certificate(os.path.join(BASE_DIR, 'neetechs-c15eb-firebase-adminsdk-felkr-67494d9fd2.json'))
-# """
+# """ asd
 # cred = credentials.Certificate({
 #     "type": "service_account",
 #     "project_id": "fcm-test-88425",
