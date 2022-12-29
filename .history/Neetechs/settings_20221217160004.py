@@ -27,9 +27,9 @@ SECRET_KEY = 'django-insecure-21gq37$c05r)+*@_ss4l(axwdfjnr4v8i^7+*j4@hs@1eu#-b5
 DEBUG = True
 
 # this choese will allow access to admin page but lets not activated it
-#CSRF_TRUSTED_ORIGINS = ['https://neetechs.azurewebsites.net/']
+#CSRF_TRUSTED_ORIGINS = ['https://server.neetechs.com/']
 
-#ALLOWED_HOSTS = ['neetechs.azurewebsites.net']
+#ALLOWED_HOSTS = ['server.neetechs.com']
 ALLOWED_HOSTS = [
     '.neetechs.com',
     'server.theislamicnation.com',
@@ -62,8 +62,8 @@ CORS_ORIGIN_WHITELIST = [
 ]
 # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
 CORS_ORIGIN_REGEX_WHITELIST = [
-    'neetechs.azurewebsites.net',
-    'www.neetechs.azurewebsites.net',
+    'server.neetechs.com',
+    'www.server.neetechs.com',
     'https://www.neetechs.com',
     'https://neetechs.com',
     'http://127.0.0.1:8000',
