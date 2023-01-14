@@ -30,7 +30,7 @@ urlpatterns = [
   #  path('', include('Service.urls')),
     path('', include('knox_allauth.url')),
     path('service/', include('Service.urls', 'service')),
-    path('categories/', include('Category.urls')),
+    path('categories/', include('category.urls', 'Category')),
     path('api/service/', include('Service.api.urls', 'service_api')),
     path('', include('chat.urls')),
     path('', include('Profile.urls')),

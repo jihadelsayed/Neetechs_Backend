@@ -17,6 +17,7 @@ MIN_TITLE_LENGTH = 3
 MIN_BODY_LENGTH = 20
 
 
+
 class CategorySerializer(serializers.ModelSerializer):
 	children = serializers.SerializerMethodField('get_SubCategorys')
 

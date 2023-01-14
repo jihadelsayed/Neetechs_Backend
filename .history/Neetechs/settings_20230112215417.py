@@ -118,7 +118,6 @@ INSTALLED_APPS = [
     'home',
     'report', 
     'Category', 
-
 ]
 
 MIDDLEWARE = [

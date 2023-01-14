@@ -30,32 +30,20 @@ DEBUG = True
 #CSRF_TRUSTED_ORIGINS = ['https://server.neetechs.com/']
 
 #ALLOWED_HOSTS = ['server.neetechs.com']
-ALLOWED_HOSTS = [
-    '.neetechs.com',
-    'server.theislamicnation.com',
-    'server.neetechs.com',
-    '192.168.1.201',
-    '127.0.0.1',
-    'server.neetechs.com',
-    'neetechs.com'
-    
-]
-
-CHAT_WS_SERVER_HOST = 'localhost' or 'neetechs.com' or 'www.neetechs.com' or 'server.theislamicnation.com' or 'server.neetechs.com'
+ALLOWED_HOSTS = ['.neetechs.com','server.neetechs.com','127.0.0.1','neetechs.com']
+CHAT_WS_SERVER_HOST = 'localhost' or 'neetechs.com' or 'www.neetechs.com'
 CHAT_WS_SERVER_PORT = 5002
 CHAT_WS_SERVER_PROTOCOL = 'ws' or 'wss'
 CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
-    'neetechs.com',
-    '.neetechs.com',
-    '.theislamicnation.com',
+    'www.server.neetechs.com',
+    'server.neetechs.com',
     'https://www.neetechs.com',
     'https://neetechs.com',
     'http://127.0.0.1:8000',
     'http://localhost:8000',
     'http://127.0.0.1:4200',
-    'http://192.168.1.201',
     'http://localhost:4200',
     'http://127.0.0.1:8100',
     'http://localhost:8100',
@@ -72,8 +60,7 @@ CORS_ORIGIN_REGEX_WHITELIST = [
     'http://localhost:4200',
     'http://127.0.0.1:8100',
     'http://localhost:8100',
-'http://192.168.1.201',
-]
+    ]
 """
 CORS_ALLOW_METHODS = [
     'DELETE',

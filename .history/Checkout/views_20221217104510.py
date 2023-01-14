@@ -382,7 +382,7 @@ class ordersListAPIView(ListAPIView):
     filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
     OrderingFilter = ('pk','title','status')
     filterset_fields =  ['status']
-    #search_fields = ['title', 'site_id', 'beskrivning','slug', 'city','state','country','underCategory','Category','beskrivning',]
+    #search_fields = ['title', 'site_id', 'beskrivning','slug', 'city','state','country','underCategory','category','beskrivning',]
 
 ######################################################################
 #### did you did the job
