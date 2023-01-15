@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+import re
 
 from decouple import config
 from firebase_admin import credentials, initialize_app
@@ -27,40 +28,72 @@ SECRET_KEY = 'django-insecure-21gq37$c05r)+*@_ss4l(axwdfjnr4v8i^7+*j4@hs@1eu#-b5
 DEBUG = True
 
 # this choese will allow access to admin page but lets not activated it
-#CSRF_TRUSTED_ORIGINS = ['https://server.neetechs.com/']
+#CSRF_TRUSTED_ORIGINS = ['https://neetechs.azurewebsites.net/']
 
-#ALLOWED_HOSTS = ['server.neetechs.com']
-ALLOWED_HOSTS = ['.neetechs.com','server.neetechs.com','127.0.0.1','neetechs.com']
-CHAT_WS_SERVER_HOST = 'localhost' or 'neetechs.com' or 'www.neetechs.com'
+#ALLOWED_HOSTS = ['neetechs.azurewebsites.net']
+ALLOWED_HOSTS = [
+    'neetechs.com',
+    '.neetechs.com',
+    'https://*.neetechs.com',
+    'https://neetechs.com',
+    'theislamicnation.com',
+    '.theislamicnation.com',
+    'https://*.theislamicnation.com',
+    'https://theislamicnation.com',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+    'http://127.0.0.1:4200',
+    'http://192.168.1.201',
+    'http://localhost:4200',
+    'http://127.0.0.1:8100',
+    'http://localhost:8100',
+    '192.168.1.201',
+    '127.0.0.1',
+    'http://localhost:4200'
+]
+
+CHAT_WS_SERVER_HOST = 'localhost' or 'neetechs.com' or 'www.neetechs.com' or 'server.theislamicnation.com' or 'server.neetechs.com'
 CHAT_WS_SERVER_PORT = 5002
 CHAT_WS_SERVER_PROTOCOL = 'ws' or 'wss'
 CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = [
-    'www.server.neetechs.com',
-    'server.neetechs.com',
-    'https://www.neetechs.com',
-    'https://neetechs.com',
-    'http://127.0.0.1:8000',
-    'http://localhost:8000',
-    'http://127.0.0.1:4200',
-    'http://localhost:4200',
-    'http://127.0.0.1:8100',
-    'http://localhost:8100',
+
+cors_origin_whitelist = [
+     'neetechs.com',
+     '.neetechs.com',
+     'https://neetechs.com',
+     'https://.neetechs.com',
+     'theislamicnation.com',
+     '.theislamicnation.com',
+     'https://theislamicnation.com',
+     'https://.theislamicnation.com',
+     'http://127.0.0.1:8000',
+     'http://localhost:8000',
+     'http://127.0.0.1:4200',
+     'http://192.168.1.201',
+     'http://localhost:4200',
+     'http://127.0.0.1:8100',
+     'http://localhost:8100',
 ]
 # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
 CORS_ORIGIN_REGEX_WHITELIST = [
-    'server.neetechs.com',
-    'www.server.neetechs.com',
-    'https://www.neetechs.com',
+    'neetechs.com',
+    '.neetechs.com',
+    'https://*.neetechs.com',
     'https://neetechs.com',
+    'theislamicnation.com',
+    '.theislamicnation.com',
+    'https://*.theislamicnation.com',
+    'https://theislamicnation.com',
     'http://127.0.0.1:8000',
     'http://localhost:8000',
     'http://127.0.0.1:4200',
+    'http://192.168.1.201',
     'http://localhost:4200',
     'http://127.0.0.1:8100',
     'http://localhost:8100',
-    ]
+'http://192.168.1.201',
+]
 """
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -117,7 +150,7 @@ INSTALLED_APPS = [
     'Checkout',
     'home',
     'report', 
-    'Category', 
+        'Category', 
 
 ]
 
