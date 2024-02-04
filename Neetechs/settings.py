@@ -248,7 +248,8 @@ DATABASES = {
         'NAME': 'neetechsdb',
         'USER': 'postgres',
         'PASSWORD': 'bipMGU7DajN2Sfn#1996',
-        'HOST': 'db.neetechs.com',
+        #'HOST': 'db.neetechs.com',
+        'HOST': 'gcvjgjprbsakyqhuxojr.supabase.co',
         'PORT': '5432'
         #'OPTIONS': {
          #   'driver': 'ODBC Driver 17 for SQL Server',
