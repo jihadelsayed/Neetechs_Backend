@@ -246,10 +246,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'neetechsdb',
-        'USER': 'postgres',
+        'USER': 'postgres.gcvjgjprbsakyqhuxojr',
         'PASSWORD': 'bipMGU7DajN2Sfn#1996',
         #'HOST': 'db.neetechs.com',
-        'HOST': 'gcvjgjprbsakyqhuxojr.supabase.co',
+        'HOST': 'aws-0-eu-central-1.pooler.supabase.com',
         'PORT': '5432'
         #'OPTIONS': {
          #   'driver': 'ODBC Driver 17 for SQL Server',
