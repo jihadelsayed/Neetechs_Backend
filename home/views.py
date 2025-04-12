@@ -27,17 +27,17 @@ class HomeContainersAPIView(ListAPIView):
 
 @csrf_exempt
 def github_webhook(request):
-    # Secret header check
-    # secret_token = request.headers.get("X-DEPLOY-SECRET")
-    # if secret_token != settings.GITHUB_WEBHOOK_SECRET:
-    #     return JsonResponse({"error": "Unauthorized"}, status=401)
+    if request.method != "POST":
+        return JsonResponse({"detail": "Method not allowed"}, status=405)
 
-    if request.method == "POST":
-        try:
-            subprocess.run(["bash", "/var/www/Neetechs_Script/deploy.sh"], check=True)
-            return JsonResponse({"status": "deployment triggered"})
-        except subprocess.CalledProcessError as e:
-            return JsonResponse({"error": str(e)}, status=500)
+    secret_token = request.headers.get("X-DEPLOY-SECRET")
+    if secret_token != settings.GITHUB_WEBHOOK_SECRET:
+        return JsonResponse({"error": "Unauthorized"}, status=401)
 
-    return JsonResponse({"detail": "Method not allowed"}, status=405)
+    try:
+        subprocess.run(["bash", "/var/www/Neetechs_Script/deploy.sh"], check=True)
+        return JsonResponse({"status": "Deployment triggered"})
+    except subprocess.CalledProcessError as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
 # اللهم صلي على سيدنا محمد

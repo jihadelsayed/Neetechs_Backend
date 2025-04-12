@@ -12,4 +12,5 @@ jobs:
       - name: Send POST request to Django Webhook
         run: |
           curl -X POST https://${{ secrets.DEPLOY_WEBHOOK_URL }} \
-            -H "X-DEPLOY-SECRET: ${{ secrets.WEBHOOK_SECRET }}"
+            -H "Content-Type: application/json" \
+            -d '{"secret": "${{ secrets.WEBHOOK_SECRET }}"}'
