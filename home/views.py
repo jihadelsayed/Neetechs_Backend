@@ -11,6 +11,9 @@ from rest_framework.pagination import LimitOffsetPagination
 import subprocess
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.authentication import BasicAuthentication
 
 class HomeSliderAPIView(ListAPIView):
     queryset = HomeSliderMoudel.objects.all()
@@ -26,6 +29,9 @@ class HomeContainersAPIView(ListAPIView):
     pagination_class = LimitOffsetPagination
 
 @csrf_exempt
+@api_view(["POST"])
+@authentication_classes([])  # 👈 disables auth
+@permission_classes([AllowAny])  # 👈 disables permissions
 def github_webhook(request):
     if request.method != "POST":
         return JsonResponse({"detail": "Method not allowed"}, status=405)
