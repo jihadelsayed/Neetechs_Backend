@@ -7,6 +7,9 @@ from django_filters.rest_framework import DjangoFilterBackend#,SearchFilter,Orde
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import LimitOffsetPagination
 
+import subprocess
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 class HomeSliderAPIView(ListAPIView):
     queryset = HomeSliderMoudel.objects.all()
@@ -21,3 +24,13 @@ class HomeContainersAPIView(ListAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = LimitOffsetPagination
 
+@csrf_exempt
+def github_webhook(request):
+    if request.method == "POST":
+        try:
+            subprocess.run(["/bin/bash", "/var/www/Neetechs_Script/deploy.sh"], check=True)
+            return JsonResponse({"status": "deployment started"})
+        except subprocess.CalledProcessError as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"detail": "Method not allowed"}, status=405)

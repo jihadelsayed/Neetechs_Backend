@@ -27,6 +27,8 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 #)
 
 urlpatterns = [
+    #path("", lambda request: JsonResponse({"status": "Neetechs API is running"})),
+
     path('admin/', admin.site.urls),
   #  path('', include('Service.urls')),
     path('', include('knox_allauth.url')),
