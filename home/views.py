@@ -25,7 +25,7 @@ class HomeContainersAPIView(ListAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = LimitOffsetPagination
-
+ 
 
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import AllowAny
