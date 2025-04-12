@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+import re
 
 from decouple import config
 from firebase_admin import credentials, initialize_app
@@ -21,83 +22,99 @@ from rest_framework.settings import api_settings
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-21gq37$c05r)+*@_ss4l(axwdfjnr4v8i^7+*j4@hs@1eu#-b5'
+SECRET_KEY = 'd*********************************'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 # this choese will allow access to admin page but lets not activated it
-#CSRF_TRUSTED_ORIGINS = ['https://server.neetechs.com/']
+#CSRF_TRUSTED_ORIGINS = ['https://neetechs.azurewebsites.net/']
 
-#ALLOWED_HOSTS = ['server.neetechs.com']
-ALLOWED_HOSTS = ['.neetechs.com','server.neetechs.com','127.0.0.1','neetechs.com']
-CHAT_WS_SERVER_HOST = 'localhost' or 'neetechs.com' or 'www.neetechs.com'
+#ALLOWED_HOSTS = ['neetechs.azurewebsites.net']
+ALLOWED_HOSTS = [
+    'neetechs.com',
+    '.neetechs.com',
+    'https://*.neetechs.com',
+    'https://neetechs.com',
+    'theislamicnation.com',
+    '.theislamicnation.com',
+    'https://*.theislamicnation.com',
+    'https://theislamicnation.com',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+    'http://127.0.0.1:4200',
+    'http://192.168.1.201',
+    'http://localhost:4200',
+    'http://127.0.0.1:8100',
+    'http://localhost:8100',
+    '192.168.1.201',
+    '127.0.0.1',
+    'http://localhost:4200'
+]
+
+CHAT_WS_SERVER_HOST = 'localhost' or 'neetechs.com' or 'www.neetechs.com' or 'server.theislamicnation.com' or 'server.neetechs.com'
 CHAT_WS_SERVER_PORT = 5002
 CHAT_WS_SERVER_PROTOCOL = 'ws' or 'wss'
 CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = [
-    'www.server.neetechs.com',
-    'server.neetechs.com',
-    'https://www.neetechs.com',
-    'https://neetechs.com',
-    'http://127.0.0.1:8000',
-    'http://localhost:8000',
-    'http://127.0.0.1:4200',
-    'http://localhost:4200',
-    'http://127.0.0.1:8100',
-    'http://localhost:8100',
+
+cors_origin_whitelist = [
+     'neetechs.com',
+     '.neetechs.com',
+     'https://neetechs.com',
+     'https://.neetechs.com',
+     'theislamicnation.com',
+     '.theislamicnation.com',
+     'https://theislamicnation.com',
+     'https://.theislamicnation.com',
+     'http://127.0.0.1:8000',
+     'http://localhost:8000',
+     'http://127.0.0.1:4200',
+     'http://192.168.1.201',
+     'http://localhost:4200',
+     'http://127.0.0.1:8100',
+     'http://localhost:8100',
 ]
 # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
 CORS_ORIGIN_REGEX_WHITELIST = [
-    'server.neetechs.com',
-    'www.server.neetechs.com',
-    'https://www.neetechs.com',
+    'neetechs.com',
+    '.neetechs.com',
+    'https://*.neetechs.com',
     'https://neetechs.com',
+    'theislamicnation.com',
+    '.theislamicnation.com',
+    'https://*.theislamicnation.com',
+    'https://theislamicnation.com',
     'http://127.0.0.1:8000',
     'http://localhost:8000',
     'http://127.0.0.1:4200',
+    'http://192.168.1.201',
     'http://localhost:4200',
     'http://127.0.0.1:8100',
     'http://localhost:8100',
-    ]
-"""
-CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
+    'http://192.168.1.201',
 ]
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
-"""
 
 # Application definition
 
 INSTALLED_APPS = [
     # main
+'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    #'django.contrib.sites',
+
     # json converter
     'rest_framework',
     'rest_framework.authtoken',
     # authontication
     #'dj_rest_auth',
+    
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -117,6 +134,8 @@ INSTALLED_APPS = [
     'Checkout',
     'home',
     'report', 
+        'Category', 
+
 ]
 
 MIDDLEWARE = [
@@ -126,6 +145,8 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -202,22 +223,10 @@ CHANNEL_LAYERS = {
 }
 
 DATABASES = {
-   # 'default': {
-    #    'ENGINE': 'django.db.backends.sqlite3',
-   #     #'NAME': BASE_DIR / 'db.sqlite3',#django 3
-    #    'NAME': str(os.path.join(BASE_DIR, "db.sqlite3"))
 
-    #}
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'neetechsdb',
-        'USER': 'postgres',
-        'PASSWORD': 'bipMGU7DajN2Sfn#1996',
-        'HOST': 'db.neetechs.com',
-        'PORT': '5432'
-        #'OPTIONS': {
-         #   'driver': 'ODBC Driver 17 for SQL Server',
-        #},
     }
 }
 # set this to False if you want to turn off pyodbc's connection pooling
@@ -268,8 +277,9 @@ USE_TZ = True
 ##########static##########################
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "staticss"),
+    os.path.join(BASE_DIR, "static"),
 )
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 ############media###############    #
@@ -303,8 +313,8 @@ DATE_INPUT_FORMATS = ['%Y-%m-%d %I:%M %p']
 
 AWS_S3_HOST = "s3.eu-north-1.amazonaws.com" 
 AWS_S3_REGION_NAME="eu-north-1"
-AWS_ACCESS_KEY_ID = 'AKIAXKYIZE7KCBD2Y3YD'
-AWS_SECRET_ACCESS_KEY = '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'
+AWS_ACCESS_KEY_ID = '**********'
+AWS_SECRET_ACCESS_KEY = '****+xDzKSfSjkh'
 AWS_STORAGE_BUCKET_NAME = 'neetechss3'
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
@@ -315,23 +325,25 @@ STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
 # stops IK checking S3 all the time - main reason to use IK v2 for me
 IMAGEKIT_DEFAULT_IMAGE_CACHE_BACKEND = 'imagekit.imagecache.NonValidatingImageCacheBackend' 
 
+
+# this need to be change to zoho mail
 EMAIL_USE_TLS = False
 EMAIL_HOST = 'smtp.titan.email'
 EMAIL_HOST_USER = 'noreply@neetechs.com'
 DEFAULT_FROM_EMAIL = 'noreply@neetechs.com'
 SERVER_EMAIL = 'noreply@neetechs.com'
-EMAIL_HOST_PASSWORD = 'Free48palestine#'
+EMAIL_HOST_PASSWORD = '*********'
 EMAIL_PORT = 465
 
 EMAIL_USE_SSL = True
 
-STRIPE_PUBLIC_KEY = "pk_test_51IwTvvIR19rXEZpRWoj9M4BGNy5nJ1GQOsXUZXHRD0PS3QGexQQSVNQR0vMB8jMoONQtO4RNQ30pC3N5BdgiGstB00shA8ejRI"
-STRIPE_SECRET_KEY = "sk_test_51IwTvvIR19rXEZpRwwwDByofI7ZaWyPsGUW5hGIWKxdtD3Mg2ZAmM9xBvZ1kptffFUQSX0Lp6rW9US3EIz37A9tl00HcDB0vJz"
+STRIPE_PUBLIC_KEY = "pk_test_**********"
+STRIPE_SECRET_KEY = "sk_test_******"
 STRIPE_WEBHOOK_SECRET = ""
 #STRIPE_LIVE_MODE = False  # Change to True in production
 #DJSTRIPE_WEBHOOK_SECRET = ""
 #DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
-#STRIPE_TEST_SECRET_KEY = "sk_test_51IwTvvIR19rXEZpRwwwDByofI7ZaWyPsGUW5hGIWKxdtD3Mg2ZAmM9xBvZ1kptffFUQSX0Lp6rW9US3EIz37A9tl00HcDB0vJz"
+#STRIPE_TEST_SECRET_KEY = ""
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=604800',
 }
@@ -346,12 +358,10 @@ REST_KNOX = {
  # 'EXPIRY_DATETIME_FORMAT': api_settings.DATETME_FORMAT,
 }
 
-DRF_RECAPTCHA_SECRET_KEY = "6LcCZTkbAAAAAJZgnFuDO8LOv9YyXtXuAhORmZdl"
+DRF_RECAPTCHA_SECRET_KEY = "******"
 
-SOCIAL_AUTH_TWITTER_KEY = 'gS3cTehMYgqyaGM8XRzmn7hzs'
-SOCIAL_AUTH_TWITTER_SECRET = '7G45UCpjFZOYEK916Vd6GjSpewVCMM4Xd58g9vE1Qdn32vBG9q'
-SOCIAL_AUTH_TWITTER_TOKEN = 'AAAAAAAAAAAAAAAAAAAAAIgHRAEAAAAACRBSw%2BqI7jZrGPcqLixn481Y1wo%3D6wvAJYwtlIplhHxJFLDL0zuvje8nEq6LTEsuAtVAlNuu151opP'
+SOCIAL_AUTH_TWITTER_KEY = '******'
+SOCIAL_AUTH_TWITTER_SECRET = '******'
+SOCIAL_AUTH_TWITTER_TOKEN = 'AAAAAAAAAAAAAAAAAAAAAI************************'
 
 DEFAULT_AUTO_FIELD='django.db.models.AutoField' 
-#6LcCZTkbAAAAAP-DG83osmudRcjDkVGVdC08pega
-#6LcCZTkbAAAAAJZgnFuDO8LOv9YyXtXuAhORmZdl

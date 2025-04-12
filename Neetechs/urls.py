@@ -18,6 +18,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 #from fcm_django.api.rest_framework import FCMDeviceAuthorizedViewSet
 
@@ -37,6 +38,11 @@ urlpatterns = [
     path('', include('home.urls')),
     path('', include('report.urls')),
     path('', include('Checkout.urls')),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+
+
     #path('devices', FCMDeviceAuthorizedViewSet.as_view({'post': 'create'}), name='create_fcm_device'),
 
     

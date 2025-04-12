@@ -48,7 +48,7 @@ pip install djangorestframework_recaptcha
 pip install django-push-notifications
 pip install psycopg2-binary 
 pip install stripe==2.57.0
-
+pip install django-cors-headers
 
 
 # pip install django-pyodbc-azure
