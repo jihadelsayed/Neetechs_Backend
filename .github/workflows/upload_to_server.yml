@@ -1,0 +1,15 @@
+name: Webhook Trigger to Django
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  call-webhook:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send POST request to Django Webhook
+        run: |
+          curl -X POST ${{ secrets.DEPLOY_WEBHOOK_URL }} \
+            -H "X-DEPLOY-SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET }}"

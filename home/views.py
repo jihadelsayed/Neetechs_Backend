@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from knox.auth import TokenAuthentication
 from .models import HomeSliderMoudel,HomeContainersModel
@@ -26,10 +27,15 @@ class HomeContainersAPIView(ListAPIView):
 
 @csrf_exempt
 def github_webhook(request):
+    # Secret header check
+    secret_token = request.headers.get("X-DEPLOY-SECRET")
+    if secret_token != settings.GITHUB_WEBHOOK_SECRET:
+        return JsonResponse({"error": "Unauthorized"}, status=401)
+
     if request.method == "POST":
         try:
-            subprocess.run(["/bin/bash", "/var/www/Neetechs_Script/deploy.sh"], check=True)
-            return JsonResponse({"status": "deployment started"})
+            subprocess.run(["bash", "/var/www/Neetechs_Script/deploy.sh"], check=True)
+            return JsonResponse({"status": "deployment triggered"})
         except subprocess.CalledProcessError as e:
             return JsonResponse({"error": str(e)}, status=500)
 

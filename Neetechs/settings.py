@@ -34,6 +34,7 @@ AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
 STRIPE_PUBLIC_KEY = config("STRIPE_PUBLIC_KEY")
 STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
 
+GITHUB_WEBHOOK_SECRET = config("GITHUB_WEBHOOK_SECRET")
 
 # this choese will allow access to admin page but lets not activated it
 # CSRF_TRUSTED_ORIGINS = ['https://neetechs.azurewebsites.net/']
