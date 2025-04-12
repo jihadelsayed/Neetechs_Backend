@@ -40,3 +40,4 @@ def github_webhook(request):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"detail": "Method not allowed"}, status=405)
+# اللهم صلي على سيدنا محمد
