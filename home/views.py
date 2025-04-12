@@ -28,10 +28,9 @@ class HomeContainersAPIView(ListAPIView):
 @csrf_exempt
 def github_webhook(request):
     # Secret header check
-    secret_token = request.headers.get("X-DEPLOY-SECRET")
-    print(settings.GITHUB_WEBHOOK_SECRET)
-    if secret_token != settings.GITHUB_WEBHOOK_SECRET:
-        return JsonResponse({"error": "Unauthorized"}, status=401)
+    # secret_token = request.headers.get("X-DEPLOY-SECRET")
+    # if secret_token != settings.GITHUB_WEBHOOK_SECRET:
+    #     return JsonResponse({"error": "Unauthorized"}, status=401)
 
     if request.method == "POST":
         try:
