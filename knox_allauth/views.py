@@ -28,7 +28,7 @@ from .utils import create_knox_token
 from .serializer_register import PhoneOrEmailRegisterSerializer
 
 class KnoxLoginView(LoginView):
-
+    permission_classes = [AllowAny]
     def get_response(self):
         serializer_class = self.get_response_serializer()
 
@@ -42,6 +42,7 @@ class KnoxLoginView(LoginView):
 
 
 class KnoxRegisterView(RegisterView):
+    permission_classes = [AllowAny]
     serializer_class = PhoneOrEmailRegisterSerializer
 
 
@@ -80,7 +81,7 @@ class KnoxRegisterView(RegisterView):
 
     
 class SocialLoginView_(SocialLoginView):
-
+    permission_classes = [AllowAny]
     def get_response(self):
         serializer_class = self.get_response_serializer()
         
@@ -96,6 +97,7 @@ class FacebookLogin(SocialLoginView_):
     adapter_class = FacebookOAuth2Adapter
 
 class GoogleLogin(SocialLoginView_):
+    permission_classes = [AllowAny]
     adapter_class = GoogleOAuth2Adapter
     #callback_url = settings.GOOGLE_AUTH_CALLBACK_URL
     #client_class = OAuth2Client

@@ -13,8 +13,10 @@ from knox_allauth.twilio_utils import send_sms_otp
 from knox.models import AuthToken
 from datetime import timedelta
 from django.core.cache import cache
+from rest_framework.permissions import AllowAny
 
 class SendPhoneOTP(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         phone = request.data.get('phone')
         if not phone:
@@ -40,6 +42,7 @@ class SendPhoneOTP(APIView):
 
 
 class VerifyPhoneOTP(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         phone = request.data.get('phone')
         otp = request.data.get('otp')
