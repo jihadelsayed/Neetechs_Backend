@@ -125,11 +125,11 @@ TEMPLATES = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = (
-    "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
-)
-
+AUTHENTICATION_BACKENDS = [
+    'knox_allauth.backends.EmailOrPhoneBackend',  # <-- this is your new backend
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ("knox.auth.TokenAuthentication",),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
@@ -153,6 +153,7 @@ REST_AUTH_SERIALIZERS = {
     "USER_DETAILS_SERIALIZER": "knox_allauth.serializer.UserSerializer",
     "TOKEN_SERIALIZER": "knox_allauth.serializer.KnoxSerializer",
 }
+REST_AUTH_SERIALIZERS["LOGIN_SERIALIZER"] = "knox_allauth.serializer.PhoneOrEmailLoginSerializer"
 
 CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
@@ -229,7 +230,9 @@ AUTH_USER_MODEL = "knox_allauth.CustomUser"
 # AUTH_USERName_MODEL = "knox_allauth.CustomUser.username"
 # AUTH_SiteId_MODEL = "knox_allauth.CustomUser.site_id"
 
-ACCOUNT_LOGIN_METHODS = {'email'}
+#ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None

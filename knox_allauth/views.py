@@ -25,6 +25,7 @@ from django.conf import settings
 from .serializer import KnoxSerializer, UserSerializer
 from .utils import create_knox_token
 
+from .serializer_register import PhoneOrEmailRegisterSerializer
 
 class KnoxLoginView(LoginView):
 
@@ -41,25 +42,25 @@ class KnoxLoginView(LoginView):
 
 
 class KnoxRegisterView(RegisterView):
-    def get_response_data(self, user):
-        return KnoxSerializer({'user': user, 'token': self.token[1]}).data
-    def get_object(self,email):
-        try:
-            return CustomUser.objects.get(email=email)
-        except CustomUser.DoesNotExist as e:
-            return Response( {"error":"Given Profile was not found."},status=404)
+    serializer_class = PhoneOrEmailRegisterSerializer
+
 
     def perform_create(self, serializer):
+        customer_email = self.request.data.get('email', f"no-email-{user.phone}@neetechs.com")
+
         customer = stripe.Customer.create(
-            email=self.request.data['email'],
+            email=customer_email,
             payment_method='pm_card_visa',
             invoice_settings={
                 'default_payment_method': 'pm_card_visa',
             },
         )
+
         user = serializer.save(self.request)
         self.token = create_knox_token(None, user, None)
-        instance = self.get_object(self.request.data['email'])
+        identifier = self.request.data.get('email') or self.request.data.get('phone')
+        instance = CustomUser.objects.filter(email=identifier).first() or CustomUser.objects.filter(phone=identifier).first()
+
         #if not self.request.data._mutable:
          #   self.request.data._mutable = True
         data = self.request.data

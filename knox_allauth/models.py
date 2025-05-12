@@ -135,7 +135,8 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ['phone']
     def __str__(self):
         return f"email={self.email} site_id={self.site_id}"
-    
+    phone_otp = models.CharField(max_length=6, blank=True, null=True)
+    otp_created_at = models.DateTimeField(blank=True, null=True)
 
     objects = UserManager()
 
