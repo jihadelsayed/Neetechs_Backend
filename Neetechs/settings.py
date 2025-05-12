@@ -276,6 +276,9 @@ SERVER_EMAIL = "noreply@neetechs.com"
 EMAIL_PORT = 465
 
 EMAIL_USE_SSL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_REQUIRED = True
+APPEND_SLASH = False
 
 STRIPE_WEBHOOK_SECRET = ""
 # STRIPE_LIVE_MODE = False  # Change to True in production
