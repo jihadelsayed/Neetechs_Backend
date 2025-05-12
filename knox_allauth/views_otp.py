@@ -14,6 +14,8 @@ from knox.models import AuthToken
 from datetime import timedelta
 from django.core.cache import cache
 from rest_framework.permissions import AllowAny
+from hashlib import sha256
+
 
 class SendPhoneOTP(APIView):
     permission_classes = [AllowAny]
@@ -22,7 +24,13 @@ class SendPhoneOTP(APIView):
         if not phone:
             return Response({"detail": "Phone number is required."}, status=400)
 
-        user, created = CustomUser.objects.get_or_create(phone=phone)
+        hashed_email = sha256(phone.encode()).hexdigest()[:10]
+        placeholder_email = f"{hashed_email}@neetechs.sms"
+
+        user, created = CustomUser.objects.get_or_create(
+            phone=phone,
+            defaults={"email": placeholder_email, "name": "PhoneUser"}
+        )
 
 
         otp = str(random.randint(100000, 999999))
