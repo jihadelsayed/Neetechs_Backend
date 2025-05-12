@@ -16,6 +16,8 @@ from django.core.cache import cache
 from rest_framework.permissions import AllowAny
 from hashlib import sha256
 
+import logging
+
 
 class SendPhoneOTP(APIView):
     permission_classes = [AllowAny]
@@ -39,9 +41,10 @@ class SendPhoneOTP(APIView):
         user.save()
 
         # 🔥 Replace this with real SMS send
-        print(f"Mock OTP for {phone}: {otp}")
         if settings.DEBUG:
             print(f"[MOCK OTP] to {phone}: {otp}")
+            logger = logging.getLogger(__name__)
+            logger.warning(f"[MOCK OTP] to {phone}: {otp}")
         else:
             send_sms_otp(phone, otp)
 
