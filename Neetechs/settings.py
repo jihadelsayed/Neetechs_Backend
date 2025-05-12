@@ -18,6 +18,7 @@ import re
 from decouple import config
 from firebase_admin import credentials, initialize_app
 from rest_framework.settings import api_settings
+from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -42,6 +43,9 @@ GITHUB_WEBHOOK_SECRET = config("GITHUB_WEBHOOK_SECRET")
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS", cast=lambda v: [s.strip() for s in v.split(",")]
 )
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "x-device-id",
+]
 
 CHAT_WS_HOSTS = config("CHAT_WS_HOSTS", cast=lambda v: [s.strip() for s in v.split(",")])
 
