@@ -46,7 +46,10 @@ class SendPhoneOTP(APIView):
             logger = logging.getLogger(__name__)
             logger.warning(f"[MOCK OTP] to {phone}: {otp}")
         else:
-            send_sms_otp(phone, otp)
+            try:
+                send_sms_otp(phone, otp)
+            except Exception as e:
+                logger.error(f"Failed to send OTP to {phone}: {e}")
 
 
         return Response({"detail": "OTP sent successfully."}, status=200)
