@@ -5,29 +5,40 @@ from django.utils.translation import gettext_lazy as _
 from allauth.account.models import EmailAddress
 
 class PhoneOrEmailLoginSerializer(serializers.Serializer):
-    identifier = serializers.CharField()
-    password = serializers.CharField()
+	identifier = serializers.CharField()
+	password = serializers.CharField()
+	
+	def validate(self, attrs):
+		identifier = attrs.get("identifier")
+		password = attrs.get("password")
 
-    def validate(self, attrs):
-        identifier = attrs.get("identifier")
-        password = attrs.get("password")
+		if not identifier or not password:
+			raise serializers.ValidationError({"detail": "Both fields are required."})
 
-        if not identifier or not password:
-            raise serializers.ValidationError({"detail": _("Both fields are required.")})
+		user = authenticate(request=self.context.get("request"), username=identifier, password=password)
 
-        user = authenticate(request=self.context.get("request"), username=identifier, password=password)
+		if not user:
+			# Check if user exists but has no password set
+			from knox_allauth.models import CustomUser
+			try:
+				user_obj = CustomUser.objects.get(email=identifier) if "@" in identifier else CustomUser.objects.get(phone=identifier)
+				if not user_obj.has_usable_password():
+					raise serializers.ValidationError({"detail": "This user has no password. Please login via phone and set a password."})
+			except CustomUser.DoesNotExist:
+				pass  # continue to default error
 
-        if not user:
-            raise serializers.ValidationError({"detail": _("Invalid phone/email or password.")})
+			raise serializers.ValidationError({"detail": "Invalid phone/email or password."})
 
-        if not user.is_active:
-            raise serializers.ValidationError({"detail": _("This account is inactive.")})
+		if not user.is_active:
+			raise serializers.ValidationError({"detail": "This account is inactive."})
 
-        if user.email and not EmailAddress.objects.filter(email=user.email, verified=True).exists():
-            raise serializers.ValidationError({"detail": _("Email is not verified.")})
+		# Optional: if email needs to be verified before login
+		if user.email and not EmailAddress.objects.filter(email=user.email, verified=True).exists():
+			raise serializers.ValidationError({"detail": "Email is not verified."})
 
-        attrs["user"] = user
-        return attrs
+		attrs["user"] = user
+		return attrs
+
 
 from allauth.account.models import EmailAddress
 from Profile.models import Erfarenhet, Intressen, Kompetenser_intyg, Studier

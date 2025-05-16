@@ -54,13 +54,13 @@ class SendPhoneOTP(APIView):
 
 class VerifyPhoneOTP(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
-        phone = request.data.get('phone')
-        otp = request.data.get('otp')
+        phone = request.data.get("phone")
+        otp = request.data.get("otp")
 
-        ip = request.META.get('REMOTE_ADDR')
-        device_id = request.headers.get('X-Device-ID', '')
-
+        ip = request.META.get("REMOTE_ADDR")
+        device_id = request.headers.get("X-Device-ID", "")
         attempt_key = f"otp_attempts_{ip}_{device_id}"
         attempts = cache.get(attempt_key, 0)
 
@@ -86,13 +86,16 @@ class VerifyPhoneOTP(APIView):
         user.save()
 
         token = AuthToken.objects.create(user)[1]
+
         return Response({
             "token": token,
             "user": {
                 "id": user.id,
                 "phone": user.phone,
                 "email": user.email,
-                "name": user.name
-            }
+                "name": user.name,
+            },
+            "has_password": user.has_usable_password()
         }, status=200)
+
 

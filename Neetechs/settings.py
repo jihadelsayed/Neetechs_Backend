@@ -95,8 +95,8 @@ INSTALLED_APPS = [
     "Checkout",
     "home",
     "report",
-    "Category",
-
+    "Category"
+    #"django_webauthn"
 ]
 
 MIDDLEWARE = [
@@ -318,5 +318,10 @@ SPECTACULAR_SETTINGS = {
 TWILIO_ACCOUNT_SID = config("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = config("TWILIO_AUTH_TOKEN")
 TWILIO_PHONE_NUMBER = config("TWILIO_PHONE_NUMBER")
+
+# WEBAUTHN_RP_NAME = "Neetechs"
+# WEBAUTHN_RP_ID = "neetechs.com"
+# WEBAUTHN_ORIGIN = "https://neetechs.com"
+
 from .logging_config import LOGGING
 
