@@ -1,12 +1,19 @@
 import json
+import base64
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.cache import cache
-from webauthn import get_webauthn_credentials
 
-from webauthn import create_webauthn_credentials
-from webauthn import verify_create_webauthn_credentials
-from webauthn import metadata, types
+from webauthn import (
+    generate_registration_options,
+    generate_authentication_options,
+    verify_registration_response,
+    verify_authentication_response,
+)
+from webauthn.helpers.structs import UserVerificationRequirement
+
+RP_ID = "neetechs.com"
+RP_NAME = "Neetechs"
 
 @csrf_exempt
 def begin_registration(request):
@@ -14,19 +21,17 @@ def begin_registration(request):
     user_id = str(data["userId"])
     username = data["username"]
 
-    rp = types.RelyingParty(id="neetechs.com", name="Neetechs")
-    user = types.User(id=user_id.encode(), name=username, display_name=username)
-
-    options, challenge = create_webauthn_credentials(
-        rp=rp,
-        user=user,
-        user_verification=types.UserVerification.PREFERRED,
+    options = generate_registration_options(
+        rp_id=RP_ID,
+        rp_name=RP_NAME,
+        user_id=user_id.encode(),
+        user_name=username,
+        user_display_name=username,
+        user_verification=UserVerificationRequirement.PREFERRED,
     )
 
-    cache.set(f"register_challenge:{user_id}", challenge, timeout=300)
-    return JsonResponse(options)
-
-
+    cache.set(f"register_challenge:{user_id}", options.challenge, timeout=300)
+    return JsonResponse(options.model_dump())
 
 
 @csrf_exempt
@@ -35,16 +40,15 @@ def complete_registration(request):
     user_id = str(data["userId"])
     challenge_b64 = cache.get(f"register_challenge:{user_id}")
 
-    result = verify_create_webauthn_credentials(
-        rp=types.RelyingParty(id="neetechs.com", name="Neetechs"),
-        challenge_b64=challenge_b64,
-        client_data_b64=data["clientData"],
-        attestation_b64=data["attestationObject"],
-        fido_metadata=metadata.FIDOMetadata(),
-        user_verification_required=True
+    result = verify_registration_response(
+        expected_rp_id=RP_ID,
+        expected_origin=f"https://{RP_ID}",
+        credential=data,
+        expected_challenge=challenge_b64,
+        user_verification_required=True,
     )
 
-    # save result.public_key, result.attestation, result.aaguid, result.sign_count
+    # Save result.credential_id, result.public_key, result.sign_count, etc. to DB here
     return JsonResponse({"status": "ok"})
 
 
@@ -53,23 +57,20 @@ def begin_authentication(request):
     data = json.loads(request.body)
     user_id = str(data["userId"])
 
-    rp = types.RelyingParty(id="neetechs.com", name="Neetechs")
-
-    # TODO: Replace with list of previously registered credential IDs from DB
+    # TODO: Replace with real credential IDs from DB
     stored_credential_ids = [
-        base64.b64decode("...")  # byte[] from DB
+        base64.b64decode("...")  # Replace with actual Base64URL-encoded credential ID bytes
     ]
 
-    options, challenge = get_webauthn_credentials(
-        rp=rp,
-        existing_keys=stored_credential_ids,
-        user_verification=types.UserVerification.PREFERRED,
+    options = generate_authentication_options(
+        rp_id=RP_ID,
+        allow_credentials=stored_credential_ids,
+        user_verification=UserVerificationRequirement.PREFERRED,
     )
 
-    cache.set(f"auth_challenge:{user_id}", challenge, timeout=300)
-    return JsonResponse(options)
+    cache.set(f"auth_challenge:{user_id}", options.challenge, timeout=300)
+    return JsonResponse(options.model_dump())
 
-from webauthn import verify_get_webauthn_credentials
 
 @csrf_exempt
 def complete_authentication(request):
@@ -77,28 +78,15 @@ def complete_authentication(request):
     user_id = str(data["userId"])
     challenge = cache.get(f"auth_challenge:{user_id}")
 
-    # ⚠️ Extract the required fields from frontend
-    client_data_b64 = data["clientData"]
-    authenticator_data_b64 = data["authenticatorData"]
-    signature_b64 = data["signature"]
-
-    # ✅ Replace with stored user info from DB
-    pubkey_alg = -7  # Example: -7 = ES256
-    sign_count = 0
-    public_key = None  # Should be the parsed key object, not a string
-
-    rp = types.RelyingParty(id="neetechs.com", name="Neetechs")
-
-    result = verify_get_webauthn_credentials(
-        rp=rp,
-        challenge_b64=challenge,
-        client_data_b64=client_data_b64,
-        authenticator_b64=authenticator_data_b64,
-        signature_b64=signature_b64,
-        sign_count=sign_count,
-        pubkey_alg=pubkey_alg,
-        pubkey=public_key,
-        user_verification_required=True
+    result = verify_authentication_response(
+        expected_rp_id=RP_ID,
+        expected_origin=f"https://{RP_ID}",
+        credential=data,
+        expected_challenge=challenge,
+        credential_public_key=None,  # Replace with public key object from DB
+        sign_count=0,                # Replace with stored sign count
+        user_verification_required=True,
     )
 
-    return JsonResponse({"status": "ok", "sign_count": result.sign_count})
+    # Update stored sign_count with result.new_sign_count
+    return JsonResponse({"status": "ok", "sign_count": result.new_sign_count})
