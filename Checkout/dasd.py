@@ -1,3 +1,10 @@
+"""
+Sample data structures, likely representing example Stripe API responses
+or data used for testing Stripe integration.
+
+This file is intended for reference or debugging purposes and is not
+part of the application's core logic.
+"""
 prod = {
     "active": true,
     "attributes": [],
@@ -44,12 +51,6 @@ ds = {
     "shipping": null,
     "tax_exempt": "none"
 }
-
-SubscriptionOptionssubscriptionType = (
-    ('groundplan', 'GroundPlan'),
-    ('premiumplanmonthly', 'premiumplanMonthly'),
-    ('premiumplanyearly', 'PremiumPlanYearly'),
-)
 
 sor = {'object': {
   'id': 'cs_test_a1PnKX8hIzCalSPMUUfuSYsUvaOeK86kZoNnVicttuhSuwdaIZ0Zyv9QCL', 'object': 'checkout.session', 'allow_promotion_codes': None, 'amount_subtotal': 49900, 'amount_total': 49900
