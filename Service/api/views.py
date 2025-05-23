@@ -343,7 +343,7 @@ def api_delete_service_view(request, slug):
 #		4) search + pagination + ordering: <your-domain>/api/service/list?search=mitch&page=2&ordering=-date_updated
 # Headers: Authorization: Token <token>
 class ApiServiceListView(ListAPIView):
-	queryset = ServicePost.objects.filter(Q(expiration_date__gte=timezone.now()) | Q(employee__subscriptionType="premiumplanMonthly") | Q(employee__subscriptionType="PremiumPlanYearly"))
+	queryset = ServicePost.objects.filter(Q(expiration_date__gte=timezone.now()) | Q(employee__subscription_type="premiumplanMonthly") | Q(employee__subscription_type="PremiumPlanYearly"))
 	serializer_class = ServicePostSerializer
 	authentication_classes = (TokenAuthentication,)
 	permission_classes = (AllowAny,)
