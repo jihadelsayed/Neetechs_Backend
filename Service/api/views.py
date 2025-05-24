@@ -427,15 +427,13 @@ class servicesListAPIView(ListAPIView):
     Permissions: AllowAny
     Filtering: DjangoFilterBackend (on many fields), SearchFilter, OrderingFilter.
     """
-    # FIXME: 'employee__subscriptionType' should likely be 'employee__subscription_type'.
-    queryset = ServicePost.objects.filter(Q(expiration_date__gte=timezone.now()) | Q(employee__subscriptionType="premiumplanMonthly") | Q(employee__subscriptionType="PremiumPlanYearly"))
-    serializer_class = ServicePostSerializer # Serializer for ServicePost instances.
-    authentication_classes = (TokenAuthentication,) # Uses Knox token authentication.
-    permission_classes = [AllowAny] # Allows unrestricted access.
-    #permission_classes = [IsAuthenticatedOrReadOnly] # This line is commented out, so AllowAny is active.
-    filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter] # Enables multiple filter backends.
-    OrderingFilter = ('title') # This sets the default ordering field for OrderingFilter. Should be `ordering_fields = ['title', 'other_field']` for multiple options.
-    # Fields available for exact match filtering via DjangoFilterBackend.
+    queryset = ServicePost.objects.filter(Q(expiration_date__gte=timezone.now()) | Q(employee__subscription_type="premiumplanMonthly") | Q(employee__subscription_type="PremiumPlanYearly"))
+    serializer_class = ServicePostSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = [AllowAny]
+    #permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
+    OrderingFilter = ('title')
     filterset_fields = ['title', 'site_id', 'beskrivning','slug', 'city','state','country','underCategory','category','status','beskrivning','bedomning','updatedAt','pris','tillganligFran','tillganligTill']
     # Fields available for searching via SearchFilter.
     search_fields = ['title', 'site_id', 'beskrivning','slug', 'city','state','country','underCategory','category','beskrivning',]
