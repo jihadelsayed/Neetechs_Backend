@@ -32,19 +32,19 @@ class ModelCategory(models.Model):
 	Represents a category for services or products.
 	Categories can be hierarchical, allowing for subcategories through the 'parent' field.
 	"""
-    name = models.CharField(max_length=255)  # The name of the category.
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.CASCADE) # Optional parent category for hierarchical structure.
-    description = models.CharField(max_length=896)  # A detailed description of the category.
+	name = models.CharField(max_length=255)  # The name of the category.
+	parent = models.ForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.CASCADE) # Optional parent category for hierarchical structure.
+	description = models.CharField(max_length=896)  # A detailed description of the category.
 
-    img = ProcessedImageField(format='PNG', processors=[ResizeToFill(128, 128)], options={'quality': 70},default='CategoryDefaultImage.jpg', upload_to=cat_upload_location, blank=True) # Image for the category, processed and resized.
-    createdAt = models.DateTimeField(auto_now_add=True, verbose_name="date published") # Timestamp when the category was created.
-    updatedAt = models.DateTimeField(auto_now=True, verbose_name="date updated") # Timestamp when the category was last updated.
-    
-    # TODO: Uncomment and review this Meta class if specific ordering or verbose names are needed.
-    # class Meta:
-    #     verbose_name = "Category"
-    #     verbose_name_plural = "Categories"
-    #     ordering = ['title'] # Note: 'title' is not a field in this model, likely 'name' was intended.
+	img = ProcessedImageField(format='PNG', processors=[ResizeToFill(128, 128)], options={'quality': 70},default='CategoryDefaultImage.jpg', upload_to=cat_upload_location, blank=True) # Image for the category, processed and resized.
+	createdAt = models.DateTimeField(auto_now_add=True, verbose_name="date published") # Timestamp when the category was created.
+	updatedAt = models.DateTimeField(auto_now=True, verbose_name="date updated") # Timestamp when the category was last updated.
 
-    def __str__(self):
-        return self.name
+	# TODO: Uncomment and review this Meta class if specific ordering or verbose names are needed.
+	# class Meta:
+	#     verbose_name = "Category"
+	#     verbose_name_plural = "Categories"
+	#     ordering = ['title'] # Note: 'title' is not a field in this model, likely 'name' was intended.
+
+	def __str__(self):
+		return self.name
