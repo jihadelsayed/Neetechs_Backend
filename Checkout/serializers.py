@@ -6,34 +6,44 @@ from .models import ServiceOrder
 from django.conf import settings
 
 
-
 class ServiceOrderSerializer(serializers.ModelSerializer):
+	"""
+	Serializes ServiceOrder instances, enriching the output with related
+	service name, employee name, and customer name via SerializerMethodFields.
+	"""
 	servicename = serializers.SerializerMethodField()
 	employedname = serializers.SerializerMethodField()
 	customername = serializers.SerializerMethodField()
+	# Explicitly defines the format and optionality for the 'ordered_at' field.
+	# This ensures consistent datetime representation and allows the field to be absent during partial updates or creation.
 	ordered_at = serializers.DateTimeField(required=False, allow_null=True,format='%Y-%m-%d %I:%M %p')
 
 	class Meta:
 		model = ServiceOrder
+		# Specifies the fields to be included in the serialized representation.
+		# This includes standard model fields and the custom method fields defined above.
 		fields = ['quantity','pk','status','serviceId','employedIdd','ordered_at','customerIdd','servicename','employedname','customername','price','enhet','date']
 
 	def get_servicename(self, obj):
-		Servicenam = ServicePost.objects.get(pk=obj.serviceId).title #.last().created_at.strftime("%Y-%m-%d %I:%M %p")
-		#print(Servicenam)
+		"""Retrieves the title of the ordered service."""
+		# Consider renaming Servicenam to service_name for Python naming conventions.
+		Servicenam = ServicePost.objects.get(pk=obj.serviceId).title
 		return Servicenam
 
 	def get_employedname(self, obj):
-		Employednam = CustomUser.objects.get(site_id=obj.employedIdd).first_name #.last().created_at.strftime("%Y-%m-%d %I:%M %p")
-		#print(Employednam)
+		"""Retrieves the first name of the employee/provider associated with the order."""
+		# Consider renaming Employednam to employee_name.
+		Employednam = CustomUser.objects.get(site_id=obj.employedIdd).first_name
 		return Employednam
 
 	def get_customername(self, obj):
-		Customernam = CustomUser.objects.get(site_id=obj.customerIdd).first_name #.last().created_at.strftime("%Y-%m-%d %I:%M %p")
-		#print(Customernam)
-		return Customernam #SubCategorySerializer(SubCategorys, many=True).data
+		"""Retrieves the first name of the customer who placed the order."""
+		# Consider renaming Customernam to customer_name.
+		Customernam = CustomUser.objects.get(site_id=obj.customerIdd).first_name
+		return Customernam
 
 
-
+# TODO: This serializer is commented out. Review its purpose and either implement/use it or remove it.
 #class OrderSerializer(serializers.ModelSerializer):
 
 #	class Meta:
