@@ -1,157 +1,316 @@
 # Neetechs Backend
 
-## Description
+Django backend for the Neetechs platform. Provides APIs for auth, profiles, services, categories, checkout/payments, chat (WebSockets via Channels), and more.
 
-This is the backend for the Neetechs platform, built with Django. It provides APIs for user management, services, categories, checkout, chat, and more. <!-- User: Please update this description with more specific details about your project's purpose. -->
+- **Domain:** `server.neetechs.com`
+- **Prod paths:** app: `/srv/neetechs/app`, venv: `/srv/neetechs/env`
+- **Service:** `gunicorn-neetechs` (systemd)
+- **DB:** PostgreSQL
+- **Static root:** `/srv/neetechs/app/staticfiles`
+- **Contact:** info@neetechs.com
 
-## Prerequisites
+## Tech Stack
+- Django, Django REST Framework
+- Django Channels (ASGI websockets)
+- django-allauth (email login)
+- Knox tokens (or DRF tokens), CORS headers
+- PostgreSQL (psycopg)
+- (Optional) S3 via django-storages/boto3
 
-Before you begin, ensure you have the following installed:
-*   Python 3.x (check your project's specific version requirements)
-*   pip (Python package installer)
-*   PostgreSQL (or the database system configured for the project)
+## Features (high level)
+- Email-only authentication (allauth)
+- User profiles
+- Services/Categories catalog
+- Checkout/Stripe integration
+- Chat (Channels websockets)
+- Admin dashboard
 
-## Setup Instructions
+---
 
-### 1. Clone the Repository
+## Quick Start (Local)
+
+### 1) Clone
 ```bash
-git clone <repository-url>
-cd neetechs-backend # Or your repository's directory name
-```
-<!-- User: Please replace `<repository-url>` with the actual URL of your repository. -->
-
-### 2. Create and Activate a Virtual Environment
-
-It's highly recommended to use a virtual environment to manage project dependencies.
-
-**Unix/macOS (bash/zsh):**
-```bash
-python3 -m venv venv
-source venv/bin/activate
+git clone <repo-url>
+cd neetechs-backend
 ```
 
-**Windows (Command Prompt):**
+### 2) Python env
 ```bash
 python -m venv venv
-venv\Scripts\activate.bat
-```
-
-**Windows (PowerShell):**
-```bash
-python -m venv venv
-venv\Scripts\Activate.ps1
-```
-
-### 3. Install Dependencies
-
-First, upgrade pip:
-```bash
+source venv/bin/activate  # Windows: venv\Scripts\activate
 python -m pip install --upgrade pip
-```
-
-Then, install all required packages from `requirements.txt`:
-```bash
 pip install -r requirements.txt
 ```
-This file should contain all necessary libraries like Django, Django REST framework, django-rest-knox, etc.
 
-### 4. Database Setup
-
-This project likely uses PostgreSQL.
-*   Ensure PostgreSQL is installed and running on your system or accessible.
-*   You will need to create a database and a user for this project.
-*   Configure your database connection details in the environment variables (see next section).
-
-For detailed instructions on installing and configuring PostgreSQL, please refer to the [official PostgreSQL documentation](https://www.postgresql.org/docs/). For Django-specific database setup, see the [Django database setup documentation](https://docs.djangoproject.com/en/stable/topics/db/models/#database-setup).
-
-#### PostgreSQL Setup Notes (Linux Example)
-
-The following commands are an example of how you might set up PostgreSQL on a Linux system. Adapt these to your specific environment and security requirements.
-
-```bash
-sudo apt update
-sudo apt install postgresql postgresql-contrib
-
-# Enable PostgreSQL to start on boot (system-dependent, may not be needed for all systems)
-# sudo systemctl enable postgresql 
-# sudo systemctl start postgresql 
-# Or for older systems:
-# update-rc.d postgresql enable
-# service postgresql start
-
-# --- Configuration (example paths, adjust as needed) ---
-# The configuration files are typically in a version-specific directory, e.g., /etc/postgresql/X.Y/main/
-# cd /etc/postgresql/<YOUR_PG_VERSION>/main/
-#
-# Edit pg_hba.conf to allow connections. 
-# For local development, 'host all all 127.0.0.1/32 md5' or 'trust' might be used.
-# For remote access, replace YOUR_IP_ADDRESS with your actual IP:
-# Example: host    all             all             YOUR_IP_ADDRESS/32       md5
-#
-# Edit postgresql.conf to listen on appropriate addresses:
-# Example: listen_addresses = 'localhost, YOUR_SERVER_IP' 
-# (or '*' for all, but be careful with security implications)
-#
-# sudo systemctl restart postgresql # Or: service postgresql restart
-```
-**Note:** Modifying `pg_hba.conf` and `postgresql.conf` requires careful consideration of security. The example `trust` method is not recommended for production. Always use strong passwords and appropriate authentication methods. The commands `update-rc.d postgresql enable` and `service postgresql start` are for older SysVinit systems; modern systems typically use `systemctl`.
-
-### 5. Environment Variables
-
-This project uses `python-decouple` to manage application settings. You will likely need to create a `.env` file in the project root.
-
-If a `.env.example` file is provided in the repository, copy it to `.env`:
+### 3) Configure environment
+Copy and edit:
 ```bash
 cp .env.example .env
 ```
-Then, edit the `.env` file to set the required environment variables, such as:
-*   `SECRET_KEY`
-*   Database settings (`DATABASE_URL` or individual `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`)
-*   Email configuration
-*   Stripe API keys
-*   Any other external service credentials.
 
-<!-- User: Please provide a .env.example file or list required environment variables here. -->
+**`.env.example`**
+```env
+# Django
+SECRET_KEY=change-me
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+CSRF_TRUSTED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000
 
-## Running the Development Server
+# Database (either DATABASE_URL or individual fields)
+DATABASE_URL=postgres://neetechs:neetechs@127.0.0.1:5432/neetechs
+# Or:
+DB_NAME=neetechs
+DB_USER=neetechs
+DB_PASSWORD=neetechs
+DB_HOST=127.0.0.1
+DB_PORT=5432
 
-Once the setup is complete, run the following commands to start the development server:
+# CORS
+CORS_ALLOWED_ORIGINS=http://127.0.0.1:4200,http://localhost:4200
 
-1.  **Create database migrations:**
-    ```bash
-    python manage.py makemigrations
-    ```
+# Email / Providers (adjust)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_HOST_USER=info@neetechs.com
+EMAIL_HOST_PASSWORD=change-me
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+DEFAULT_FROM_EMAIL=info@neetechs.com
 
-2.  **Apply database migrations:**
-    ```bash
-    python manage.py migrate
-    ```
+# Stripe (if used)
+STRIPE_SECRET_KEY=sk_live_or_test
+STRIPE_PUBLIC_KEY=pk_live_or_test
 
-3.  **Start the development server:**
-    ```bash
-    python manage.py runserver
-    ```
-The server will typically be available at `http://127.0.0.1:8000/`.
+# S3 (optional)
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_STORAGE_BUCKET_NAME=
+AWS_S3_REGION_NAME=
+```
 
-## Static Files (for Deployment)
+### 4) DB setup (local example)
+```bash
+# Linux example
+sudo -u postgres psql <<SQL
+CREATE USER neetechs WITH PASSWORD 'neetechs';
+CREATE DATABASE neetechs OWNER neetechs;
+GRANT ALL PRIVILEGES ON DATABASE neetechs TO neetechs;
+SQL
+```
 
-When deploying your application, you'll need to collect all static files (CSS, JavaScript, images) into a single location. Django uses the `collectstatic` command for this.
+### 5) Migrate + run
+```bash
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+# http://127.0.0.1:8000/
+```
+
+---
+
+## Deployment (Linode + Nginx + Gunicorn)
+
+### Paths/assumptions
+- Code: `/srv/neetechs/app`
+- Venv: `/srv/neetechs/env`
+- System user: `deploy`
+- Service: `gunicorn-neetechs`
+- Domain: `server.neetechs.com`
+
+### Gunicorn systemd unit
+`/etc/systemd/system/gunicorn-neetechs.service`
+```ini
+[Unit]
+Description=Gunicorn Neetechs
+After=network.target
+
+[Service]
+User=deploy
+Group=www-data
+WorkingDirectory=/srv/neetechs/app
+Environment="PATH=/srv/neetechs/env/bin"
+EnvironmentFile=/srv/neetechs/app/.env
+ExecStart=/srv/neetechs/env/bin/gunicorn config.asgi:application   --workers 3 --worker-class uvicorn.workers.UvicornWorker   --bind 127.0.0.1:8001 --timeout 120
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
 
 ```bash
-python manage.py collectstatic
+sudo systemctl daemon-reload
+sudo systemctl enable --now gunicorn-neetechs
 ```
-This command copies all static files from your apps into the directory specified by `STATIC_ROOT` in your `settings.py`.
 
-If you are using `django-storages` and `boto3` to serve static files from a service like AWS S3, `collectstatic` will handle uploading these files to your configured S3 bucket.
+### Nginx (reverse proxy)
+`/etc/nginx/sites-available/neetechs.conf`
+```nginx
+server {
+  server_name server.neetechs.com;
+
+  client_max_body_size 25m;
+
+  location /static/ {
+    alias /srv/neetechs/app/staticfiles/;
+  }
+
+  location /media/ {
+    alias /srv/neetechs/app/media/;
+  }
+
+  location / {
+    proxy_pass http://127.0.0.1:8001;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_redirect off;
+  }
+
+  listen 80;
+}
+```
+
+```bash
+sudo ln -sf /etc/nginx/sites-available/neetechs.conf /etc/nginx/sites-enabled/neetechs.conf
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+### SSL (Let’s Encrypt)
+```bash
+sudo certbot --nginx -d server.neetechs.com --agree-tos -m info@neetechs.com -n
+sudo systemctl restart nginx
+```
+
+### Static files (prod)
+```bash
+source /srv/neetechs/env/bin/activate
+python /srv/neetechs/app/manage.py collectstatic --noinput
+deactivate
+```
+
+---
+
+## CI/CD (GitHub Actions → SSH deploy)
+
+Secrets required:
+- `SSH_HOST=server.neetechs.com`
+- `SSH_USER=deploy`
+- `SSH_KEY=<private key>`
+- (optional) `SSH_PORT=22`
+
+`.github/workflows/deploy.yml`
+```yaml
+name: Deploy Neetechs
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add host
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "${{ secrets.SSH_PORT || 22 }}" -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            sudo -u deploy -H bash <<'SH'
+            set -Eeuo pipefail
+            cd /srv/neetechs/app
+            git pull
+
+            source /srv/neetechs/env/bin/activate
+            python -m pip install --upgrade -r requirements.linux.txt
+
+            set -a
+            source .env
+            set +a
+
+            python manage.py migrate --noinput -v 2
+            python manage.py collectstatic --noinput
+            deactivate
+            SH
+
+            sudo systemctl restart gunicorn-neetechs
+            sudo systemctl is-active --quiet gunicorn-neetechs || (sudo journalctl -u gunicorn-neetechs -n 200 --no-pager && exit 1)
+```
+
+---
+
+## Django Settings Notes
+
+### Static config
+```python
+STATIC_URL = "/static/"
+STATIC_ROOT = "/srv/neetechs/app/staticfiles"
+# STATICFILES_DIRS = []  # only if you have extra local asset dirs
+MEDIA_URL = "/media/"
+MEDIA_ROOT = "/srv/neetechs/app/media"
+```
+
+### allauth (new API)
+```python
+ACCOUNT_LOGIN_METHODS = {"email"}  # replaces deprecated ACCOUNT_AUTHENTICATION_METHOD
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]  # replaces ACCOUNT_EMAIL_REQUIRED/USERNAME_REQUIRED
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # your choice
+```
+
+### Security (prod)
+```python
+DEBUG = False
+ALLOWED_HOSTS = ["server.neetechs.com"]
+CSRF_TRUSTED_ORIGINS = ["https://server.neetechs.com"]
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+```
+
+---
+
+## Common Commands
+
+```bash
+# Migrations
+python manage.py makemigrations
+python manage.py migrate -v 2
+
+# Superuser
+python manage.py createsuperuser
+
+# Collect static
+python manage.py collectstatic --noinput
+
+# Run dev server
+python manage.py runserver
+
+# Health check (quick DB ping)
+python - <<'PY'
+import django; django.setup()
+from django.db import connections
+connections['default'].cursor().execute('SELECT 1'); print("DB OK")
+PY
+```
+
+---
 
 ## Troubleshooting
 
-### Python Interpreter Mismatch in Virtual Environment
-If you encounter an error like `No Python at 'C:\Users\jihad\AppData\Local\Programs\Python\Python310\python.exe'`, it means the Python interpreter specified in your virtual environment's `pyvenv.cfg` file is incorrect or the path has changed.
+- **Static warning**: “STATICFILES_DIRS path does not exist” → either create the dir or remove it; rely on `STATIC_ROOT` + `collectstatic`.
+- **Postgres timeout**: check service `systemctl status postgresql`, `ss -lntp | grep 5432`, ensure Django `HOST=127.0.0.1` and credentials match. If remote DB, open UFW only to your app server IP and add proper `pg_hba.conf` entries.
+- **allauth deprecations**: use `ACCOUNT_LOGIN_METHODS` and `ACCOUNT_SIGNUP_FIELDS` as shown above.
+- **Gunicorn fails**: `journalctl -u gunicorn-neetechs -n 200 --no-pager`.
 
-**Solution:**
-1.  Open the `pyvenv.cfg` file located in the root of your virtual environment (e.g., `venv/pyvenv.cfg`).
-2.  Look for the `home` key (or similar, depending on your OS and Python version).
-3.  Update the path to point to the correct location of your Python executable.
-    For example, if your Python 3.10 is actually at `C:\Python310\python.exe`, change it accordingly.
-4.  Save the file and try reactivating the virtual environment.
+---
+
+## License
+Proprietary — Neetechs. All rights reserved.
