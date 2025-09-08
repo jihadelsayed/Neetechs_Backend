@@ -1,0 +1,37 @@
+name: Deploy Django to Linode
+
+on:
+  push:
+    branches: [ "main" ]   # adjust if you deploy from another branch
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "22" "${{ secrets.SSH_HOST_Linode_server_neetechs_com }}" >> ~/.ssh/known_hosts
+
+      - name: Remote deploy
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.SSH_HOST_Linode_server_neetechs_com }}
+          username: ${{ secrets.SSH_USER_Linode }}
+          key: ${{ secrets.SSH_KEY_Linode }}
+          port: 22
+          script: |
+            set -e
+            sudo -u deploy -H bash <<'SH'
+            cd /srv/neetechs/app
+            git pull
+            source /srv/neetechs/env/bin/activate || python3 -m venv /srv/neetechs/env && source /srv/neetechs/env/bin/activate
+            pip install --upgrade pip wheel
+            [ -f requirements.linux.txt ] && pip install -r requirements.linux.txt --upgrade
+            export $(grep -v '^#' .env | xargs)
+            python manage.py migrate --noinput
+            deactivate
+            SH
+            sudo systemctl restart gunicorn-neetechs
