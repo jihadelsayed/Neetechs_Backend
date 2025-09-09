@@ -32,6 +32,7 @@ jobs:
             [ -f requirements.linux.txt ] && pip install -r requirements.linux.txt --upgrade
             export $(grep -v '^#' .env | xargs)
             python manage.py migrate --noinput
+            python manage.py makemigrations
             deactivate
             SH
             sudo systemctl restart gunicorn-neetechs
