@@ -290,6 +290,9 @@ python manage.py createsuperuser
 python manage.py collectstatic --noinput
 
 # Run dev server
+BASE="http://127.0.0.1:8000"
+HDR='Content-Type: application/json'
+
 python manage.py runserver
 
 # Health check (quick DB ping)
