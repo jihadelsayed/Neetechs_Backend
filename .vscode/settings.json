@@ -1,4 +1,6 @@
 {
     "appService.defaultWebAppToDeploy": "/subscriptions/6bf9756d-28c9-4010-a8f8-0f7ad49dee35/AppServices/subscriptions/6bf9756d-28c9-4010-a8f8-0f7ad49dee35/resourceGroups/Neetechs/providers/Microsoft.Web/sites/neetechs",
-    "appService.deploySubpath": "."
+    "appService.deploySubpath": ".",
+    "python.defaultInterpreterPath": ".venv/bin/python",
+    "terminal.integrated.defaultProfile.linux": "bash"
 }
