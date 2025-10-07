@@ -1,8 +1,7 @@
-
+# knox_allauth/views_set_password.py
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
 
 class SetPasswordView(APIView):
     permission_classes = [IsAuthenticated]
@@ -14,6 +13,6 @@ class SetPasswordView(APIView):
 
         user = request.user
         user.set_password(password)
-        user.save(update_fields=["password"])
+        user.save()
 
         return Response({"detail": "Password set successfully."}, status=200)

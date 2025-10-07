@@ -1,7 +1,11 @@
+
 from django.apps import AppConfig
 
 
 class KnoxAllauthConfig(AppConfig):
-    name = 'knox_allauth'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "knox_allauth"
+    verbose_name = "Knox + Allauth"
+
     def ready(self):
-    	import knox_allauth.signals
+        import knox_allauth.signals  # noqa: F401

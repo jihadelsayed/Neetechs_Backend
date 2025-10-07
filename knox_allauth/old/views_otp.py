@@ -1,52 +1,56 @@
+# knox_allauth/views_otp.py
 
-import logging
 import random
-from hashlib import sha256
-from datetime import timedelta
-
 from django.utils import timezone
-from django.core.cache import cache
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework import status
+from Neetechs import settings
+from knox_allauth.models import CustomUser
 
+from datetime import timedelta
+from knox_allauth.twilio_utils import send_sms_otp
 from knox.models import AuthToken
-from django.conf import settings
+from datetime import timedelta
+from django.core.cache import cache
+from rest_framework.permissions import AllowAny
+from hashlib import sha256
 
-from .models import CustomUser
-from .twilio_utils import send_sms_otp
-
-logger = logging.getLogger(__name__)
+import logging
 
 
 class SendPhoneOTP(APIView):
     permission_classes = [AllowAny]
-
     def post(self, request):
-        phone = request.data.get("phone")
+        phone = request.data.get('phone')
         if not phone:
             return Response({"detail": "Phone number is required."}, status=400)
 
         hashed_email = sha256(phone.encode()).hexdigest()[:10]
         placeholder_email = f"{hashed_email}@neetechs.sms"
 
-        user, _ = CustomUser.objects.get_or_create(
+        user, created = CustomUser.objects.get_or_create(
             phone=phone,
-            defaults={"email": placeholder_email, "name": "PhoneUser"},
+            defaults={"email": placeholder_email, "name": "PhoneUser"}
         )
 
-        otp = f"{random.randint(100000, 999999)}"
+
+        otp = str(random.randint(100000, 999999))
         user.phone_otp = otp
         user.otp_created_at = timezone.now()
-        user.save(update_fields=["phone_otp", "otp_created_at"])
+        user.save()
 
-        if getattr(settings, "DEBUG", False):
-            logger.warning("[MOCK OTP] to %s: %s", phone, otp)
+        # 🔥 Replace this with real SMS send
+        if settings.DEBUG:
+            print(f"[MOCK OTP] to {phone}: {otp}")
+            logger = logging.getLogger(__name__)
+            logger.warning(f"[MOCK OTP] to {phone}: {otp}")
         else:
             try:
                 send_sms_otp(phone, otp)
             except Exception as e:
-                logger.error("Failed to send OTP to %s: %s", phone, e)
+                logger.error(f"Failed to send OTP to {phone}: {e}")
+
 
         return Response({"detail": "OTP sent successfully."}, status=200)
 
@@ -75,27 +79,26 @@ class VerifyPhoneOTP(APIView):
             cache.set(attempt_key, attempts + 1, timeout=3600)
             return Response({"detail": "Invalid OTP."}, status=400)
 
-        if user.otp_created_at and (timezone.now() - user.otp_created_at > timedelta(minutes=5)):
+        if timezone.now() - user.otp_created_at > timedelta(minutes=5):
             return Response({"detail": "OTP expired."}, status=400)
 
         cache.delete(attempt_key)
 
         user.phone_otp = None
         user.otp_created_at = None
-        user.save(update_fields=["phone_otp", "otp_created_at"])
+        user.save()
 
         token = AuthToken.objects.create(user)[1]
 
-        return Response(
-            {
-                "token": token,
-                "user": {
-                    "id": user.id,
-                    "phone": user.phone,
-                    "email": user.email,
-                    "name": user.name,
-                },
-                "has_password": user.has_usable_password(),
+        return Response({
+            "token": token,
+            "user": {
+                "id": user.id,
+                "phone": user.phone,
+                "email": user.email,
+                "name": user.name,
             },
-            status=200,
-        )
+            "has_password": user.has_usable_password()
+        }, status=200)
+
+
