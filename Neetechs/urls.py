@@ -33,18 +33,18 @@ urlpatterns = [
   #  path('', include('Service.urls')),
     path("", include("knox_allauth.urls", namespace="knox_allauth")),  # <- fix
     path('service/', include('Service.urls', 'service')),
-    path('categories/', include('Category.urls')),
+    path('api/categories/', include('Category.urls')),
     path('api/service/', include('Service.api.urls', 'service_api')),
-    path('', include('chat.urls')),
-    path('', include('Profile.urls')),
+    path('api/chat/', include('chat.urls')),
+    path('api/profile/', include('Profile.urls')),
     path('', include('home.urls')),
-    path('', include('report.urls')),
-    path('', include('Checkout.urls')),
+    path('api/report/', include('report.urls')),
+    path('api/', include('Checkout.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+    path('api/trees/', include('trees.urls')),
 
- 
     #path('devices', FCMDeviceAuthorizedViewSet.as_view({'post': 'create'}), name='create_fcm_device'),
 
     

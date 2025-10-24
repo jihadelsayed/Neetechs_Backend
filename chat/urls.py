@@ -8,11 +8,11 @@ router.register('thread', ThreadViewSet)
 #router.register('message', MessageAPIView)
 
 urlpatterns = [
-    path('chat/<str:username>/', ThreadView.as_view()),
-	path('api/chat/', include(router.urls)),
-	path('api/chat/messages/<str:site_id>/', MessagesAPIView.as_view()),
-	path('api/chat/message/<int:id>/', MessageAPIView.as_view()),
-    #path('api/chat/threads/<str:site_id>/', ThreadsAPIView.as_view()),
-    #path('api/chat/threads/', ThreadViewSet()),
+    path('<str:username>/', ThreadView.as_view()),
+	path('', include(router.urls)),
+	path('messages/<str:site_id>/', MessagesAPIView.as_view()),
+	path('message/<int:id>/', MessageAPIView.as_view()),
+    #path('threads/<str:site_id>/', ThreadsAPIView.as_view()),
+    #path('threads/', ThreadViewSet()),
 
 ]

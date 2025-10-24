@@ -19,5 +19,5 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.twitter",
     "fcm_django",
     # Your apps
-    "chat","Profile","Service","Checkout","home","report","Category","knox_allauth","stripe",
+    "chat","Profile","Service","Checkout","home","report","Category","knox_allauth","stripe","trees",
 ]
