@@ -28,11 +28,90 @@ Django backend for the Neetechs platform. Provides APIs for auth, profiles, serv
 Architecture and deployment diagrams now live under `/docs/`. Drop new `.png` diagrams there and link to them from this README (e.g., `![Architecture](docs/diagram.png)`).
 
 ## Endpoints
-- `/` responds with `{"message":"Neetechs API","docs":"/api/docs/"}` so clients can discover docs without guessing.
-- `/api/v1/` hosts the versioned API via DRF routers (categories, services, chat, profile, home slider/containers) plus `/api/v1/auth/...` for login/register/logout/OTP/OAuth/me.
+- `/` returns `{"message":"Neetechs API","docs":"/api/docs/"}` as a discovery stub.
+- `/api/` is a JSON index that lists supported versions, documentation, and key resources.
+- `/api/schema/`, `/api/docs/`, and `/api/redoc/` expose the OpenAPI schema via drf-spectacular.
 - Health probes: `/healthz/` (liveness) and `/readyz/`.
 - `/webhooks/github/` validates GitHub's `X-Hub-Signature-256` header (or the legacy `X-DEPLOY-SECRET`) before executing your deploy script. Set `GITHUB_WEBHOOK_SECRET`, `DEPLOY_SCRIPT_PATH`, and `GITHUB_DEPLOY_BRANCH` in `.env`.
-- Legacy paths such as `/auth/login/`, `/api/service/`, `/api/home/list/HomeSlider` now issue 301/308 redirects to their `/api/v1/...` equivalents. Update integrations soon; the redirects are temporary.
+
+### Versioned API Tree
+```text
+/api/
+└── v1/
+    ├── auth/
+    │   ├── login/
+    │   ├── logout/
+    │   ├── register/
+    │   ├── password/set/
+    │   ├── otp/send/
+    │   ├── otp/verify/
+    │   ├── oauth/google/
+    │   ├── oauth/facebook/
+    │   └── me/
+    ├── categories/
+    │   └── <name>/
+    ├── services/
+    │   ├── filters/category/
+    │   ├── filters/sub_category/
+    │   ├── filters/city/
+    │   ├── filters/state/
+    │   ├── filters/country/
+    │   ├── filters/comments/
+    │   ├── filters/likes/
+    │   ├── filters/dislikes/
+    │   ├── likes/toggle/
+    │   ├── search/
+    │   ├── list/
+    │   └── <slug>/
+    ├── profile/
+    │   ├── profiles/
+    │   ├── <site_id>/
+    │   ├── all/<site_id>/
+    │   ├── certifications/[create/|<id>/]
+    │   ├── interests/[create/|<id>/]
+    │   ├── studies/[create/|<id>/]
+    │   └── experience/[create/|<id>/]
+    ├── chat/
+    ├── home/
+    │   ├── slider/
+    │   └── containers/
+    ├── checkout/webhook
+    ├── report/
+    └── trees/
+```
+
+### Legacy Redirects (HTTP 308)
+| Legacy path | Redirects to |
+| --- | --- |
+| `/auth/login/` | `/api/v1/auth/login/` |
+| `/auth/logout/` | `/api/v1/auth/logout/` |
+| `/auth/register/` | `/api/v1/auth/register/` |
+| `/auth/user/` | `/api/v1/auth/me/` |
+| `/auth/otp/send/` | `/api/v1/auth/otp/send/` |
+| `/auth/otp/verify/` | `/api/v1/auth/otp/verify/` |
+| `/auth/password/change/` | `/api/v1/auth/password/set/` |
+| `/auth/password/reset/` | `/api/v1/auth/password/set/` |
+| `/auth/password/reset/confirm/` | `/api/v1/auth/password/set/` |
+| `/verify-email/again/` | `/api/v1/auth/email/resend/` |
+| `/api/service/list` | `/api/v1/services/` |
+| `/api/service/create` | `/api/v1/services/` |
+| `/api/service/<slug>/update` | `/api/v1/services/<slug>/` |
+| `/api/service/<slug>/delete` | `/api/v1/services/<slug>/` |
+| `/api/service/Category/` | `/api/v1/services/filters/category/` |
+| `/api/service/SubCategory/` | `/api/v1/services/filters/sub_category/` |
+| `/api/service/City/` | `/api/v1/services/filters/city/` |
+| `/api/service/Country/` | `/api/v1/services/filters/country/` |
+| `/api/service/State/` | `/api/v1/services/filters/state/` |
+| `/api/service/Comments/` | `/api/v1/services/filters/comments/` |
+| `/api/service/Likes/` | `/api/v1/services/filters/likes/` |
+| `/api/service/DisLikes/` | `/api/v1/services/filters/dislikes/` |
+| `/api/categories/<name>/` | `/api/v1/categories/<name>/` |
+| `/api/chat/*` | `/api/v1/chat/*` |
+| `/api/home/list/HomeSlider` | `/api/v1/home/slider/` |
+| `/api/home/list/HomeContainers` | `/api/v1/home/containers/` |
+| `/api/webhook` | `/api/v1/checkout/webhook` |
+| `/github-webhook/` | `/webhooks/github/` |
+| `/api/v1/profile/profile/*` | `/api/v1/profile/*` |
 
 ---
 
