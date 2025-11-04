@@ -253,6 +253,7 @@ class ServicePostCreateSerializer(serializers.ModelSerializer):
 		model = ServicePost
 		# Specifies the fields available during the creation of a ServicePost.
 		fields = ['title','expiration_date','stripeId','enhet', 'employee', 'pris', 'image', 'image2', 'image3', 'image4', 'image5', 'beskrivning', 'status', 'tillganligFran', 'tillganligTill', 'category', 'underCategory', 'country', 'state', 'city']
+		read_only_fields = ['employee']
 	
 # TODO: CRITICAL REVIEW - This custom save() method manually handles instance creation, file saving, and validation.
 # This is highly unconventional for DRF ModelSerializers and prone to errors.
@@ -329,7 +330,6 @@ class ServicePostCreateSerializer(serializers.ModelSerializer):
 		except KeyError:
 			raise serializers.ValidationError({"response": "You must have a title, some content, and an image."})
 	"""
-
 
 
 

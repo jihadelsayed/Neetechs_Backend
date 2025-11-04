@@ -23,14 +23,45 @@ def api_index(_request):
                 "v1": {
                     "base": "/api/v1/",
                     "docs": "/api/docs/",
-                    "resources": [
-                        "/api/v1/categories/",
-                        "/api/v1/services/",
-                        "/api/v1/chat/",
-                        "/api/v1/profile/",
-                        "/api/v1/home/slider/",
-                        "/api/v1/home/containers/",
+                    "auth": [
+                        "/api/v1/auth/login/",
+                        "/api/v1/auth/logout/",
+                        "/api/v1/auth/register/",
+                        "/api/v1/auth/otp/send/",
+                        "/api/v1/auth/oauth/google/",
+                        "/api/v1/auth/oauth/facebook/",
                     ],
+                    "resources": {
+                        "categories": "/api/v1/categories/",
+                        "services": {
+                            "base": "/api/v1/services/",
+                            "filters": [
+                                "/api/v1/services/filters/category/",
+                                "/api/v1/services/filters/sub_category/",
+                                "/api/v1/services/filters/city/",
+                                "/api/v1/services/filters/state/",
+                                "/api/v1/services/filters/country/",
+                                "/api/v1/services/filters/comments/",
+                                "/api/v1/services/filters/likes/",
+                                "/api/v1/services/filters/dislikes/",
+                            ],
+                        },
+                        "chat": "/api/v1/chat/",
+                        "profile": {
+                            "base": "/api/v1/profile/",
+                            "sections": [
+                                "/api/v1/profile/certifications/",
+                                "/api/v1/profile/interests/",
+                                "/api/v1/profile/studies/",
+                                "/api/v1/profile/experience/",
+                            ],
+                        },
+                        "home": [
+                            "/api/v1/home/slider/",
+                            "/api/v1/home/containers/",
+                        ],
+                        "checkout": "/api/v1/checkout/webhook",
+                    },
                 }
             }
         }
