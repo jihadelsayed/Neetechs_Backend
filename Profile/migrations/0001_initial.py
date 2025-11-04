@@ -80,7 +80,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name': 'Study',
-                'verbose_name_plural': 'Studys',
+                'verbose_name_plural': 'Studies',
                 'ordering': ['name'],
             },
         ),

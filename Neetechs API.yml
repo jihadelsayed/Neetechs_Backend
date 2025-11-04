@@ -109,7 +109,7 @@ paths:
                 properties:
                   token:
                     type: string
-                    description: Knox token to send as `Authorization: Token <token>`.
+                    description: "Knox token to send as `Authorization: Token <token>`."
                   expiry:
                     type: string
                     format: date-time

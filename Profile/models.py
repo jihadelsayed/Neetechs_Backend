@@ -51,7 +51,7 @@ class Study(models.Model):
     class Meta:
         # TODO: Translate verbose_name and verbose_name_plural to English.
         verbose_name = "Study"
-        verbose_name_plural = "Studys"
+        verbose_name_plural = "Studies"
         ordering = ['name'] # Default ordering for queries.
 
     def __str__(self):
