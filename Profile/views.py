@@ -91,7 +91,7 @@ class ProfileCollectionView(views.APIView):
     filter_backends = [DjangoFilterBackend] 
     filterset_fields = ['site_id', 'in_stock'] # 'in_stock' is not a field on CustomUser model.
 
-class ProfileSummaryView(views.APIView):
+class ProfileInfoView(views.APIView):
     """
     Retrieves all information for a specific user profile using their site_id.
     Interacts with the CustomUser model using AllProfileInfoSerializer.

@@ -1,0 +1,2241 @@
+openapi: 3.0.3
+info:
+  title: Neetechs API
+  version: "1.0.0"
+  description: >
+    Public contract for the Neetechs marketplace platform. The API powers
+    authentication, service discovery, real-time chat, profile management,
+    operational health checks, and deployment webhooks. Unless otherwise noted,
+    all endpoints require a Knox API token supplied in the `Authorization`
+    header (`Token <key>`).
+servers:
+  - url: https://api.neetechs.com
+    description: Production
+  - url: https://staging-api.neetechs.com
+    description: Staging
+  - url: http://localhost:8000
+    description: Local development
+security:
+  - knoxApiToken: []
+tags:
+  - name: auth
+    description: Authentication, registration, MFA, and identity utilities.
+  - name: categories
+    description: Read-only category catalogue for classifying services.
+  - name: services
+    description: CRUD and filtering endpoints for marketplace services.
+  - name: chat
+    description: Threaded messaging between marketplace participants.
+  - name: profile
+    description: Endpoints for user profile data, studies, experience, and interests.
+  - name: home
+    description: Public home page content such as sliders and hero containers.
+  - name: webhooks
+    description: Inbound deployment webhooks and other callback integrations.
+  - name: ops
+    description: Operational tooling, readiness, and legacy redirect surfaces.
+paths:
+  /healthz/:
+    get:
+      tags: [ops]
+      summary: Liveness probe
+      description: Returns 200 when the application process is healthy.
+      security: []
+      responses:
+        "200":
+          description: Service is alive.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+        "500":
+          $ref: '#/components/responses/Error500'
+  /readyz/:
+    get:
+      tags: [ops]
+      summary: Readiness probe
+      description: Returns 200 when downstream dependencies are available.
+      security: []
+      responses:
+        "200":
+          description: Service is ready to receive traffic.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+        "500":
+          $ref: '#/components/responses/Error500'
+  /api/v1/auth/login/:
+    post:
+      tags: [auth]
+      summary: Obtain a Knox API token
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+              required: [email, password]
+      responses:
+        "200":
+          description: Authenticated successfully.
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Knox token to send as `Authorization: Token <token>`.
+                  expiry:
+                    type: string
+                    format: date-time
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "429":
+          $ref: '#/components/responses/Error429'
+  /api/v1/auth/logout/:
+    post:
+      tags: [auth]
+      summary: Invalidate current Knox token
+      operationId: logout
+      responses:
+        "204":
+          description: Token revoked.
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "429":
+          $ref: '#/components/responses/Error429'
+  /api/v1/auth/register/:
+    post:
+      tags: [auth]
+      summary: Register a new account
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password1:
+                  type: string
+                  format: password
+                password2:
+                  type: string
+                  format: password
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+              required: [email, password1, password2]
+      responses:
+        "201":
+          description: Account created. Confirmation email sent when configured.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        "400":
+          $ref: '#/components/responses/Error400'
+        "422":
+          $ref: '#/components/responses/Error422'
+        "429":
+          $ref: '#/components/responses/Error429'
+  /api/v1/auth/password/set/:
+    post:
+      tags: [auth]
+      summary: Set or reset account password
+      operationId: setPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password1:
+                  type: string
+                  format: password
+                password2:
+                  type: string
+                  format: password
+                token:
+                  type: string
+                  description: Reset token if invoked from password reset flow.
+              required: [password1, password2]
+      responses:
+        "200":
+          description: Password updated.
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "422":
+          $ref: '#/components/responses/Error422'
+  /api/v1/auth/otp/send/:
+    post:
+      tags: [auth]
+      summary: Send phone OTP
+      description: Dispatches a one-time password via SMS to the authenticated user's phone.
+      operationId: sendOtp
+      responses:
+        "202":
+          description: OTP sent.
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "429":
+          $ref: '#/components/responses/Error429'
+  /api/v1/auth/otp/verify/:
+    post:
+      tags: [auth]
+      summary: Verify phone OTP
+      operationId: verifyOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                phone_number:
+                  type: string
+              required: [code]
+      responses:
+        "200":
+          description: OTP verified.
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "422":
+          $ref: '#/components/responses/Error422'
+  /api/v1/auth/oauth/google/:
+    post:
+      tags: [auth]
+      summary: Sign in with Google OAuth
+      operationId: googleOAuth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                access_token:
+                  type: string
+                  description: Google OAuth access token.
+              required: [access_token]
+      responses:
+        "200":
+          description: Authenticated via Google.
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "429":
+          $ref: '#/components/responses/Error429'
+  /api/v1/auth/oauth/facebook/:
+    post:
+      tags: [auth]
+      summary: Sign in with Facebook OAuth
+      operationId: facebookOAuth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                access_token:
+                  type: string
+                  description: Facebook OAuth access token.
+              required: [access_token]
+      responses:
+        "200":
+          description: Authenticated via Facebook.
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "429":
+          $ref: '#/components/responses/Error429'
+  /api/v1/auth/me/:
+    get:
+      tags: [auth]
+      summary: Retrieve current user profile
+      operationId: currentUser
+      responses:
+        "200":
+          description: Authenticated user details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "403":
+          $ref: '#/components/responses/Error403'
+  /api/v1/auth/email/resend/:
+    post:
+      tags: [auth]
+      summary: Resend email confirmation
+      responses:
+        "202":
+          description: Confirmation email scheduled.
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "429":
+          $ref: '#/components/responses/Error429'
+  /auth/login/:
+    get:
+      deprecated: true
+      tags: [ops]
+      summary: Legacy login redirect
+      description: Permanent redirect to `/api/v1/auth/login/`.
+      responses:
+        "308":
+          description: Refer to `/api/v1/auth/login/`.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              example: /api/v1/auth/login/
+  /auth/logout/:
+    get:
+      deprecated: true
+      tags: [ops]
+      summary: Legacy logout redirect
+      description: Permanent redirect to `/api/v1/auth/logout/`.
+      responses:
+        "308":
+          description: Refer to `/api/v1/auth/logout/`.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              example: /api/v1/auth/logout/
+  /auth/register/:
+    get:
+      deprecated: true
+      tags: [ops]
+      summary: Legacy register redirect
+      description: Permanent redirect to `/api/v1/auth/register/`.
+      responses:
+        "308":
+          description: Refer to `/api/v1/auth/register/`.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              example: /api/v1/auth/register/
+  /auth/user/:
+    get:
+      deprecated: true
+      tags: [ops]
+      summary: Legacy current-user redirect
+      description: Permanent redirect to `/api/v1/auth/me/`.
+      responses:
+        "308":
+          description: Refer to `/api/v1/auth/me/`.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              example: /api/v1/auth/me/
+  /auth/otp/send/:
+    get:
+      deprecated: true
+      tags: [ops]
+      summary: Legacy OTP send redirect
+      description: Permanent redirect to `/api/v1/auth/otp/send/`.
+      responses:
+        "308":
+          description: Refer to `/api/v1/auth/otp/send/`.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              example: /api/v1/auth/otp/send/
+  /auth/otp/verify/:
+    get:
+      deprecated: true
+      tags: [ops]
+      summary: Legacy OTP verify redirect
+      description: Permanent redirect to `/api/v1/auth/otp/verify/`.
+      responses:
+        "308":
+          description: Refer to `/api/v1/auth/otp/verify/`.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              example: /api/v1/auth/otp/verify/
+  /auth/facebook/:
+    get:
+      deprecated: true
+      tags: [ops]
+      summary: Legacy Facebook OAuth redirect
+      description: Permanent redirect to `/api/v1/auth/oauth/facebook/`.
+      responses:
+        "308":
+          description: Refer to `/api/v1/auth/oauth/facebook/`.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              example: /api/v1/auth/oauth/facebook/
+  /auth/google/:
+    get:
+      deprecated: true
+      tags: [ops]
+      summary: Legacy Google OAuth redirect
+      description: Permanent redirect to `/api/v1/auth/oauth/google/`.
+      responses:
+        "308":
+          description: Refer to `/api/v1/auth/oauth/google/`.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              example: /api/v1/auth/oauth/google/
+  /auth/password/change/:
+    get:
+      deprecated: true
+      tags: [ops]
+      summary: Legacy password change redirect
+      description: Permanent redirect to `/api/v1/auth/password/set/`.
+      responses:
+        "308":
+          description: Refer to `/api/v1/auth/password/set/`.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              example: /api/v1/auth/password/set/
+  /auth/password/reset/:
+    get:
+      deprecated: true
+      tags: [ops]
+      summary: Legacy password reset redirect
+      description: Permanent redirect to `/api/v1/auth/password/set/`.
+      responses:
+        "308":
+          description: Refer to `/api/v1/auth/password/set/`.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              example: /api/v1/auth/password/set/
+  /auth/password/reset/confirm/:
+    get:
+      deprecated: true
+      tags: [ops]
+      summary: Legacy password reset confirm redirect
+      description: Permanent redirect to `/api/v1/auth/password/set/`.
+      responses:
+        "308":
+          description: Refer to `/api/v1/auth/password/set/`.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              example: /api/v1/auth/password/set/
+  /verify-email/again/:
+    get:
+      deprecated: true
+      tags: [ops]
+      summary: Legacy email confirmation redirect
+      description: Permanent redirect to `/api/v1/auth/email/resend/`.
+      responses:
+        "308":
+          description: Refer to `/api/v1/auth/email/resend/`.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              example: /api/v1/auth/email/resend/
+  /api/v1/categories/:
+    get:
+      tags: [categories]
+      summary: List categories
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Ordering'
+      responses:
+        "200":
+          description: Paginated list of categories.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Category'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "403":
+          $ref: '#/components/responses/Error403'
+  /api/v1/categories/{resource_id}/:
+    get:
+      tags: [categories]
+      summary: Retrieve category
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        "200":
+          description: Category detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        "404":
+          $ref: '#/components/responses/Error404'
+  /api/v1/services/:
+    get:
+      tags: [services]
+      summary: List services
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Ordering'
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Filter services by title or description.
+      responses:
+        "200":
+          description: Paginated list of services.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Service'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "403":
+          $ref: '#/components/responses/Error403'
+    post:
+      tags: [services]
+      summary: Create service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service'
+      responses:
+        "201":
+          description: Service created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "422":
+          $ref: '#/components/responses/Error422'
+  /api/v1/services/{resource_id}/:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    get:
+      tags: [services]
+      summary: Retrieve service
+      responses:
+        "200":
+          description: Service detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        "404":
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [services]
+      summary: Replace service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service'
+      responses:
+        "200":
+          description: Service updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "403":
+          $ref: '#/components/responses/Error403'
+        "404":
+          $ref: '#/components/responses/Error404'
+    patch:
+      tags: [services]
+      summary: Partially update service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service'
+      responses:
+        "200":
+          description: Service updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "403":
+          $ref: '#/components/responses/Error403'
+        "404":
+          $ref: '#/components/responses/Error404'
+    delete:
+      tags: [services]
+      summary: Delete service
+      responses:
+        "204":
+          description: Service deleted.
+        "401":
+          $ref: '#/components/responses/Error401'
+        "403":
+          $ref: '#/components/responses/Error403'
+        "404":
+          $ref: '#/components/responses/Error404'
+  /api/v1/services/filters/category/:
+    get:
+      tags: [services]
+      summary: List services filtered by category
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: Filtered services.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+        "400":
+          $ref: '#/components/responses/Error400'
+  /api/v1/services/filters/sub_category/:
+    get:
+      tags: [services]
+      summary: List services filtered by sub-category
+      parameters:
+        - in: query
+          name: sub_category
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: Filtered services.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+        "400":
+          $ref: '#/components/responses/Error400'
+  /api/v1/services/filters/country/:
+    get:
+      tags: [services]
+      summary: List services filtered by country
+      parameters:
+        - in: query
+          name: country
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: Filtered services.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+        "400":
+          $ref: '#/components/responses/Error400'
+  /api/v1/services/filters/state/:
+    get:
+      tags: [services]
+      summary: List services filtered by state
+      parameters:
+        - in: query
+          name: state
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: Filtered services.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+        "400":
+          $ref: '#/components/responses/Error400'
+  /api/v1/services/filters/city/:
+    get:
+      tags: [services]
+      summary: List services filtered by city
+      parameters:
+        - in: query
+          name: city
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: Filtered services.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+        "400":
+          $ref: '#/components/responses/Error400'
+  /api/v1/services/filters/comments/:
+    get:
+      tags: [services]
+      summary: List service comments
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        "200":
+          description: Service comments.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    comment:
+                      type: string
+                    author:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
+        "400":
+          $ref: '#/components/responses/Error400'
+  /api/v1/services/filters/likes/:
+    get:
+      tags: [services]
+      summary: List service likes
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        "200":
+          description: Service likes.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    user_id:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
+        "400":
+          $ref: '#/components/responses/Error400'
+  /api/v1/services/filters/dislikes/:
+    get:
+      tags: [services]
+      summary: List service dislikes
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        "200":
+          description: Service dislikes.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    user_id:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
+        "400":
+          $ref: '#/components/responses/Error400'
+  /api/v1/services/search/:
+    get:
+      tags: [services]
+      summary: Search services
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Free text search across services.
+      responses:
+        "200":
+          description: Services matching the query.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Service'
+  /api/v1/services/likes/toggle/:
+    post:
+      tags: [services]
+      summary: Toggle like status for a service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                service_id:
+                  type: string
+                  format: uuid
+              required: [service_id]
+      responses:
+        "200":
+          description: Like state updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  liked:
+                    type: boolean
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+  /api/v1/services/reactions/:
+    post:
+      tags: [services]
+      summary: Submit a reaction for a service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                service_id:
+                  type: string
+                  format: uuid
+                reaction:
+                  type: string
+              required: [service_id, reaction]
+      responses:
+        "200":
+          description: Reaction recorded.
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+  /api/v1/services/{resource_id}/is-employee/:
+    get:
+      tags: [services]
+      summary: Check if current user owns the service
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        "200":
+          description: Ownership check result.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  is_employee:
+                    type: boolean
+        "401":
+          $ref: '#/components/responses/Error401'
+        "404":
+          $ref: '#/components/responses/Error404'
+  /api/v1/services/{resource_id}/ownership/:
+    get:
+      tags: [services]
+      summary: Retrieve service ownership details
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        "200":
+          description: Ownership metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  owners:
+                    type: array
+                    items:
+                      type: string
+        "401":
+          $ref: '#/components/responses/Error401'
+        "404":
+          $ref: '#/components/responses/Error404'
+  /api/v1/chat/threads/:
+    get:
+      tags: [chat]
+      summary: List chat threads for the authenticated user
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Ordering'
+      responses:
+        "200":
+          description: Paginated threads.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Thread'
+        "401":
+          $ref: '#/components/responses/Error401'
+    post:
+      tags: [chat]
+      summary: Start a new chat thread
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                participant_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  minItems: 1
+              required: [participant_ids]
+      responses:
+        "201":
+          description: Thread created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thread'
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+  /api/v1/chat/threads/{resource_id}/:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    get:
+      tags: [chat]
+      summary: Retrieve a chat thread
+      responses:
+        "200":
+          description: Thread detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thread'
+        "404":
+          $ref: '#/components/responses/Error404'
+    delete:
+      tags: [chat]
+      summary: Archive a chat thread
+      responses:
+        "204":
+          description: Thread archived.
+        "401":
+          $ref: '#/components/responses/Error401'
+        "404":
+          $ref: '#/components/responses/Error404'
+  /api/v1/chat/threads/{resource_id}/messages/:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    get:
+      tags: [chat]
+      summary: List messages in a thread
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        "200":
+          description: Paginated messages.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Message'
+        "404":
+          $ref: '#/components/responses/Error404'
+    post:
+      tags: [chat]
+      summary: Send a message to a thread
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                attachments:
+                  type: array
+                  items:
+                    type: string
+                    format: uri
+              required: [body]
+      responses:
+        "201":
+          description: Message created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "400":
+          $ref: '#/components/responses/Error400'
+        "404":
+          $ref: '#/components/responses/Error404'
+  /api/v1/chat/threads/{resource_id}/messages/{message_id}/:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+      - name: message_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [chat]
+      summary: Retrieve a message
+      responses:
+        "200":
+          description: Message detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "404":
+          $ref: '#/components/responses/Error404'
+    patch:
+      tags: [chat]
+      summary: Edit a message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+      responses:
+        "200":
+          description: Message updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "400":
+          $ref: '#/components/responses/Error400'
+        "404":
+          $ref: '#/components/responses/Error404'
+    delete:
+      tags: [chat]
+      summary: Delete a message
+      responses:
+        "204":
+          description: Message deleted.
+        "404":
+          $ref: '#/components/responses/Error404'
+  /api/v1/profile/:
+    get:
+      tags: [profile]
+      summary: List profiles
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated list of profiles.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Profile'
+        "401":
+          $ref: '#/components/responses/Error401'
+  /api/v1/profile/records/:
+    get:
+      tags: [profile]
+      summary: List profiles (legacy aggregation)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        "200":
+          description: Paginated profiles.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Profile'
+    post:
+      tags: [profile]
+      summary: Create or update own profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Profile'
+      responses:
+        "201":
+          description: Profile created or updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+  /api/v1/profile/{resource_id}/:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    get:
+      tags: [profile]
+      summary: Retrieve profile
+      responses:
+        "200":
+          description: Profile detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        "404":
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [profile]
+      summary: Replace profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Profile'
+      responses:
+        "200":
+          description: Profile updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "404":
+          $ref: '#/components/responses/Error404'
+    patch:
+      tags: [profile]
+      summary: Partially update profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Profile'
+      responses:
+        "200":
+          description: Profile updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "404":
+          $ref: '#/components/responses/Error404'
+    delete:
+      tags: [profile]
+      summary: Delete profile
+      responses:
+        "204":
+          description: Profile deleted.
+        "401":
+          $ref: '#/components/responses/Error401'
+        "404":
+          $ref: '#/components/responses/Error404'
+  /api/v1/profile/{resource_id}/info/:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    get:
+      tags: [profile]
+      summary: Retrieve full profile info
+      description: Returns the profile along with interests, certifications, studies, and experience.
+      responses:
+        "200":
+          description: Aggregated profile info.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile:
+                    $ref: '#/components/schemas/Profile'
+                  interests:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Interest'
+                  certifications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Certification'
+                  studies:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Study'
+                  experience:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Experience'
+        "404":
+          $ref: '#/components/responses/Error404'
+  /api/v1/profile/certifications/:
+    get:
+      tags: [profile]
+      summary: List certifications
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        "200":
+          description: Paginated certifications.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Certification'
+  /api/v1/profile/certifications/create/:
+    post:
+      tags: [profile]
+      summary: Create certification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Certification'
+      responses:
+        "201":
+          description: Certification created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certification'
+        "400":
+          $ref: '#/components/responses/Error400'
+  /api/v1/profile/certifications/{resource_id}/:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    get:
+      tags: [profile]
+      summary: Retrieve certification
+      responses:
+        "200":
+          description: Certification detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certification'
+        "404":
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [profile]
+      summary: Replace certification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Certification'
+      responses:
+        "200":
+          description: Certification updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certification'
+        "400":
+          $ref: '#/components/responses/Error400'
+        "404":
+          $ref: '#/components/responses/Error404'
+    delete:
+      tags: [profile]
+      summary: Delete certification
+      responses:
+        "204":
+          description: Certification removed.
+        "404":
+          $ref: '#/components/responses/Error404'
+  /api/v1/profile/interests/:
+    get:
+      tags: [profile]
+      summary: List interests
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        "200":
+          description: Paginated interests.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Interest'
+  /api/v1/profile/interests/create/:
+    post:
+      tags: [profile]
+      summary: Create interest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Interest'
+      responses:
+        "201":
+          description: Interest created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Interest'
+        "400":
+          $ref: '#/components/responses/Error400'
+  /api/v1/profile/interests/{resource_id}/:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    get:
+      tags: [profile]
+      summary: Retrieve interest
+      responses:
+        "200":
+          description: Interest detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Interest'
+        "404":
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [profile]
+      summary: Replace interest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Interest'
+      responses:
+        "200":
+          description: Interest updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Interest'
+        "400":
+          $ref: '#/components/responses/Error400'
+        "404":
+          $ref: '#/components/responses/Error404'
+    delete:
+      tags: [profile]
+      summary: Delete interest
+      responses:
+        "204":
+          description: Interest removed.
+        "404":
+          $ref: '#/components/responses/Error404'
+  /api/v1/profile/studies/:
+    get:
+      tags: [profile]
+      summary: List studies
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        "200":
+          description: Paginated studies.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Study'
+  /api/v1/profile/studies/create/:
+    post:
+      tags: [profile]
+      summary: Create study
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Study'
+      responses:
+        "201":
+          description: Study created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Study'
+        "400":
+          $ref: '#/components/responses/Error400'
+  /api/v1/profile/studies/{resource_id}/:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    get:
+      tags: [profile]
+      summary: Retrieve study
+      responses:
+        "200":
+          description: Study detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Study'
+        "404":
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [profile]
+      summary: Replace study
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Study'
+      responses:
+        "200":
+          description: Study updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Study'
+        "400":
+          $ref: '#/components/responses/Error400'
+        "404":
+          $ref: '#/components/responses/Error404'
+    delete:
+      tags: [profile]
+      summary: Delete study
+      responses:
+        "204":
+          description: Study removed.
+        "404":
+          $ref: '#/components/responses/Error404'
+  /api/v1/profile/experience/:
+    get:
+      tags: [profile]
+      summary: List experience records
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        "200":
+          description: Paginated experience records.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Experience'
+  /api/v1/profile/experience/create/:
+    post:
+      tags: [profile]
+      summary: Create experience record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Experience'
+      responses:
+        "201":
+          description: Experience created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Experience'
+        "400":
+          $ref: '#/components/responses/Error400'
+  /api/v1/profile/experience/{resource_id}/:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    get:
+      tags: [profile]
+      summary: Retrieve experience record
+      responses:
+        "200":
+          description: Experience detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Experience'
+        "404":
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [profile]
+      summary: Replace experience record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Experience'
+      responses:
+        "200":
+          description: Experience updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Experience'
+        "400":
+          $ref: '#/components/responses/Error400'
+        "404":
+          $ref: '#/components/responses/Error404'
+    delete:
+      tags: [profile]
+      summary: Delete experience record
+      responses:
+        "204":
+          description: Experience removed.
+        "404":
+          $ref: '#/components/responses/Error404'
+  /api/v1/home/slider/:
+    get:
+      tags: [home]
+      summary: List home slider entries
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        "200":
+          description: Paginated slider items.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            title:
+                              type: string
+                            image:
+                              type: string
+                              format: uri
+  /api/v1/home/containers/:
+    get:
+      tags: [home]
+      summary: List home containers
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        "200":
+          description: Paginated container content blocks.
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Paginated'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            title:
+                              type: string
+                            body:
+                              type: string
+  /webhooks/github/:
+    post:
+      tags: [webhooks]
+      summary: Trigger deployment pipeline
+      description: >
+        Receives signed GitHub webhook payloads and triggers the deployment
+        script when the target branch matches the configured deploy branch.
+      security: []
+      parameters:
+        - name: X-Hub-Signature-256
+          in: header
+          required: true
+          schema:
+            type: string
+          description: >
+            GitHub signature for webhook payload verification (SHA-256 HMAC).
+        - name: X-GitHub-Event
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Raw GitHub webhook payload.
+      responses:
+        "200":
+          description: Deployment triggered successfully.
+        "202":
+          description: Webhook ignored (branch mismatch).
+        "400":
+          $ref: '#/components/responses/Error400'
+        "401":
+          $ref: '#/components/responses/Error401'
+        "500":
+          $ref: '#/components/responses/Error500'
+components:
+  securitySchemes:
+    knoxApiToken:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: >
+        Provide the Knox token as `Token <key>`. Tokens are obtained via
+        `/api/v1/auth/login/` and expire automatically if not refreshed.
+  schemas:
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        detail:
+          type: string
+          description: Human-readable error message.
+        code:
+          type: string
+          description: Machine-readable error code.
+      required: [detail]
+    Paginated:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items: {}
+      required: [count, results]
+    Profile:
+      type: object
+      description: Public profile fields exposed for marketplace users.
+      properties:
+        id:
+          type: string
+          format: uuid
+        site_id:
+          type: string
+        name:
+          type: string
+        first_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        profession:
+          type: string
+        bio:
+          type: string
+        rating:
+          type: number
+          format: float
+        members:
+          type: integer
+        followers:
+          type: integer
+        earning:
+          type: number
+          format: float
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        picture:
+          type: string
+          format: uri
+        picture_medium:
+          type: string
+          format: uri
+        picture_small:
+          type: string
+          format: uri
+        about:
+          type: string
+        member_since:
+          type: string
+          format: date
+    Interest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        added_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Certification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        added_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Study:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        location:
+          type: string
+        content:
+          type: string
+        degree:
+          type: string
+        started_at:
+          type: string
+          format: date
+        ended_at:
+          type: string
+          format: date
+    Experience:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        company:
+          type: string
+        location:
+          type: string
+        content:
+          type: string
+        started_at:
+          type: string
+          format: date
+        ended_at:
+          type: string
+          format: date
+    Service:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [requested, confirmed, canceled, pending, paid]
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        category:
+          type: string
+        sub_category:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        image:
+          type: string
+          format: uri
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Thread:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        subject:
+          type: string
+        participants:
+          type: array
+          items:
+            type: string
+            format: uuid
+        last_message_preview:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        thread_id:
+          type: string
+          format: uuid
+        sender_id:
+          type: string
+          format: uuid
+        body:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        edited_at:
+          type: string
+          format: date-time
+          nullable: true
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: Page number to return (1-indexed).
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PageSize:
+      name: page_size
+      in: query
+      description: Number of items per page (max 100).
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Ordering:
+      name: ordering
+      in: query
+      description: Comma-separated list of fields to order by.
+      schema:
+        type: string
+    ResourceId:
+      name: resource_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  headers:
+    X-RateLimit-Limit:
+      description: Maximum number of requests allowed in the current window.
+      schema:
+        type: integer
+    X-RateLimit-Remaining:
+      description: Remaining requests in the current rate-limit window.
+      schema:
+        type: integer
+    X-RateLimit-Reset:
+      description: Epoch timestamp when the current rate-limit window resets.
+      schema:
+        type: integer
+        format: int64
+    X-Total-Count:
+      description: Total number of items available for the current resource.
+      schema:
+        type: integer
+    Link:
+      description: RFC 5988 `Link` header for pagination navigation.
+      schema:
+        type: string
+  responses:
+    Error400:
+      description: Bad request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error401:
+      description: Authentication failure.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error403:
+      description: Missing permissions.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error404:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error422:
+      description: Unprocessable entity.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error429:
+      description: Too many requests.
+      headers:
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error500:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
