@@ -1,7 +1,7 @@
 from chat.models import Thread, Message
 from rest_framework import viewsets,views
 from chat.serializers import MessageSerializers, ThreadSerializers
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly,AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from knox.auth import TokenAuthentication
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -99,6 +99,5 @@ class MessageAPIView(views.APIView):
         instance.delete()
         return HttpResponse(status=204)
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [AllowAny]
-
+    permission_classes = [IsAuthenticatedOrReadOnly]
 

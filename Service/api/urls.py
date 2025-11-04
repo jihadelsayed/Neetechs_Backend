@@ -56,7 +56,7 @@ urlpatterns = [
 	# Lists service posts, often with specific filtering (e.g., active/premium) via API.
 	path('list', ApiServiceListView.as_view(), name="list"),
 	# General listing/filtering endpoint for service posts via API.
-	path('', servicesListAPIView.as_view(), name="filter"),
+	path('filter/', servicesListAPIView.as_view(), name="filter"),
 	# Checks if the authenticated user is the employee (owner) of a service post by slug via API.
 	path('<slug>/is_employee', api_is_employee_of_servicepost, name="is_employee"),
 ]

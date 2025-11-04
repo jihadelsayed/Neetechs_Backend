@@ -8,7 +8,7 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly,AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -37,35 +37,35 @@ CREATE_SUCCESS = 'created' # Indicates successful creation of a resource.
 class CategoryViewSet(ListAPIView):
 	"""Lists all service categories (ModelCategory instances)."""
 	authentication_classes = (TokenAuthentication,) # Specifies Knox token authentication.
-	permission_classes = (AllowAny,) # Allows unrestricted access to this view.
+	permission_classes = (IsAuthenticatedOrReadOnly,) # Allows unrestricted access to this view.
 	serializer_class = CategorySerializer # Serializer for ModelCategory instances.
 	queryset = ModelCategory.objects.all() # Retrieves all ModelCategory objects.
 	
 class SubCategoryViewSet(ListAPIView):
 	"""Lists all service subcategories (ModelSubCategory instances), ordered by parent category."""
 	authentication_classes = (TokenAuthentication,)
-	permission_classes = (AllowAny,)
+	permission_classes = (IsAuthenticatedOrReadOnly,)
 	serializer_class = SubCategorySerializer # Serializer for ModelSubCategory instances.
 	queryset = ModelSubCategory.objects.all().order_by('Category') # Retrieves all subcategories, ordered by their parent category.
 
 class CountryViewSet(ListAPIView):
 	"""Lists all countries (ModelCountry instances)."""
 	authentication_classes = (TokenAuthentication,)
-	permission_classes = (AllowAny,)
+	permission_classes = (IsAuthenticatedOrReadOnly,)
 	serializer_class = CountrySerializer # Serializer for ModelCountry instances.
 	queryset = ModelCountry.objects.all() # Retrieves all ModelCountry objects.
 
 class StateViewSet(ListAPIView):
 	"""Lists all states/regions (ModelState instances)."""
 	authentication_classes = (TokenAuthentication,)
-	permission_classes = (AllowAny,)
+	permission_classes = (IsAuthenticatedOrReadOnly,)
 	serializer_class = StateSerializer # Serializer for ModelState instances.
 	queryset = ModelState.objects.all() # Retrieves all ModelState objects.
 
 class CityViewSet(ListAPIView):
 	"""Lists distinct city names found in ServicePost instances."""
 	authentication_classes = (TokenAuthentication,)
-	permission_classes = (AllowAny,)
+	permission_classes = (IsAuthenticatedOrReadOnly,)
 	serializer_class = CitySerializer # Serializer for city data (likely a custom serializer for distinct values).
 	queryset = ServicePost.objects.values('city').distinct() # Retrieves unique city values from ServicePost.
 
@@ -79,7 +79,7 @@ class LikesViewSet(ListAPIView):
 	ModelLikes seems to have been removed or is not used here.
 	"""
 	authentication_classes = (TokenAuthentication,)
-	permission_classes = (AllowAny,)
+	permission_classes = (IsAuthenticatedOrReadOnly,)
 	serializer_class = LikesSerializer # Serializer for handling 'likes' field of ServicePost.
 	queryset = ServicePost.objects.all() # Operates on all ServicePost instances.
 	
@@ -154,14 +154,14 @@ class DisLikesViewSet(ListAPIView):
 	ModelDisLikes seems to have been removed or is not used here.
 	"""
 	authentication_classes = (TokenAuthentication,)
-	permission_classes = (AllowAny,)
+	permission_classes = (IsAuthenticatedOrReadOnly,)
 	serializer_class = DisLikesSerializer # Serializer for handling 'disLikes' field of ServicePost.
 	queryset = ServicePost.objects.all() # Operates on all ServicePost instances.
 
 class CommentsViewSet(ListAPIView):
 	"""Lists all comments (ModelComments instances)."""
 	authentication_classes = (TokenAuthentication,)
-	permission_classes = (AllowAny,)
+	permission_classes = (IsAuthenticatedOrReadOnly,)
 	serializer_class = CommentsSerializer # Serializer for ModelComments instances.
 	queryset = ModelComments.objects.all() # Retrieves all ModelComments objects.
 
@@ -403,7 +403,7 @@ class ApiServiceListView(ListAPIView):
 	Supports pagination, searching, and ordering.
 
 	Authentication: TokenAuthentication
-	Permissions: AllowAny
+	Permissions: IsAuthenticatedOrReadOnly (public read access, authenticated writes if added later)
 	Pagination: PageNumberPagination
 	Filtering: SearchFilter (on title, beskrivning, slug, employee__username), OrderingFilter.
 	"""
@@ -411,7 +411,7 @@ class ApiServiceListView(ListAPIView):
 	queryset = ServicePost.objects.filter(Q(expiration_date__gte=timezone.now()) | Q(employee__subscription_type="premiumplanMonthly") | Q(employee__subscription_type="PremiumPlanYearly"))
 	serializer_class = ServicePostSerializer # Serializer for ServicePost instances.
 	authentication_classes = (TokenAuthentication,) # Uses Knox token authentication.
-	permission_classes = (AllowAny,) # Allows unrestricted access.
+	permission_classes = (IsAuthenticatedOrReadOnly,) # Allows unrestricted access.
 	pagination_class = PageNumberPagination # Enables pagination for the list.
 	filter_backends = (SearchFilter, OrderingFilter) # Enables search and ordering.
 	search_fields = ('title', 'beskrivning', 'slug','employee__username') # Fields available for searching.
@@ -424,14 +424,13 @@ class servicesListAPIView(ListAPIView):
     Provides more detailed field-level filtering via DjangoFilterBackend.
 
     Authentication: TokenAuthentication
-    Permissions: AllowAny
+    Permissions: IsAuthenticatedOrReadOnly (public read access, authenticated writes if added later)
     Filtering: DjangoFilterBackend (on many fields), SearchFilter, OrderingFilter.
     """
     queryset = ServicePost.objects.filter(Q(expiration_date__gte=timezone.now()) | Q(employee__subscription_type="premiumplanMonthly") | Q(employee__subscription_type="PremiumPlanYearly"))
     serializer_class = ServicePostSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [AllowAny]
-    #permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
     OrderingFilter = ('title')
     filterset_fields = ['title', 'site_id', 'beskrivning','slug', 'city','state','country','underCategory','category','status','beskrivning','bedomning','updatedAt','pris','tillganligFran','tillganligTill']

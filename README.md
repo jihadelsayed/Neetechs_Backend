@@ -25,6 +25,15 @@ Django backend for the Neetechs platform. Provides APIs for auth, profiles, serv
 - Chat (Channels websockets)
 - Admin dashboard
 
+Architecture and deployment diagrams now live under `/docs/`. Drop new `.png` diagrams there and link to them from this README (e.g., `![Architecture](docs/diagram.png)`).
+
+## Endpoints
+- `/` responds with `{"message":"Neetechs API","docs":"/api/docs/"}` so clients can discover docs without guessing.
+- `/api/v1/` hosts the versioned API via DRF routers (categories, services, chat, profile, home slider/containers) plus `/api/v1/auth/...` for login/register/logout/OTP/OAuth/me.
+- Health probes: `/healthz/` (liveness) and `/readyz/`.
+- `/webhooks/github/` validates GitHub's `X-Hub-Signature-256` header (or the legacy `X-DEPLOY-SECRET`) before executing your deploy script. Set `GITHUB_WEBHOOK_SECRET`, `DEPLOY_SCRIPT_PATH`, and `GITHUB_DEPLOY_BRANCH` in `.env`.
+- Legacy paths such as `/auth/login/`, `/api/service/`, `/api/home/list/HomeSlider` now issue 301/308 redirects to their `/api/v1/...` equivalents. Update integrations soon; the redirects are temporary.
+
 ---
 
 ## Quick Start (Local)
@@ -187,6 +196,45 @@ source /srv/neetechs/env/bin/activate
 python /srv/neetechs/app/manage.py collectstatic --noinput
 deactivate
 ```
+
+### GitHub → server webhook deploys
+1. Set the following in `.env` (or the systemd `EnvironmentFile`):
+   - `GITHUB_WEBHOOK_SECRET` – shared HMAC secret with your GitHub repository webhook.
+   - `GITHUB_DEPLOY_BRANCH` – only payloads whose `ref` matches this branch will trigger a deploy.
+   - `DEPLOY_SCRIPT_PATH` – absolute path to the bash script that performs the deploy (`/var/www/Neetechs_Script/deploy.sh` by default).
+2. Point the GitHub webhook at `https://server.neetechs.com/webhooks/github/`, choose the “application/json” content type, and paste the same secret.
+3. The webhook view exposes `GITHUB_EVENT` and `GITHUB_REF` in the script environment so you can branch on push vs tag events inside the bash script.
+4. Responses include a short snippet of stdout/stderr to ease troubleshooting; full logs should still live on the server (e.g., `journalctl -u gunicorn-neetechs`).
+
+## AWS Elastic Beanstalk Notes
+
+If you deploy via Elastic Beanstalk, keep the following tiny checklist handy:
+
+1. Create the folder and config file:
+   ```bash
+   mkdir -p .ebextensions
+   cat > .ebextensions/django.config <<'YML'
+   option_settings:
+     aws:elasticbeanstalk:container:python:
+       WSGIPath: ebdjango.wsgi:application
+   option_settings:
+     aws:elasticbeanstalk:container:python:
+       WSGIPath: ebdjango.asgi:application
+   YML
+   ```
+2. Add the EB host to `ALLOWED_HOSTS` in your settings:
+   ```python
+   ALLOWED_HOSTS = ['eb-django-app-dev.elasticbeanstalk.com', ...]
+   ```
+3. Usual EB commands:
+   ```bash
+   eb init
+   eb status
+   eb deploy
+   eb open
+   eb logs --zip
+   eb logs
+   ```
 
 ---
 

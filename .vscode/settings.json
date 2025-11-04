@@ -1,7 +1,0 @@
-{
-  "python.defaultInterpreterPath": ".venv/bin/python",
-  "python.languageServer": "Pylance",
-  "python.analysis.indexing": true,
-  "python.analysis.typeCheckingMode": "basic",
-  "terminal.integrated.defaultProfile.linux": "bash"
-}

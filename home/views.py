@@ -1,16 +1,22 @@
 # اللهم صلي على سيدنا محمد
-from django.conf import settings
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from knox.auth import TokenAuthentication
-from .models import HomeSliderMoudel,HomeContainersModel
-from .serializer import HomeSliderSerializer,HomeContainersSerializer
+import json
+import os
+import subprocess
+from pathlib import Path
 
-from django_filters.rest_framework import DjangoFilterBackend#,SearchFilter,OrderingFilter
+from django.conf import settings
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-import subprocess
-from django.http import JsonResponse
+from knox.auth import TokenAuthentication
+
+from Neetechs.permissions import DeployWebhookPermission
+from .models import HomeSliderMoudel, HomeContainersModel
+from .serializer import HomeSliderSerializer, HomeContainersSerializer
 
 
 class HomeSliderAPIView(ListAPIView):
@@ -25,28 +31,88 @@ class HomeContainersAPIView(ListAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = LimitOffsetPagination
- 
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from django.conf import settings
-import subprocess
 
 @csrf_exempt
 @api_view(["POST"])
 @authentication_classes([])  # disable all auth
-@permission_classes([AllowAny])  # allow any request
+@permission_classes([DeployWebhookPermission])  # validate deploy secret header
 def github_webhook(request):
-    secret_token = request.headers.get("X-DEPLOY-SECRET")
+    """
+    Trigger the deployment script when GitHub sends a signed webhook request.
 
-    if secret_token != settings.GITHUB_WEBHOOK_SECRET:
-        return JsonResponse({"error": "Unauthorized"}, status=401)
+    The request is authenticated by DeployWebhookPermission which validates the
+    ``X-Hub-Signature-256`` header (or the legacy ``X-DEPLOY-SECRET``).
+    """
+
+    payload = _json_payload(request)
+    branch = payload.get("ref")
+    target_branch = getattr(settings, "GITHUB_DEPLOY_BRANCH", "refs/heads/main")
+
+    if target_branch and branch and branch != target_branch:
+        return JsonResponse(
+            {
+                "status": "ignored",
+                "detail": f"branch {branch} does not match {target_branch}",
+            },
+            status=202,
+        )
+
+    script_path = Path(getattr(settings, "DEPLOY_SCRIPT_PATH", "/var/www/Neetechs_Script/deploy.sh"))
+    if not script_path.exists():
+        return JsonResponse({"error": f"Deploy script not found at {script_path}"}, status=500)
+
+    timeout = getattr(settings, "DEPLOY_SCRIPT_TIMEOUT", 120)
+    env = {
+        **os.environ,
+        "GITHUB_EVENT": request.headers.get("X-GitHub-Event", ""),
+        "GITHUB_REF": branch or "",
+    }
 
     try:
-        subprocess.run(["bash", "/var/www/Neetechs_Script/deploy.sh"], check=True)
-        return JsonResponse({"status": "Deployment triggered"})
-    except subprocess.CalledProcessError as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        result = subprocess.run(
+            ["/bin/bash", str(script_path)],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            env=env,
+        )
+    except subprocess.TimeoutExpired:
+        return JsonResponse({"error": f"Deploy script timed out after {timeout}s"}, status=504)
+    except subprocess.CalledProcessError as exc:
+        return JsonResponse(
+            {
+                "error": "Deploy script failed",
+                "exit_code": exc.returncode,
+                "stderr": _tail(exc.stderr),
+            },
+            status=500,
+        )
 
+    return JsonResponse(
+        {
+            "status": "Deployment triggered",
+            "stdout": _tail(result.stdout),
+            "branch": branch,
+        }
+    )
+
+
+def _json_payload(request):
+    if not request.body:
+        return {}
+    try:
+        return json.loads(request.body)
+    except json.JSONDecodeError:
+        return {}
+
+
+def _tail(text, limit=2000):
+    """
+    Return a small chunk from the end of script output to avoid huge responses.
+    """
+
+    snippet = (text or "").strip()
+    if len(snippet) > limit:
+        return snippet[-limit:]
+    return snippet

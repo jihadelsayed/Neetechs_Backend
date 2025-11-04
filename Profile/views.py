@@ -10,8 +10,7 @@ from rest_framework import views, viewsets
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import (AllowAny, IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from knox_allauth.models import CustomUser
@@ -28,7 +27,7 @@ class ProfilesListAPIView(ListAPIView):
     Supports listing, and filtering by various fields like site_id, profession, name, etc.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly
+    Permissions: IsAuthenticated
     Filtering: Uses DjangoFilterBackend, SearchFilter, OrderingFilter.
                Filterable fields: 'first_name', 'site_id', 'about', 'profession', 'city', 'state', 'country'.
                Searchable fields: 'first_name', 'site_id', 'about', 'profession', 'city', 'state', 'country'.
@@ -37,7 +36,7 @@ class ProfilesListAPIView(ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = ProfileSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     # Note: The following filter_backends and filterset_fields are defined twice.
     # The second set of definitions will override the first.
     filter_backends = [DjangoFilterBackend] 
@@ -61,7 +60,7 @@ class ProfilesAPIView(views.APIView):
                 it might be intended for a user to update their own profile if `username` (user ID) is passed.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly
+    Permissions: IsAuthenticated
     """
     def get(self, request):
         Profiles = CustomUser.objects.all()
@@ -87,7 +86,7 @@ class ProfilesAPIView(views.APIView):
         return Response(serializer.errors,status=400)
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     # filter_backends and filterset_fields here seem to be from a ListAPIView context and might not be fully effective on a standard APIView.
     filter_backends = [DjangoFilterBackend] 
     filterset_fields = ['site_id', 'in_stock'] # 'in_stock' is not a field on CustomUser model.
@@ -101,7 +100,7 @@ class AllProfileInfoAPIView(views.APIView):
         - GET: Retrieves a specific profile by site_id.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly
+    Permissions: IsAuthenticated
     """
     def get_object(self,site_id):
         """
@@ -123,7 +122,7 @@ class AllProfileInfoAPIView(views.APIView):
         return Response(serializer.data, status=200)
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
 class ProfileAPIView(views.APIView):
     """
@@ -137,7 +136,7 @@ class ProfileAPIView(views.APIView):
         - DELETE: Deletes a profile.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly (allows read, restricts write to authenticated users, though further checks might be needed for own-profile edits).
+    Permissions: IsAuthenticated (allows read, restricts write to authenticated users, though further checks might be needed for own-profile edits).
     """
     def get_object(self,site_id):
         """
@@ -194,7 +193,7 @@ class ProfileAPIView(views.APIView):
         return HttpResponse(status=204) # No content response for successful deletion.
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
 class Kompetenser_intygsListAPIView(ListAPIView):
     """
@@ -202,13 +201,13 @@ class Kompetenser_intygsListAPIView(ListAPIView):
     Supports filtering by name, username (FK ID), and username's site_id.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly
+    Permissions: IsAuthenticated
     Filtering: Uses DjangoFilterBackend. Filterable fields: 'name', 'username', 'username__site_id'.
     """
     queryset = Kompetenser_intyg.objects.all()
     serializer_class = Kompetenser_intygSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['name','username','username__site_id']
 
@@ -221,7 +220,7 @@ class Kompetenser_intygsPostAPIView(views.APIView):
         - POST: Creates a new skill/certificate entry.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly (though POST implies authenticated write).
+    Permissions: IsAuthenticated (though POST implies authenticated write).
     """
     def post(self, request):
         data= request.data
@@ -233,7 +232,7 @@ class Kompetenser_intygsPostAPIView(views.APIView):
         return Response(serializer.errors,status=400)
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
 
 class Kompetenser_intygAPIView(views.APIView):
@@ -247,7 +246,7 @@ class Kompetenser_intygAPIView(views.APIView):
         - DELETE: Deletes a skill/certificate.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly.
+    Permissions: IsAuthenticated.
     """
     def get_object(self,id):
         """
@@ -283,7 +282,7 @@ class Kompetenser_intygAPIView(views.APIView):
         return HttpResponse(status=204)
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
 class IntressensListAPIView(ListAPIView):
     """
@@ -291,14 +290,14 @@ class IntressensListAPIView(ListAPIView):
     Supports filtering by name, username (FK ID), and username's site_id.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly
+    Permissions: IsAuthenticated
     Filtering: Uses DjangoFilterBackend. Filterable fields: 'name', 'username', 'username__site_id'.
     Pagination: LimitOffsetPagination.
     """
     queryset = Intressen.objects.all()
     serializer_class = IntressenSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['name','username','username__site_id']
     pagination_class = LimitOffsetPagination
@@ -312,7 +311,7 @@ class IntressensPostAPIView(views.APIView):
         - POST: Creates a new interest entry.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly.
+    Permissions: IsAuthenticated.
     """
     def post(self, request):
         data= request.data
@@ -324,7 +323,7 @@ class IntressensPostAPIView(views.APIView):
         return Response(serializer.errors,status=400)
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
 class IntressenAPIView(views.APIView):
     """
@@ -337,7 +336,7 @@ class IntressenAPIView(views.APIView):
         - DELETE: Deletes an interest.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly.
+    Permissions: IsAuthenticated.
     """
     def get_object(self,id):
         """
@@ -373,7 +372,7 @@ class IntressenAPIView(views.APIView):
         return HttpResponse(status=204)
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
 
 
@@ -383,13 +382,13 @@ class StudiersListAPIView(ListAPIView):
     Supports filtering by name, username (FK ID), and username's site_id.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly
+    Permissions: IsAuthenticated
     Filtering: Uses DjangoFilterBackend. Filterable fields: 'name', 'username', 'username__site_id'.
     """
     queryset = Studier.objects.all()
     serializer_class = StudierSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['name','username','username__site_id']
 
@@ -402,7 +401,7 @@ class StudiersPostAPIView(views.APIView):
         - POST: Creates a new study entry.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly.
+    Permissions: IsAuthenticated.
     """
     def post(self, request):
         data= request.data
@@ -414,7 +413,7 @@ class StudiersPostAPIView(views.APIView):
         return Response(serializer.errors,status=400)
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
 class userStudierAPIView(views.APIView):
     """
@@ -422,7 +421,7 @@ class userStudierAPIView(views.APIView):
     However, there are issues in its current implementation (see get_object).
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly
+    Permissions: IsAuthenticated
     Lookup field: 'site_id' (intended for URL).
     """
     def get_object(self,site_id):
@@ -450,7 +449,7 @@ class userStudierAPIView(views.APIView):
         return Response(serializer.data, status=200)
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     lookupfield = 'site_id' # DRF's generic views use lookup_field, not lookupfield.
 
 class StudierAPIView(views.APIView):
@@ -464,7 +463,7 @@ class StudierAPIView(views.APIView):
         - DELETE: Deletes a study entry.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly.
+    Permissions: IsAuthenticated.
     """
     def get_object(self,id):
         """
@@ -500,7 +499,7 @@ class StudierAPIView(views.APIView):
         return HttpResponse(status=204)
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
 class ErfarenhetsListAPIView(ListAPIView):
     """
@@ -508,14 +507,14 @@ class ErfarenhetsListAPIView(ListAPIView):
     Supports filtering by name, username (FK ID), and username's site_id.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly
+    Permissions: IsAuthenticated
     Filtering: Uses DjangoFilterBackend. Filterable fields: 'name', 'username', 'username__site_id'.
     Pagination: LimitOffsetPagination.
     """
     queryset = Erfarenhet.objects.all()
     serializer_class = ErfarenhetSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['name','username','username__site_id']
     pagination_class = LimitOffsetPagination
@@ -529,7 +528,7 @@ class ErfarenhetsPostAPIView(views.APIView):
         - POST: Creates a new experience entry.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly.
+    Permissions: IsAuthenticated.
     """
     def post(self, request):
         data= request.data
@@ -541,7 +540,7 @@ class ErfarenhetsPostAPIView(views.APIView):
         return Response(serializer.errors,status=400)
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
 class ErfarenhetAPIView(views.APIView):
     """
@@ -554,7 +553,7 @@ class ErfarenhetAPIView(views.APIView):
         - DELETE: Deletes an experience entry.
     
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly.
+    Permissions: IsAuthenticated.
     """
     def get_object(self,id):
         """
@@ -590,4 +589,4 @@ class ErfarenhetAPIView(views.APIView):
         return HttpResponse(status=204)
         
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]

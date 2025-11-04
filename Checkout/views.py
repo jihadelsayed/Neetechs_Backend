@@ -8,13 +8,14 @@ from datetime import timedelta
 from knox_allauth.models import CustomUser
 from Service.models import ServicePost
 from Neetechs.settings import STRIPE_WEBHOOK_SECRET
+from Neetechs.permissions import ReadOnlyOrStaff, StripeWebhookPermission
 import json
 from rest_framework.generics import ListAPIView
 from Checkout.models import ServiceOrder
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly,AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from django.conf import settings
 
 #from Service.models import ServicePost
@@ -387,13 +388,14 @@ def api_subscription_view(request):
 
             
 @api_view(['POST'])
-@permission_classes((AllowAny,)) # Webhooks should be publicly accessible but secured by signature verification.
+# Validate Stripe signatures before processing.
+@permission_classes((StripeWebhookPermission,))
 def api_subscription_detail_webhook(request):
     """
     Handles incoming webhooks from Stripe for subscription and payment events.
 
     Method: POST
-    Permissions: AllowAny (secured by Stripe signature verification).
+    Permissions: StripeWebhookPermission (secured by Stripe signature verification).
     Request Data: Stripe event payload.
     Logic:
         - Verifies the Stripe webhook signature.
@@ -407,24 +409,20 @@ def api_subscription_detail_webhook(request):
         - Success: Returns the event data object.
         - Error: Returns an error response if signature verification fails or an exception occurs.
     """
-    request_data = request.data
-
-    if STRIPE_WEBHOOK_SECRET:
-        # Retrieve the event by verifying the signature using the raw body and secret.
+    event = getattr(request, "_stripe_event", None)
+    if event is None:
+        if not STRIPE_WEBHOOK_SECRET:
+            return Response({"error": "Missing Stripe webhook secret."}, status=status.HTTP_400_BAD_REQUEST)
+        # Retrieve the event by verifying the signature using the raw body and secret (fallback when permission wasn't applied).
         signature = request.headers.get('stripe-signature')
         try:
             event = stripe.Webhook.construct_event(
-                payload=request.data, sig_header=signature, secret=STRIPE_WEBHOOK_SECRET)
-            data = event['data']
+                payload=request.body, sig_header=signature, secret=STRIPE_WEBHOOK_SECRET)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST) # Return specific error for signature issue.
-        event_type = event['type']
-    else:
-        # This branch is for environments where webhook secret is not configured (e.g., local testing without signature verification).
-        # It's less secure and should ideally not be used in production.
-        data = request_data['data']
-        event_type = request_data['type']
-    
+
+    data = event['data']
+    event_type = event['type']
     data_object = data['object']
 
     if event_type == 'invoice.paid':
@@ -587,14 +585,14 @@ class ordersListAPIView(ListAPIView):
     Orders are listed in reverse primary key order (newest first).
 
     Authentication: TokenAuthentication
-    Permissions: IsAuthenticatedOrReadOnly (allows read access to anyone, write access to authenticated users).
+    Permissions: ReadOnlyOrStaff (public read access, staff-only writes).
     Filtering: Supports filtering by 'status'.
                Supports searching and ordering.
     """
     queryset = ServiceOrder.objects.all().order_by("-pk")
     serializer_class = ServiceOrderSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [ReadOnlyOrStaff]
     filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
     OrderingFilter = ('pk','title','status') # 'title' might refer to a related field.
     filterset_fields =  ['status']

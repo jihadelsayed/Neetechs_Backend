@@ -22,6 +22,25 @@ for _k, _v in _mod.__dict__.items():
     if _k.isupper():
         globals()[_k] = _v
 
+# Enforce read-only defaults unless a sub-settings module overrides them explicitly.
+REST_FRAMEWORK = {
+    **globals().get("REST_FRAMEWORK", {}),
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly"
+    ],
+}
+
+# Ensure DRF exposes versioned URLs everywhere.
+REST_FRAMEWORK.update(
+    {
+        "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
+        "DEFAULT_VERSION": "v1",
+        "ALLOWED_VERSIONS": ("v1",),
+    }
+)
+
+APPEND_SLASH = True
+
 # Optional: make it easy to see which settings loaded when DEBUG is on
 if globals().get("DEBUG"):
     loaded_from = _target

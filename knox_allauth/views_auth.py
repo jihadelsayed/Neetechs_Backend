@@ -3,7 +3,7 @@ import stripe
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -99,3 +99,11 @@ class EmailConfirmation(APIView):
             return Response({"message": "Email confirmation sent"}, status=status.HTTP_201_CREATED)
         except Exception:
             return Response({"message": "This email does not exist, please create a new account"}, status=status.HTTP_403_FORBIDDEN)
+
+
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = ProfileSerializer(request.user)
+        return Response(serializer.data)

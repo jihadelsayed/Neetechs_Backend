@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly,AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from knox.auth import TokenAuthentication
 
 from Category.models import ModelCategory
@@ -35,9 +35,9 @@ class CategoryViewSet(ListAPIView):
 	This view is publicly accessible for reading.
 
 	Authentication: Uses TokenAuthentication.
-	Permissions: AllowAny (anyone can access this endpoint for read operations).
+	Permissions: IsAuthenticatedOrReadOnly (public read access, authenticated writes if expanded).
 	"""
 	authentication_classes = (TokenAuthentication,)
-	permission_classes = (AllowAny,)
+	permission_classes = (IsAuthenticatedOrReadOnly,)
 	serializer_class = CategorySerializer
 	queryset = ModelCategory.objects.all()
