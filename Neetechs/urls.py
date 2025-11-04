@@ -25,21 +25,15 @@ router.register("home/slider", HomeSliderViewSet, basename="home-slider")
 router.register("home/containers", HomeContainersViewSet, basename="home-containers")
 
 api_v1_patterns = [
-    path("services/", include(("Service.api.urls", "services"))),
-    path("profile/", include(("Profile.urls", "profile"))),
-    path("checkout/", include(("Checkout.urls", "checkout"))),
-    path("report/", include(("report.urls", "report"))),
-    path("trees/", include(("trees.urls", "trees"))),
-    path("chat/", include(("chat.urls", "chat"))),
-    path("home/", include(("home.urls", "home"))),
+    path("services/", include(("Service.api.urls", "services"), namespace="services")),
+    path("profile/", include(("Profile.urls", "profile"), namespace="profile")),
+    path("checkout/", include(("Checkout.urls", "checkout"), namespace="checkout")),
+    path("report/", include(("report.urls", "report"), namespace="report")),
+    path("trees/", include(("trees.urls", "trees"), namespace="trees")),
+    path("chat/", include(("chat.urls", "chat"), namespace="chat")),
+    path("home/", include(("home.urls", "home"), namespace="home")),
     path("", include((router.urls, "api-v1"), namespace="api-v1")),
     path("auth/", include(("Neetechs.urls_auth", "api-auth"), namespace="api-auth")),
-    path("services/", include(("Service.api.urls", "service_api"))),
-    path("profile/", include("Profile.urls")),
-    path("chat/", include("chat.urls")),
-    path("checkout/", include("Checkout.urls")),
-    path("report/", include("report.urls")),
-    path("trees/", include("trees.urls")),
 ]
 
 urlpatterns = [
