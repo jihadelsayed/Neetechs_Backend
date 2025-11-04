@@ -9,20 +9,20 @@ from ..models import CustomUser as User
 # Optional imports from other apps (guarded so this file doesn't explode if they aren't installed yet)
 try:
     from Profile.serializer import (
-        ErfarenhetSerializer,
-        IntressenSerializer,
-        Kompetenser_intygSerializer,
-        StudierSerializer,
+        ExperienceSerializer,
+        InterestSerializer,
+        CompetenceCertificateSerializer,
+        StudySerializer,
     )
     from Profile.models import (
-        Erfarenhet,
-        Intressen,
-        Kompetenser_intyg,
-        Studier,
+        Experience,
+        Interest,
+        CompetenceCertificate,
+        Study,
     )
 except Exception:
-    ErfarenhetSerializer = IntressenSerializer = Kompetenser_intygSerializer = StudierSerializer = None
-    Erfarenhet = Intressen = Kompetenser_intyg = Studier = None
+    ExperienceSerializer = InterestSerializer = CompetenceCertificateSerializer = StudySerializer = None
+    Experience = Interest = CompetenceCertificate = Study = None
 
 try:
     from Service.models import ModelCategory, ModelSubCategory
@@ -35,10 +35,10 @@ except Exception:
 class UserSerializer(serializers.ModelSerializer):
     # Derived / related data
     emailConfirmed = serializers.SerializerMethodField()
-    Intressen = serializers.SerializerMethodField()
-    Kompetenser_intyg = serializers.SerializerMethodField()
-    Studier = serializers.SerializerMethodField()
-    Erfarenhet = serializers.SerializerMethodField()
+    Interest = serializers.SerializerMethodField()
+    CompetenceCertificate = serializers.SerializerMethodField()
+    Study = serializers.SerializerMethodField()
+    Experience = serializers.SerializerMethodField()
     Categories = serializers.SerializerMethodField()
     subCategories = serializers.SerializerMethodField()
     CategoryLastupdate = serializers.SerializerMethodField()
@@ -83,10 +83,10 @@ class UserSerializer(serializers.ModelSerializer):
             "subscription_type",
             "about",
             # related/derived
-            "Intressen",
-            "Kompetenser_intyg",
-            "Studier",
-            "Erfarenhet",
+            "Interest",
+            "CompetenceCertificate",
+            "Study",
+            "Experience",
             "Categories",
             "subCategories",
             "CategoryLastupdate",
@@ -106,29 +106,29 @@ class UserSerializer(serializers.ModelSerializer):
     def get_emailConfirmed(self, obj):
         return EmailAddress.objects.filter(email__iexact=obj.email, verified=True).exists() if obj.email else False
 
-    def get_Intressen(self, obj):
-        if not (Intressen and IntressenSerializer):
+    def get_Interest(self, obj):
+        if not (Interest and InterestSerializer):
             return []
-        qs = Intressen.objects.filter(username=obj.id)
-        return IntressenSerializer(qs, many=True).data
+        qs = Interest.objects.filter(username=obj.id)
+        return InterestSerializer(qs, many=True).data
 
-    def get_Kompetenser_intyg(self, obj):
-        if not (Kompetenser_intyg and Kompetenser_intygSerializer):
+    def get_CompetenceCertificate(self, obj):
+        if not (CompetenceCertificate and CompetenceCertificateSerializer):
             return []
-        qs = Kompetenser_intyg.objects.filter(username=obj.id)
-        return Kompetenser_intygSerializer(qs, many=True).data
+        qs = CompetenceCertificate.objects.filter(username=obj.id)
+        return CompetenceCertificateSerializer(qs, many=True).data
 
-    def get_Studier(self, obj):
-        if not (Studier and StudierSerializer):
+    def get_Study(self, obj):
+        if not (Study and StudySerializer):
             return []
-        qs = Studier.objects.filter(username=obj.id)
-        return StudierSerializer(qs, many=True).data
+        qs = Study.objects.filter(username=obj.id)
+        return StudySerializer(qs, many=True).data
 
-    def get_Erfarenhet(self, obj):
-        if not (Erfarenhet and ErfarenhetSerializer):
+    def get_Experience(self, obj):
+        if not (Experience and ExperienceSerializer):
             return []
-        qs = Erfarenhet.objects.filter(username=obj.id)
-        return ErfarenhetSerializer(qs, many=True).data
+        qs = Experience.objects.filter(username=obj.id)
+        return ExperienceSerializer(qs, many=True).data
 
     def get_Categories(self, obj):
         if not (ModelCategory and CategorySerializer):

@@ -62,8 +62,8 @@ def test_legacy_redirects(client, legacy_path, target):
 >>>>>>> Stashed changes
 
 
-def test_profile_certifications_resolves():
-    assert _resolved_view_name("/api/v1/profile/certifications/") == "Kompetenser_intygsListAPIView"
+def test_profile_competences_resolves():
+    assert _resolved_view_name("/api/v1/profile/competences/") == "CompetenceCertificatesListAPIView"
 
 
 @pytest.mark.django_db

@@ -15,10 +15,10 @@ from rest_framework.response import Response
 
 from knox_allauth.models import CustomUser
 
-from .models import Erfarenhet, Intressen, Kompetenser_intyg, Studier
-from .serializer import (AllProfileInfoSerializer, ErfarenhetSerializer,
-                         IntressenSerializer, Kompetenser_intygSerializer,
-                         ProfileSerializer, StudierSerializer)
+from .models import Experience, Interest, CompetenceCertificate, Study
+from .serializer import (AllProfileInfoSerializer, ExperienceSerializer,
+                         InterestSerializer, CompetenceCertificateSerializer,
+                         ProfileSerializer, StudySerializer)
 
 
 class ProfileListView(ListAPIView):
@@ -195,26 +195,26 @@ class ProfileDetailView(views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
 
-class CertificationListView(ListAPIView):
+class CompetenceListView(ListAPIView):
     """
-    Lists all Kompetenser_intyg (Skills/Certificates) entries.
+    Lists all CompetenceCertificate (Skills/Certificates) entries.
     Supports filtering by name, username (FK ID), and username's site_id.
     
     Authentication: TokenAuthentication
     Permissions: IsAuthenticated
     Filtering: Uses DjangoFilterBackend. Filterable fields: 'name', 'username', 'username__site_id'.
     """
-    queryset = Kompetenser_intyg.objects.all()
-    serializer_class = Kompetenser_intygSerializer
+    queryset = CompetenceCertificate.objects.all()
+    serializer_class = CompetenceCertificateSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['name','username','username__site_id']
 
-class CertificationCreateView(views.APIView):
+class CompetenceCreateView(views.APIView):
     """
-    API view for creating Kompetenser_intyg (Skills/Certificates) entries.
-    Interacts with Kompetenser_intyg model using Kompetenser_intygSerializer.
+    API view for creating CompetenceCertificate (Skills/Certificates) entries.
+    Interacts with CompetenceCertificate model using CompetenceCertificateSerializer.
 
     Operations:
         - POST: Creates a new skill/certificate entry.
@@ -224,7 +224,7 @@ class CertificationCreateView(views.APIView):
     """
     def post(self, request):
         data= request.data
-        serializer = Kompetenser_intygSerializer(data=data)
+        serializer = CompetenceCertificateSerializer(data=data)
         # Authorization check: Ensures the authenticated user's ID matches the 'username' (FK ID) in the request data.
         if serializer.is_valid() and int(request.user.id) == int(request.data.get('username')):
             serializer.save()
@@ -235,10 +235,10 @@ class CertificationCreateView(views.APIView):
     permission_classes = [IsAuthenticated]
 
 
-class CertificationDetailView(views.APIView):
+class CompetenceDetailView(views.APIView):
     """
-    API view for retrieving, updating, or deleting a specific Kompetenser_intyg (Skill/Certificate) entry by its ID.
-    Interacts with Kompetenser_intyg model.
+    API view for retrieving, updating, or deleting a specific CompetenceCertificate (Skill/Certificate) entry by its ID.
+    Interacts with CompetenceCertificate model.
 
     Operations:
         - GET: Retrieves a skill/certificate.
@@ -250,26 +250,26 @@ class CertificationDetailView(views.APIView):
     """
     def get_object(self,id):
         """
-        Retrieves a Kompetenser_intyg instance by its ID.
+        Retrieves a CompetenceCertificate instance by its ID.
         Returns a Response object directly on error (unconventional).
         """
         try:
             # Returning Response directly from get_object on error is unconventional.
-            return Kompetenser_intyg.objects.get(id=id)
-        except Kompetenser_intyg.DoesNotExist: # Corrected exception name
-            return Response( {"error":"Given Kompetenser_intyg was not found."},status=404) # Corrected typo "mot"
+            return CompetenceCertificate.objects.get(id=id)
+        except CompetenceCertificate.DoesNotExist: # Corrected exception name
+            return Response( {"error":"Given CompetenceCertificate was not found."},status=404) # Corrected typo "mot"
 
     def get(self, request,id=None):
         instance = self.get_object(id)
         if isinstance(instance, Response): return instance
-        serializer = Kompetenser_intygSerializer(instance)
+        serializer = CompetenceCertificateSerializer(instance)
         return Response(serializer.data, status=200)
 
     def put(self, request,id=None):
         data= request.data
         instance = self.get_object(id)
         if isinstance(instance, Response): return instance
-        serializer = Kompetenser_intygSerializer(instance,data=data)
+        serializer = CompetenceCertificateSerializer(instance,data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=200)
@@ -286,7 +286,7 @@ class CertificationDetailView(views.APIView):
 
 class InterestListView(ListAPIView):
     """
-    Lists all Intressen (Interests) entries with pagination.
+    Lists all Interest (Interests) entries with pagination.
     Supports filtering by name, username (FK ID), and username's site_id.
     
     Authentication: TokenAuthentication
@@ -294,8 +294,8 @@ class InterestListView(ListAPIView):
     Filtering: Uses DjangoFilterBackend. Filterable fields: 'name', 'username', 'username__site_id'.
     Pagination: LimitOffsetPagination.
     """
-    queryset = Intressen.objects.all()
-    serializer_class = IntressenSerializer
+    queryset = Interest.objects.all()
+    serializer_class = InterestSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
@@ -304,8 +304,8 @@ class InterestListView(ListAPIView):
 
 class InterestCreateView(views.APIView):
     """
-    API view for creating Intressen (Interests) entries.
-    Interacts with Intressen model using IntressenSerializer.
+    API view for creating Interest (Interests) entries.
+    Interacts with Interest model using InterestSerializer.
 
     Operations:
         - POST: Creates a new interest entry.
@@ -315,7 +315,7 @@ class InterestCreateView(views.APIView):
     """
     def post(self, request):
         data= request.data
-        serializer = IntressenSerializer(data=data)
+        serializer = InterestSerializer(data=data)
         # Authorization check: Ensures the authenticated user's ID matches the 'username' (FK ID) in the request data.
         if serializer.is_valid() and int(request.user.id) == int(request.data.get('username')):
             serializer.save()
@@ -327,8 +327,8 @@ class InterestCreateView(views.APIView):
 
 class InterestDetailView(views.APIView):
     """
-    API view for retrieving, updating, or deleting a specific Intressen (Interest) entry by its ID.
-    Interacts with Intressen model.
+    API view for retrieving, updating, or deleting a specific Interest (Interest) entry by its ID.
+    Interacts with Interest model.
 
     Operations:
         - GET: Retrieves an interest.
@@ -340,26 +340,26 @@ class InterestDetailView(views.APIView):
     """
     def get_object(self,id):
         """
-        Retrieves an Intressen instance by its ID.
+        Retrieves an Interest instance by its ID.
         Returns a Response object directly on error (unconventional).
         """
         try:
             # Returning Response directly from get_object on error is unconventional.
-            return Intressen.objects.get(id=id)
-        except Intressen.DoesNotExist: # Corrected exception name
-            return Response( {"error":"Given Intressen was not found."},status=404) # Corrected typo "mot"
+            return Interest.objects.get(id=id)
+        except Interest.DoesNotExist: # Corrected exception name
+            return Response( {"error":"Given Interest was not found."},status=404) # Corrected typo "mot"
 
     def get(self, request,id=None):
         instance = self.get_object(id)
         if isinstance(instance, Response): return instance
-        serializer = IntressenSerializer(instance)
+        serializer = InterestSerializer(instance)
         return Response(serializer.data, status=200)
 
     def put(self, request,id=None):
         data= request.data
         instance = self.get_object(id)
         if isinstance(instance, Response): return instance
-        serializer = IntressenSerializer(instance,data=data)
+        serializer = InterestSerializer(instance,data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=200)
@@ -378,15 +378,15 @@ class InterestDetailView(views.APIView):
 
 class StudyListView(ListAPIView):
     """
-    Lists all Studier (Studies) entries.
+    Lists all Study (Studies) entries.
     Supports filtering by name, username (FK ID), and username's site_id.
     
     Authentication: TokenAuthentication
     Permissions: IsAuthenticated
     Filtering: Uses DjangoFilterBackend. Filterable fields: 'name', 'username', 'username__site_id'.
     """
-    queryset = Studier.objects.all()
-    serializer_class = StudierSerializer
+    queryset = Study.objects.all()
+    serializer_class = StudySerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
@@ -394,8 +394,8 @@ class StudyListView(ListAPIView):
 
 class StudyCreateView(views.APIView):
     """
-    API view for creating Studier (Studies) entries.
-    Interacts with Studier model using StudierSerializer.
+    API view for creating Study (Studies) entries.
+    Interacts with Study model using StudySerializer.
 
     Operations:
         - POST: Creates a new study entry.
@@ -405,7 +405,7 @@ class StudyCreateView(views.APIView):
     """
     def post(self, request):
         data= request.data
-        serializer = StudierSerializer(data=data)
+        serializer = StudySerializer(data=data)
         # Authorization check: Ensures the authenticated user's ID matches the 'username' (FK ID) in the request data.
         if serializer.is_valid() and int(request.user.id) == int(request.data.get('username')):
             serializer.save()
@@ -415,9 +415,9 @@ class StudyCreateView(views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
 
-class userStudierAPIView(views.APIView):
+class userStudyAPIView(views.APIView):
     """
-    API view intended to list Studier (Studies) entries for a specific user identified by site_id.
+    API view intended to list Study (Studies) entries for a specific user identified by site_id.
     However, there are issues in its current implementation (see get_object).
     
     Authentication: TokenAuthentication
@@ -427,25 +427,25 @@ class userStudierAPIView(views.APIView):
     def get_object(self,site_id):
         """
         Attempts to retrieve studies for a user.
-        Currently queries Intressen model using 'site_id__site_id' which is likely incorrect.
+        Currently queries Interest model using 'site_id__site_id' which is likely incorrect.
         Returns a Response object directly on error (unconventional).
         """
         try:
-            # FIXME: This queries the Intressen model, not Studier.
+            # FIXME: This queries the Interest model, not Study.
             # Also, 'site_id__site_id' is an incorrect lookup. It should likely be
-            # Studier.objects.filter(username__site_id=site_id) to get multiple entries,
+            # Study.objects.filter(username__site_id=site_id) to get multiple entries,
             # or .get() if only one is expected for a specific relation not shown here.
             # Returning Response directly from get_object on error is unconventional.
-            return Intressen.objects.get(site_id__site_id=site_id) 
-        except Intressen.DoesNotExist: # Should be Studier.DoesNotExist if model is corrected.
-            return Response( {"error":"Given userStudierAPIView was not found."},status=404) # Corrected typo "mot"
+            return Interest.objects.get(site_id__site_id=site_id) 
+        except Interest.DoesNotExist: # Should be Study.DoesNotExist if model is corrected.
+            return Response( {"error":"Given userStudyAPIView was not found."},status=404) # Corrected typo "mot"
 
     def get(self, request,site_id=None):
         instance = self.get_object(site_id)
         if isinstance(instance, Response): return instance
-        # FIXME: Serializer mismatch. Fetches Intressen (or fails to fetch Studier) 
-        # but uses StudierSerializer. This will likely lead to errors or incorrect data.
-        serializer = StudierSerializer(instance) # If instance is a list, many=True is needed.
+        # FIXME: Serializer mismatch. Fetches Interest (or fails to fetch Study) 
+        # but uses StudySerializer. This will likely lead to errors or incorrect data.
+        serializer = StudySerializer(instance) # If instance is a list, many=True is needed.
         return Response(serializer.data, status=200)
 
     authentication_classes = (TokenAuthentication,)
@@ -454,8 +454,8 @@ class userStudierAPIView(views.APIView):
 
 class StudyDetailView(views.APIView):
     """
-    API view for retrieving, updating, or deleting a specific Studier (Study) entry by its ID.
-    Interacts with Studier model.
+    API view for retrieving, updating, or deleting a specific Study (Study) entry by its ID.
+    Interacts with Study model.
 
     Operations:
         - GET: Retrieves a study entry.
@@ -467,26 +467,26 @@ class StudyDetailView(views.APIView):
     """
     def get_object(self,id):
         """
-        Retrieves a Studier instance by its ID.
+        Retrieves a Study instance by its ID.
         Returns a Response object directly on error (unconventional).
         """
         try:
             # Returning Response directly from get_object on error is unconventional.
-            return Studier.objects.get(id=id)
-        except Studier.DoesNotExist:
-            return Response( {"error":"Given Studier was not found."},status=404) # Corrected typo "mot"
+            return Study.objects.get(id=id)
+        except Study.DoesNotExist:
+            return Response( {"error":"Given Study was not found."},status=404) # Corrected typo "mot"
 
     def get(self, request,id=None):
         instance = self.get_object(id)
         if isinstance(instance, Response): return instance
-        serializer = StudierSerializer(instance)
+        serializer = StudySerializer(instance)
         return Response(serializer.data, status=200)
 
     def put(self, request,id=None):
         data= request.data
         instance = self.get_object(id)
         if isinstance(instance, Response): return instance
-        serializer = StudierSerializer(instance,data=data)
+        serializer = StudySerializer(instance,data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=200)
@@ -503,7 +503,7 @@ class StudyDetailView(views.APIView):
 
 class ExperienceListView(ListAPIView):
     """
-    Lists all Erfarenhet (Experience) entries with pagination.
+    Lists all Experience (Experience) entries with pagination.
     Supports filtering by name, username (FK ID), and username's site_id.
     
     Authentication: TokenAuthentication
@@ -511,8 +511,8 @@ class ExperienceListView(ListAPIView):
     Filtering: Uses DjangoFilterBackend. Filterable fields: 'name', 'username', 'username__site_id'.
     Pagination: LimitOffsetPagination.
     """
-    queryset = Erfarenhet.objects.all()
-    serializer_class = ErfarenhetSerializer
+    queryset = Experience.objects.all()
+    serializer_class = ExperienceSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
@@ -521,8 +521,8 @@ class ExperienceListView(ListAPIView):
 
 class ExperienceCreateView(views.APIView):
     """
-    API view for creating Erfarenhet (Experience) entries.
-    Interacts with Erfarenhet model using ErfarenhetSerializer.
+    API view for creating Experience (Experience) entries.
+    Interacts with Experience model using ExperienceSerializer.
 
     Operations:
         - POST: Creates a new experience entry.
@@ -532,7 +532,7 @@ class ExperienceCreateView(views.APIView):
     """
     def post(self, request):
         data= request.data
-        serializer = ErfarenhetSerializer(data=data)
+        serializer = ExperienceSerializer(data=data)
         # Authorization check: Ensures the authenticated user's ID matches the 'username' (FK ID) in the request data.
         if serializer.is_valid() and int(request.user.id) == int(request.data.get('username')):
             serializer.save()
@@ -544,8 +544,8 @@ class ExperienceCreateView(views.APIView):
 
 class ExperienceDetailView(views.APIView):
     """
-    API view for retrieving, updating, or deleting a specific Erfarenhet (Experience) entry by its ID.
-    Interacts with Erfarenhet model.
+    API view for retrieving, updating, or deleting a specific Experience (Experience) entry by its ID.
+    Interacts with Experience model.
 
     Operations:
         - GET: Retrieves an experience entry.
@@ -557,26 +557,26 @@ class ExperienceDetailView(views.APIView):
     """
     def get_object(self,id):
         """
-        Retrieves an Erfarenhet instance by its ID.
+        Retrieves an Experience instance by its ID.
         Returns a Response object directly on error (unconventional).
         """
         try:
             # Returning Response directly from get_object on error is unconventional.
-            return Erfarenhet.objects.get(id=id)
-        except Erfarenhet.DoesNotExist: # Corrected exception name
-            return Response( {"error":"Given Erfarenhet was not found."},status=404) # Corrected typo "mot"
+            return Experience.objects.get(id=id)
+        except Experience.DoesNotExist: # Corrected exception name
+            return Response( {"error":"Given Experience was not found."},status=404) # Corrected typo "mot"
 
     def get(self, request,id=None):
         instance = self.get_object(id)
         if isinstance(instance, Response): return instance
-        serializer = ErfarenhetSerializer(instance)
+        serializer = ExperienceSerializer(instance)
         return Response(serializer.data, status=200)
 
     def put(self, request,id=None):
         data= request.data
         instance = self.get_object(id)
         if isinstance(instance, Response): return instance
-        serializer = ErfarenhetSerializer(instance, data=data)
+        serializer = ExperienceSerializer(instance, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=200)

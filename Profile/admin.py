@@ -7,13 +7,13 @@ studies, skills, and interests.
 from django.contrib import admin
 
 # Register your models here.
-from .models import Erfarenhet,Studier,Kompetenser_intyg,Intressen
+from .models import Experience,Study,CompetenceCertificate,Interest
 
-# Register the Intressen model with the admin site.
-admin.site.register(Intressen)
-# Register the Kompetenser_intyg model with the admin site.
-admin.site.register(Kompetenser_intyg)
-# Register the Studier model with the admin site.
-admin.site.register(Studier)
-# Register the Erfarenhet model with the admin site.
-admin.site.register(Erfarenhet)
+# Register the Interest model with the admin site.
+admin.site.register(Interest)
+# Register the CompetenceCertificate model with the admin site.
+admin.site.register(CompetenceCertificate)
+# Register the Study model with the admin site.
+admin.site.register(Study)
+# Register the Experience model with the admin site.
+admin.site.register(Experience)

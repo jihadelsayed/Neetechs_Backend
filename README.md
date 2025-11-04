@@ -68,7 +68,7 @@ Architecture and deployment diagrams now live under `/docs/`. Drop new `.png` di
     │   ├── profiles/
     │   ├── <site_id>/
     │   ├── all/<site_id>/
-    │   ├── certifications/[create/|<id>/]
+    │   ├── competences/[create/|<id>/]
     │   ├── interests/[create/|<id>/]
     │   ├── studies/[create/|<id>/]
     │   └── experience/[create/|<id>/]
@@ -115,7 +115,7 @@ Architecture and deployment diagrams now live under `/docs/`. Drop new `.png` di
 | `/api/v1/profile/profile/*` | `/api/v1/profile/*` |
 =======
 - `/` responds with `{"message":"Neetechs API","docs":"/api/docs/"}` so clients can discover docs without guessing.
-- `/api/v1/` hosts the versioned API: `/api/v1/auth/`, `/api/v1/categories/`, `/api/v1/services/` (plus `/featured/`, `/filters/`, `/reactions/`), `/api/v1/profile/` (experience, studies, interests, certifications), `/api/v1/home/slider/`, `/api/v1/home/containers/`, `/api/v1/checkout/`, `/api/v1/report/`, `/api/v1/trees/`, and `/api/v1/chat/`.
+- `/api/v1/` hosts the versioned API: `/api/v1/auth/`, `/api/v1/categories/`, `/api/v1/services/` (plus `/featured/`, `/filters/`, `/reactions/`), `/api/v1/profile/` (experience, studies, interests, competences), `/api/v1/home/slider/`, `/api/v1/home/containers/`, `/api/v1/checkout/`, `/api/v1/report/`, `/api/v1/trees/`, and `/api/v1/chat/`.
 - Health probes: `/healthz/` (liveness) and `/readyz/`.
 - `/webhooks/github/` validates GitHub's `X-Hub-Signature-256` header (or the legacy `X-DEPLOY-SECRET`) before executing your deploy script. Set `GITHUB_WEBHOOK_SECRET`, `DEPLOY_SCRIPT_PATH`, and `GITHUB_DEPLOY_BRANCH` in `.env`.
 - Legacy paths now issue HTTP 308 redirects to their `/api/v1/...` counterparts (see table below).
@@ -125,7 +125,7 @@ Architecture and deployment diagrams now live under `/docs/`. Drop new `.png` di
 | `/auth/login/` | → | `/api/v1/auth/login/` | `308` |
 | `/api/service/list` | → | `/api/v1/services/` | `308` |
 | `/api/service/Category/` | → | `/api/v1/services/filters/category/` | `308` |
-| `/api/v1/profile/profile/list/Intressens` | → | `/api/v1/profile/interests/` | `308` |
+| `/api/v1/profile/profile/list/Interests` | → | `/api/v1/profile/interests/` | `308` |
 | `/api/home/list/HomeSlider` | → | `/api/v1/home/slider/` | `308` |
 | `/api/webhook` | → | `/api/v1/checkout/webhook/` | `308` |
 >>>>>>> Stashed changes

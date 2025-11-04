@@ -4,7 +4,7 @@ from rest_framework import serializers
 from knox_allauth.models import CustomUser
 from Service.models import ModelCategory, ModelSubCategory
 
-from .models import Erfarenhet, Intressen, Kompetenser_intyg, Studier
+from .models import Experience, Interest, CompetenceCertificate, Study
 
 
 class ProfileSerializerBase(serializers.ModelSerializer):
@@ -111,22 +111,22 @@ class ProfileSerializer(ProfileSerializerBase):
             "about",
         )
 
-class IntressenSerializer(serializers.ModelSerializer):
+class InterestSerializer(serializers.ModelSerializer):
     """
-    Serializes Intressen (Interest) model instances, including the user's site_id.
+    Serializes Interest (Interest) model instances, including the user's site_id.
     """
     site_id = serializers.SerializerMethodField() # Custom field to include user's site_id.
     def get_site_id(self, obj):
         """Retrieves the site_id of the user associated with this interest."""
         return obj.username.site_id
     class Meta:
-        model = Intressen
+        model = Interest
         # Specifies the fields to include in the serialized output.
         fields = ('id','site_id','username', 'Added_at', 'updated_at', 'name')
 
-class Kompetenser_intygSerializer(serializers.ModelSerializer):
+class CompetenceCertificateSerializer(serializers.ModelSerializer):
     """
-    Serializes Kompetenser_intyg (Skill/Certificate) model instances,
+    Serializes CompetenceCertificate (Skill/Certificate) model instances,
     including the user's site_id.
     """
     site_id = serializers.SerializerMethodField() # Custom field to include user's site_id.
@@ -134,28 +134,28 @@ class Kompetenser_intygSerializer(serializers.ModelSerializer):
         """Retrieves the site_id of the user associated with this skill/certificate."""
         return obj.username.site_id
     class Meta:
-        model = Kompetenser_intyg
+        model = CompetenceCertificate
         # Specifies the fields to include in the serialized output.
         fields = ('id','site_id','username', 'Added_at', 'updated_at', 'name')
 
-class StudierSerializer(serializers.ModelSerializer):
+class StudySerializer(serializers.ModelSerializer):
     """
-    Serializes Studier (Study) model instances, including the user's site_id.
+    Serializes Study (Study) model instances, including the user's site_id.
     """
     site_id = serializers.SerializerMethodField() # Custom field to include user's site_id.
     def get_site_id(self, obj):
         """Retrieves the site_id of the user associated with this study entry."""
         return obj.username.site_id
     class Meta:
-        model = Studier
+        model = Study
         # Specifies the fields to include in the serialized output.
         fields = ('id','site_id','username', 'Added_at', 'updated_at', 'name', 'plats', 'content', 'started_at', 'ended_at', 'degree')
         #read_only_fields = ('id',) # This line is commented out, review if read_only_fields are needed.
 
 
-class ErfarenhetSerializer(serializers.ModelSerializer):
+class ExperienceSerializer(serializers.ModelSerializer):
     """
-    Serializes Erfarenhet (Experience) model instances, including the user's site_id.
+    Serializes Experience (Experience) model instances, including the user's site_id.
     """
     site_id = serializers.SerializerMethodField() # Custom field to include user's site_id.
     def get_site_id(self, obj):
@@ -163,7 +163,7 @@ class ErfarenhetSerializer(serializers.ModelSerializer):
         return obj.username.site_id
         
     class Meta:
-        model = Erfarenhet
+        model = Experience
         # Specifies the fields to include in the serialized output.
         fields = ('id','site_id','username', 'Added_at', 'updated_at', 'name', 'plats', 'content', 'started_at', 'ended_at','company')
     
@@ -173,35 +173,35 @@ class AllProfileInfoSerializer(ProfileSerializerBase):
     embedding their interests, skills, studies, and experiences directly in the output.
     Also includes category update timestamps and email confirmation status.
     """
-    Intressen = serializers.SerializerMethodField()
-    Kompetenser_intyg = serializers.SerializerMethodField()
-    Studier = serializers.SerializerMethodField()
-    Erfarenhet = serializers.SerializerMethodField()
+    Interest = serializers.SerializerMethodField()
+    CompetenceCertificate = serializers.SerializerMethodField()
+    Study = serializers.SerializerMethodField()
+    Experience = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
         # Specifies all fields to be included for a comprehensive profile view.
-        fields = ('id', 'stripeCustomerId', 'emailConfirmed', 'subscriptionType', 'Intressen', 'Kompetenser_intyg', 'Studier', 'Erfarenhet', 'CategoryLastupdate', 'SubcategoryLastupdate', 'email', 'name', 'first_name', 'phone', 'site_id', 'is_creator', 'bio', 'rating', 'members',
+        fields = ('id', 'stripeCustomerId', 'emailConfirmed', 'subscriptionType', 'Interest', 'CompetenceCertificate', 'Study', 'Experience', 'CategoryLastupdate', 'SubcategoryLastupdate', 'email', 'name', 'first_name', 'phone', 'site_id', 'is_creator', 'bio', 'rating', 'members',
 		          'followers', 'earning', 'profession', 'picture_medium', 'picture_small', 'picture_tag', 'location', 'address1', 'address2', 'zip_code', 'city', 'state', 'country', 'member_since', 'picture','Facebook_link','twitter','profile_completed','Linkdin_link','sms','othersSocialMedia','about')
 
-    def get_Intressen(self, obj):
+    def get_Interest(self, obj):
         """Retrieves and serializes the user's interests."""
         # .filter() returns a queryset, which doesn't raise DoesNotExist.
         # If no interests are found, an empty list will be serialized, which is the desired behavior.
-        intressen = Intressen.objects.filter(username=obj.id)
-        return IntressenSerializer(intressen, many=True).data
+        interest = Interest.objects.filter(username=obj.id)
+        return InterestSerializer(interest, many=True).data
 
-    def get_Kompetenser_intyg(self, obj):
+    def get_CompetenceCertificate(self, obj):
         """Retrieves and serializes the user's skills/certificates."""
-        kompetenser_intyg = Kompetenser_intyg.objects.filter(username=obj.id)
-        return Kompetenser_intygSerializer(kompetenser_intyg, many=True).data
+        competence_intyg = CompetenceCertificate.objects.filter(username=obj.id)
+        return CompetenceCertificateSerializer(competence_intyg, many=True).data
 
-    def get_Studier(self, obj):
+    def get_Study(self, obj):
         """Retrieves and serializes the user's studies."""
-        studier = Studier.objects.filter(username=obj.id)
-        return StudierSerializer(studier, many=True).data
+        study = Study.objects.filter(username=obj.id)
+        return StudySerializer(study, many=True).data
 
-    def get_Erfarenhet(self, obj):
+    def get_Experience(self, obj):
         """Retrieves and serializes the user's work experiences."""
-        erfarenheter = Erfarenhet.objects.filter(username=obj.id)
-        return ErfarenhetSerializer(erfarenheter, many=True).data
+        experienceer = Experience.objects.filter(username=obj.id)
+        return ExperienceSerializer(experienceer, many=True).data

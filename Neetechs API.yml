@@ -1403,7 +1403,7 @@ paths:
     get:
       tags: [profile]
       summary: Retrieve full profile info
-      description: Returns the profile along with interests, certifications, studies, and experience.
+      description: Returns the profile along with interests, competences, studies, and experience.
       responses:
         "200":
           description: Aggregated profile info.
@@ -1418,10 +1418,10 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Interest'
-                  certifications:
+                  competences:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Certification'
+                      $ref: '#/components/schemas/Competence'
                   studies:
                     type: array
                     items:
@@ -1432,16 +1432,16 @@ paths:
                       $ref: '#/components/schemas/Experience'
         "404":
           $ref: '#/components/responses/Error404'
-  /api/v1/profile/certifications/:
+  /api/v1/profile/competences/:
     get:
       tags: [profile]
-      summary: List certifications
+      summary: List competences
       parameters:
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/PageSize'
       responses:
         "200":
-          description: Paginated certifications.
+          description: Paginated competences.
           headers:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
@@ -1457,67 +1457,67 @@ paths:
                       results:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Certification'
-  /api/v1/profile/certifications/create/:
+                          $ref: '#/components/schemas/Competence'
+  /api/v1/profile/competences/create/:
     post:
       tags: [profile]
-      summary: Create certification
+      summary: Create competence
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Certification'
+              $ref: '#/components/schemas/Competence'
       responses:
         "201":
-          description: Certification created.
+          description: Competence created.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Certification'
+                $ref: '#/components/schemas/Competence'
         "400":
           $ref: '#/components/responses/Error400'
-  /api/v1/profile/certifications/{resource_id}/:
+  /api/v1/profile/competences/{resource_id}/:
     parameters:
       - $ref: '#/components/parameters/ResourceId'
     get:
       tags: [profile]
-      summary: Retrieve certification
+      summary: Retrieve competence
       responses:
         "200":
-          description: Certification detail.
+          description: Competence detail.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Certification'
+                $ref: '#/components/schemas/Competence'
         "404":
           $ref: '#/components/responses/Error404'
     put:
       tags: [profile]
-      summary: Replace certification
+      summary: Replace competence
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Certification'
+              $ref: '#/components/schemas/Competence'
       responses:
         "200":
-          description: Certification updated.
+          description: Competence updated.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Certification'
+                $ref: '#/components/schemas/Competence'
         "400":
           $ref: '#/components/responses/Error400'
         "404":
           $ref: '#/components/responses/Error404'
     delete:
       tags: [profile]
-      summary: Delete certification
+      summary: Delete competence
       responses:
         "204":
-          description: Certification removed.
+          description: Competence removed.
         "404":
           $ref: '#/components/responses/Error404'
   /api/v1/profile/interests/:
@@ -1990,7 +1990,7 @@ components:
         updated_at:
           type: string
           format: date-time
-    Certification:
+    Competence:
       type: object
       properties:
         id:

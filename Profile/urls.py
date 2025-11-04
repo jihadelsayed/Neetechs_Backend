@@ -2,9 +2,9 @@
 from django.urls import path
 
 from .views import (
-    CertificationCreateView,
-    CertificationDetailView,
-    CertificationListView,
+    CompetenceCreateView,
+    CompetenceDetailView,
+    CompetenceListView,
     ExperienceCreateView,
     ExperienceDetailView,
     ExperienceListView,
@@ -36,7 +36,7 @@ urlpatterns = [
     path("interests/", InterestListView.as_view(), name="interests-list"),
     path("interests/create/", InterestCreateView.as_view(), name="interests-create"),
     path("interests/<int:id>/", InterestDetailView.as_view(), name="interests-detail"),
-    path("certifications/", CertificationListView.as_view(), name="certifications-list"),
-    path("certifications/create/", CertificationCreateView.as_view(), name="certifications-create"),
-    path("certifications/<int:id>/", CertificationDetailView.as_view(), name="certifications-detail"),
+    path("competences/", CompetenceListView.as_view(), name="competences-list"),
+    path("competences/create/", CompetenceCreateView.as_view(), name="competences-create"),
+    path("competences/<int:id>/", CompetenceDetailView.as_view(), name="competences-detail"),
 ]

@@ -4,10 +4,10 @@ from Neetechs import settings
 
 
 # Create your models here.
-class Erfarenhet(models.Model):
+class Experience(models.Model):
     """
     Represents a user's work experience entry.
-    Swedish: Erfarenhet (Experience).
+    Swedish: Experience (Experience).
     """
     username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE) # Link to the user this work experience belongs to.
     Added_at = models.DateTimeField( # Timestamp when the entry was created. Note: Name is not snake_case.
@@ -23,17 +23,17 @@ class Erfarenhet(models.Model):
 
     class Meta:
         # TODO: Translate verbose_name and verbose_name_plural to English.
-        verbose_name = "Erfarenhet"
-        verbose_name_plural = "Erfarenhets"
+        verbose_name = "Experience"
+        verbose_name_plural = "Experiences"
         ordering = ['name'] # Default ordering for queries.
 
     def __str__(self):
         return self.name
 
-class Studier(models.Model):
+class Study(models.Model):
     """
     Represents a user's educational background or study entry.
-    Swedish: Studier (Studies).
+    Swedish: Study (Studies).
     """
     username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE) # Link to the user this education entry belongs to.
     Added_at = models.DateTimeField( # Timestamp when the entry was created. Note: Name is not snake_case.
@@ -50,17 +50,17 @@ class Studier(models.Model):
 
     class Meta:
         # TODO: Translate verbose_name and verbose_name_plural to English.
-        verbose_name = "Studier"
-        verbose_name_plural = "Studiers"
+        verbose_name = "Study"
+        verbose_name_plural = "Studys"
         ordering = ['name'] # Default ordering for queries.
 
     def __str__(self):
         return self.name
 
-class Kompetenser_intyg(models.Model):
+class CompetenceCertificate(models.Model):
     """
     Represents a user's skill, competence, or certificate entry.
-    Swedish: Kompetenser_intyg (Skills/Certificates).
+    Swedish: CompetenceCertificate (Skills/Certificates).
     This model is currently simple. Consider expanding with fields like
     issuing body, date achieved, level, etc. if more detail is needed for skills/certificates.
     """
@@ -73,18 +73,18 @@ class Kompetenser_intyg(models.Model):
 
     class Meta:
         # TODO: Translate verbose_name and verbose_name_plural to English.
-        verbose_name = "Kompetenser eller intyg"
-        verbose_name_plural = "Kompetensers och intygs"
+        verbose_name = "Competence eller intyg"
+        verbose_name_plural = "Competences och intygs"
         ordering = ['name'] # Default ordering for queries.
 
     def __str__(self):
         return self.name
 
 
-class Intressen(models.Model):
+class Interest(models.Model):
     """
     Represents a user's interests.
-    Swedish: Intressen (Interests).
+    Swedish: Interest (Interests).
     This model is very simple, primarily storing the name of an interest.
     """
     username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE) # Link to the user this interest belongs to.
@@ -96,8 +96,8 @@ class Intressen(models.Model):
 
     class Meta:
         # TODO: Translate verbose_name and verbose_name_plural to English.
-        verbose_name = "Intressen"
-        verbose_name_plural = "Intressens"
+        verbose_name = "Interest"
+        verbose_name_plural = "Interests"
         ordering = ['name'] # Default ordering for queries.
 
     def __str__(self):

@@ -50,7 +50,7 @@ def api_index(_request):
                         "profile": {
                             "base": "/api/v1/profile/",
                             "sections": [
-                                "/api/v1/profile/certifications/",
+                                "/api/v1/profile/competences/",
                                 "/api/v1/profile/interests/",
                                 "/api/v1/profile/studies/",
                                 "/api/v1/profile/experience/",

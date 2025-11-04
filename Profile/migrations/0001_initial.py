@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Erfarenhet',
+            name='Experience',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('Added_at', models.DateTimeField(auto_now_add=True, verbose_name='Added at')),
@@ -29,13 +29,13 @@ class Migration(migrations.Migration):
                 ('username', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'verbose_name': 'Erfarenhet',
-                'verbose_name_plural': 'Erfarenhets',
+                'verbose_name': 'Experience',
+                'verbose_name_plural': 'Experiences',
                 'ordering': ['name'],
             },
         ),
         migrations.CreateModel(
-            name='Intressen',
+            name='Interest',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('Added_at', models.DateTimeField(auto_now_add=True, verbose_name='Added at')),
@@ -44,13 +44,13 @@ class Migration(migrations.Migration):
                 ('username', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'verbose_name': 'Intressen',
-                'verbose_name_plural': 'Intressens',
+                'verbose_name': 'Interest',
+                'verbose_name_plural': 'Interests',
                 'ordering': ['name'],
             },
         ),
         migrations.CreateModel(
-            name='Kompetenser_intyg',
+            name='CompetenceCertificate',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('Added_at', models.DateTimeField(auto_now_add=True, verbose_name='Added at')),
@@ -59,13 +59,13 @@ class Migration(migrations.Migration):
                 ('username', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'verbose_name': 'Kompetenser eller intyg',
-                'verbose_name_plural': 'Kompetensers och intygs',
+                'verbose_name': 'Competence eller intyg',
+                'verbose_name_plural': 'Competences och intygs',
                 'ordering': ['name'],
             },
         ),
         migrations.CreateModel(
-            name='Studier',
+            name='Study',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('Added_at', models.DateTimeField(auto_now_add=True, verbose_name='Added at')),
@@ -79,8 +79,8 @@ class Migration(migrations.Migration):
                 ('username', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'verbose_name': 'Studier',
-                'verbose_name_plural': 'Studiers',
+                'verbose_name': 'Study',
+                'verbose_name_plural': 'Studys',
                 'ordering': ['name'],
             },
         ),
