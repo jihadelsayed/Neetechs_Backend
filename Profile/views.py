@@ -21,7 +21,7 @@ from .serializer import (AllProfileInfoSerializer, ErfarenhetSerializer,
                          ProfileSerializer, StudierSerializer)
 
 
-class ProfilesListAPIView(ListAPIView):
+class ProfileListView(ListAPIView):
     """
     Lists all user profiles (CustomUser instances) with filtering capabilities.
     Supports listing, and filtering by various fields like site_id, profession, name, etc.
@@ -48,7 +48,7 @@ class ProfilesListAPIView(ListAPIView):
     search_fields = ['first_name', 'site_id', 'about','profession', 'city','state','country']
 
 
-class ProfilesAPIView(views.APIView):
+class ProfileCollectionView(views.APIView):
     """
     API view for listing all profiles or creating/updating a profile.
     Interacts with the CustomUser model using ProfileSerializer.
@@ -91,7 +91,7 @@ class ProfilesAPIView(views.APIView):
     filter_backends = [DjangoFilterBackend] 
     filterset_fields = ['site_id', 'in_stock'] # 'in_stock' is not a field on CustomUser model.
 
-class AllProfileInfoAPIView(views.APIView):
+class ProfileSummaryView(views.APIView):
     """
     Retrieves all information for a specific user profile using their site_id.
     Interacts with the CustomUser model using AllProfileInfoSerializer.
@@ -124,7 +124,7 @@ class AllProfileInfoAPIView(views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
 
-class ProfileAPIView(views.APIView):
+class ProfileDetailView(views.APIView):
     """
     API view for retrieving, updating, or deleting a specific user profile by site_id.
     Interacts with the CustomUser model using ProfileSerializer.
@@ -195,7 +195,7 @@ class ProfileAPIView(views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
 
-class Kompetenser_intygsListAPIView(ListAPIView):
+class CertificationListView(ListAPIView):
     """
     Lists all Kompetenser_intyg (Skills/Certificates) entries.
     Supports filtering by name, username (FK ID), and username's site_id.
@@ -211,7 +211,7 @@ class Kompetenser_intygsListAPIView(ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['name','username','username__site_id']
 
-class Kompetenser_intygsPostAPIView(views.APIView):
+class CertificationCreateView(views.APIView):
     """
     API view for creating Kompetenser_intyg (Skills/Certificates) entries.
     Interacts with Kompetenser_intyg model using Kompetenser_intygSerializer.
@@ -235,7 +235,7 @@ class Kompetenser_intygsPostAPIView(views.APIView):
     permission_classes = [IsAuthenticated]
 
 
-class Kompetenser_intygAPIView(views.APIView):
+class CertificationDetailView(views.APIView):
     """
     API view for retrieving, updating, or deleting a specific Kompetenser_intyg (Skill/Certificate) entry by its ID.
     Interacts with Kompetenser_intyg model.
@@ -284,7 +284,7 @@ class Kompetenser_intygAPIView(views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
 
-class IntressensListAPIView(ListAPIView):
+class InterestListView(ListAPIView):
     """
     Lists all Intressen (Interests) entries with pagination.
     Supports filtering by name, username (FK ID), and username's site_id.
@@ -302,7 +302,7 @@ class IntressensListAPIView(ListAPIView):
     filterset_fields = ['name','username','username__site_id']
     pagination_class = LimitOffsetPagination
 
-class IntressensPostAPIView(views.APIView):
+class InterestCreateView(views.APIView):
     """
     API view for creating Intressen (Interests) entries.
     Interacts with Intressen model using IntressenSerializer.
@@ -325,7 +325,7 @@ class IntressensPostAPIView(views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
 
-class IntressenAPIView(views.APIView):
+class InterestDetailView(views.APIView):
     """
     API view for retrieving, updating, or deleting a specific Intressen (Interest) entry by its ID.
     Interacts with Intressen model.
@@ -376,7 +376,7 @@ class IntressenAPIView(views.APIView):
 
 
 
-class StudiersListAPIView(ListAPIView):
+class StudyListView(ListAPIView):
     """
     Lists all Studier (Studies) entries.
     Supports filtering by name, username (FK ID), and username's site_id.
@@ -392,7 +392,7 @@ class StudiersListAPIView(ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['name','username','username__site_id']
 
-class StudiersPostAPIView(views.APIView):
+class StudyCreateView(views.APIView):
     """
     API view for creating Studier (Studies) entries.
     Interacts with Studier model using StudierSerializer.
@@ -452,7 +452,7 @@ class userStudierAPIView(views.APIView):
     permission_classes = [IsAuthenticated]
     lookupfield = 'site_id' # DRF's generic views use lookup_field, not lookupfield.
 
-class StudierAPIView(views.APIView):
+class StudyDetailView(views.APIView):
     """
     API view for retrieving, updating, or deleting a specific Studier (Study) entry by its ID.
     Interacts with Studier model.
@@ -501,7 +501,7 @@ class StudierAPIView(views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
 
-class ErfarenhetsListAPIView(ListAPIView):
+class ExperienceListView(ListAPIView):
     """
     Lists all Erfarenhet (Experience) entries with pagination.
     Supports filtering by name, username (FK ID), and username's site_id.
@@ -519,7 +519,7 @@ class ErfarenhetsListAPIView(ListAPIView):
     filterset_fields = ['name','username','username__site_id']
     pagination_class = LimitOffsetPagination
 
-class ErfarenhetsPostAPIView(views.APIView):
+class ExperienceCreateView(views.APIView):
     """
     API view for creating Erfarenhet (Experience) entries.
     Interacts with Erfarenhet model using ErfarenhetSerializer.
@@ -542,7 +542,7 @@ class ErfarenhetsPostAPIView(views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
 
-class ErfarenhetAPIView(views.APIView):
+class ExperienceDetailView(views.APIView):
     """
     API view for retrieving, updating, or deleting a specific Erfarenhet (Experience) entry by its ID.
     Interacts with Erfarenhet model.
