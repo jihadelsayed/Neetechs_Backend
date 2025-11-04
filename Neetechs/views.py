@@ -23,7 +23,6 @@ def api_index(_request):
                 "v1": {
                     "base": "/api/v1/",
                     "docs": "/api/docs/",
-<<<<<<< Updated upstream
                     "auth": [
                         "/api/v1/auth/login/",
                         "/api/v1/auth/logout/",
@@ -31,27 +30,6 @@ def api_index(_request):
                         "/api/v1/auth/otp/send/",
                         "/api/v1/auth/oauth/google/",
                         "/api/v1/auth/oauth/facebook/",
-=======
-                    "resources": [
-                        "/api/v1/auth/",
-                        "/api/v1/categories/",
-                        "/api/v1/services/",
-                        "/api/v1/services/featured/",
-                        "/api/v1/services/filters/",
-                        "/api/v1/services/reactions/",
-                        "/api/v1/profile/",
-                        "/api/v1/profile/experience/",
-                        "/api/v1/profile/studies/",
-                        "/api/v1/profile/interests/",
-                        "/api/v1/profile/certifications/",
-                        "/api/v1/home/slider/",
-                        "/api/v1/home/containers/",
-                        "/api/v1/checkout/",
-                        "/api/v1/checkout/webhook/",
-                        "/api/v1/report/",
-                        "/api/v1/trees/",
-                        "/api/v1/chat/",
->>>>>>> Stashed changes
                     ],
                     "resources": {
                         "categories": "/api/v1/categories/",

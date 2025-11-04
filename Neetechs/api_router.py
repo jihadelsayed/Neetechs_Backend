@@ -31,11 +31,7 @@ class CategoryViewSet(ReadOnlyViewSet):
     queryset = ModelCategory.objects.all()
     serializer_class = CategorySerializer
     lookup_field = "name"
-<<<<<<< Updated upstream
     lookup_value_regex = "[^/]+"
-=======
-    lookup_value_regex = r"[^/]+"
->>>>>>> Stashed changes
 
 
 class ServicePostViewSet(viewsets.ModelViewSet):
