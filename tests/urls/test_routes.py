@@ -6,6 +6,7 @@ from rest_framework.test import APIClient
 from Category.models import ModelCategory
 
 
+<<<<<<< Updated upstream
 def _resolved_view_name(path: str) -> str:
     match = resolve(path)
     if hasattr(match.func, "view_class"):
@@ -21,6 +22,44 @@ def test_login_route_resolves():
 
 def test_services_router_resolves():
     assert _resolved_view_name("/api/v1/services/") == "ServicePostViewSet"
+=======
+@pytest.mark.parametrize(
+    ("name", "expected"),
+    [
+        ("api-v1:categories-list", "/api/v1/categories/"),
+        ("api-v1:services-list", "/api/v1/services/"),
+        ("api-auth:login", "/api/v1/auth/login/"),
+        ("profile:experience-list", "/api/v1/profile/experience/"),
+        ("services:reactions", "/api/v1/services/reactions/"),
+    ],
+)
+def test_reverse_new_routes(name, expected):
+    assert reverse(name) == expected
+
+
+def test_services_collection_routable(client):
+    response = client.get("/api/v1/services/")
+    assert response.status_code in {200, 401, 403}
+
+
+def test_profile_experience_route():
+    match = resolve("/api/v1/profile/experience/")
+    assert match.view_name == "profile:experience-list"
+
+
+@pytest.mark.parametrize(
+    ("legacy_path", "target"),
+    [
+        ("/auth/login/", "/api/v1/auth/login/"),
+        ("/api/service/list", "/api/v1/services/"),
+        ("/api/webhook", "/api/v1/checkout/webhook/"),
+    ],
+)
+def test_legacy_redirects(client, legacy_path, target):
+    response = client.get(legacy_path, follow=False)
+    assert response.status_code == 308
+    assert response.headers["Location"].startswith(target)
+>>>>>>> Stashed changes
 
 
 def test_profile_certifications_resolves():

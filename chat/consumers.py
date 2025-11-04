@@ -109,13 +109,13 @@ class ChatConsumer(AsyncConsumer):
 
 def get_or_create_personal_thread(userowner, friendusername):
     threadName = userowner+friendusername
-    Namethread = friendusername+userowner
+    namethread = friendusername+userowner
     print("thread =" + threadName)
     try:
         try:
             return Thread.objects.get(ThreadName=threadName)
         except Thread.DoesNotExist:
-            return Thread.objects.get(ThreadName=Namethread)
+            return Thread.objects.get(ThreadName=namethread)
     except Thread.DoesNotExist:
         user1 = CustomUser.objects.get(site_id=userowner)
         user2 = CustomUser.objects.get(site_id=friendusername)

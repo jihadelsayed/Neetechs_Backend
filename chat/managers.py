@@ -3,12 +3,12 @@ from django.db.models import Count
 #from .models import Message
 
 class ThreadManager(models.Manager):
-   # def get_object(self,threadName,Namethread):
+   # def get_object(self,threadName,namethread):
        # try:
         #    try:
          #       return Message.objects.filter(thread__name=threadName)
           #  except Message.DoesNotExist:
-           #     return Message.objects.filter(thread__name=Namethread)
+           #     return Message.objects.filter(thread__name=namethread)
       #  except Message.DoesNotExist as e:
        #     return Response( {"error":"Given message was not found."},status=404)
     def get_or_create_personal_thread(self, userownersiterid, userfriendsiteid):

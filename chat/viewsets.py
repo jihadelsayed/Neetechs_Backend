@@ -48,19 +48,19 @@ class ThreadViewSet(viewsets.ModelViewSet):
        # return Response(serializer.errors,status=400)
 
 class MessagesAPIView(views.APIView):
-    def get_object(self,threadName,Namethread):
+    def get_object(self,threadName,namethread):
         try:
-            if Message.objects.filter(thread__ThreadName=Namethread).first() == None:
+            if Message.objects.filter(thread__ThreadName=namethread).first() == None:
                 return Message.objects.filter(thread__ThreadName=threadName)
             else:
-                return Message.objects.filter(thread__ThreadName=Namethread)
+                return Message.objects.filter(thread__ThreadName=namethread)
         except Message.DoesNotExist as e:
             return Response( {"error":"Given message was not found."},status=404)
     def get(self, request,site_id=None):
         current_user = self.request.user.site_id
         threadName = current_user + site_id
-        Namethread = site_id + current_user
-        instance = self.get_object(threadName,Namethread)
+        namethread = site_id + current_user
+        instance = self.get_object(threadName,namethread)
         serializer = MessageSerializers(instance,many=True)
         return Response(serializer.data, status=200)
 

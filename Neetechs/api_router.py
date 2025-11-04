@@ -31,12 +31,18 @@ class CategoryViewSet(ReadOnlyViewSet):
     queryset = ModelCategory.objects.all()
     serializer_class = CategorySerializer
     lookup_field = "name"
+<<<<<<< Updated upstream
     lookup_value_regex = "[^/]+"
+=======
+    lookup_value_regex = r"[^/]+"
+>>>>>>> Stashed changes
 
 
 class ServicePostViewSet(viewsets.ModelViewSet):
     queryset = ServicePost.objects.all().order_by("-createdAt")
     serializer_class = ServicePostSerializer
+    lookup_field = "slug"
+    lookup_value_regex = r"[^/]+"
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = [
         "title",

@@ -1,9 +1,11 @@
-# apps/trees/urls.py
-from django.urls import path, include
+"""Router configuration for tree resources under /api/v1/trees/."""
 from rest_framework.routers import DefaultRouter
+
 from .views import TreeViewSet
 
-router = DefaultRouter()
-router.register(r"trees", TreeViewSet, basename="trees")
+app_name = "trees"
 
-urlpatterns = [ path("", include(router.urls)) ]
+router = DefaultRouter()
+router.register("", TreeViewSet, basename="trees")
+
+urlpatterns = router.urls
