@@ -7,48 +7,109 @@ from Service.models import ModelCategory, ModelSubCategory
 from .models import Erfarenhet, Intressen, Kompetenser_intyg, Studier
 
 
-class ProfileSerializer(serializers.ModelSerializer):
+class ProfileSerializerBase(serializers.ModelSerializer):
     """
-    Serializes essential CustomUser profile data, including timestamps for
-    category/subcategory updates and email confirmation status.
-    """
-    member_since = serializers.DateTimeField(format='%Y-%m-%d')
-    CategoryLastupdate = serializers.SerializerMethodField('get_CategorysLastupdate')
-    SubcategoryLastupdate = serializers.SerializerMethodField('get_SubCategorysLastupdate')
-    emailConfirmed = serializers.SerializerMethodField('get_emailConfirmed')
+    Shared serializer setup for profile payloads.
 
-    class Meta:
-        model = CustomUser
-        # Specifies the fields to include in the serialized output.
-        fields = ('id', 'stripeCustomerId', 'emailConfirmed', 'subscriptionType', 'name','CategoryLastupdate', 'SubcategoryLastupdate', 'email', 'first_name', 'phone', 'site_id', 'is_creator', 'bio', 'rating', 'members',
-		          'followers', 'earning', 'profession', 'picture_medium', 'picture_small', 'picture_tag', 'location', 'address1', 'address2', 'zip_code', 'city', 'state', 'country', 'member_since', 'picture','Facebook_link','twitter','profile_completed','Linkdin_link','sms','othersSocialMedia','about')
-	
-    def get_CategorysLastupdate(self, obj):
-        """Retrieves the timestamp of the most recently updated ModelCategory."""
+    Keeps the existing camelCase field names in API responses but maps them to the
+    snake_case model fields.
+    """
+
+    member_since = serializers.DateTimeField(format="%Y-%m-%d", allow_null=True)
+    CategoryLastupdate = serializers.SerializerMethodField()
+    SubcategoryLastupdate = serializers.SerializerMethodField()
+    emailConfirmed = serializers.SerializerMethodField()
+
+    stripeCustomerId = serializers.CharField(
+        source="stripe_customer_id", allow_blank=True, allow_null=True, read_only=True
+    )
+    subscriptionType = serializers.CharField(
+        source="subscription_type", allow_blank=True, allow_null=True, read_only=True
+    )
+    Facebook_link = serializers.CharField(
+        source="facebook_link", allow_blank=True, allow_null=True, read_only=True
+    )
+    Linkdin_link = serializers.CharField(
+        source="linkedin_link", allow_blank=True, allow_null=True, read_only=True
+    )
+    othersSocialMedia = serializers.CharField(
+        source="other_social_media", allow_blank=True, allow_null=True, read_only=True
+    )
+
+    def get_CategoryLastupdate(self, obj):
+        """Timestamp of the most recently updated category."""
+
         try:
-            # Corrected variable name and exception type
-            category_last_update = ModelCategory.objects.all().latest('updatedAt').updatedAt
+            category_last_update = ModelCategory.objects.latest("updatedAt").updatedAt
         except ModelCategory.DoesNotExist:
             category_last_update = None
         return category_last_update
 
-    def get_emailConfirmed(self, obj):
-        """Checks if the user's email address is verified."""
+    def get_SubcategoryLastupdate(self, obj):
+        """Timestamp of the most recently updated sub-category."""
+
         try:
-            # Corrected variable name and exception type
-            email_confirmed = EmailAddress.objects.get(email=obj.email).verified
-        except EmailAddress.DoesNotExist: # Corrected exception type
-            email_confirmed = None
-        return email_confirmed
-                
-    def get_SubCategorysLastupdate(self, obj):
-        """Retrieves the timestamp of the most recently updated ModelSubCategory."""
-        try:
-            # Corrected variable name and exception type
-            subcategory_last_update = ModelSubCategory.objects.all().latest('updatedAt').updatedAt
-        except ModelSubCategory.DoesNotExist: # Corrected exception type
+            subcategory_last_update = ModelSubCategory.objects.latest("updatedAt").updatedAt
+        except ModelSubCategory.DoesNotExist:
             subcategory_last_update = None
         return subcategory_last_update
+
+    def get_emailConfirmed(self, obj):
+        """Whether the user's primary email is verified via allauth."""
+
+        try:
+            email_confirmed = EmailAddress.objects.get(email=obj.email).verified
+        except EmailAddress.DoesNotExist:
+            email_confirmed = None
+        return email_confirmed
+
+
+class ProfileSerializer(ProfileSerializerBase):
+    """
+    Serializes essential CustomUser profile data.
+    """
+
+    class Meta:
+        model = CustomUser
+        fields = (
+            "id",
+            "stripeCustomerId",
+            "emailConfirmed",
+            "subscriptionType",
+            "name",
+            "CategoryLastupdate",
+            "SubcategoryLastupdate",
+            "email",
+            "first_name",
+            "phone",
+            "site_id",
+            "is_creator",
+            "bio",
+            "rating",
+            "members",
+            "followers",
+            "earning",
+            "profession",
+            "picture_medium",
+            "picture_small",
+            "picture_tag",
+            "location",
+            "address1",
+            "address2",
+            "zip_code",
+            "city",
+            "state",
+            "country",
+            "member_since",
+            "picture",
+            "Facebook_link",
+            "twitter",
+            "profile_completed",
+            "Linkdin_link",
+            "sms",
+            "othersSocialMedia",
+            "about",
+        )
 
 class IntressenSerializer(serializers.ModelSerializer):
     """
@@ -106,7 +167,7 @@ class ErfarenhetSerializer(serializers.ModelSerializer):
         # Specifies the fields to include in the serialized output.
         fields = ('id','site_id','username', 'Added_at', 'updated_at', 'name', 'plats', 'content', 'started_at', 'ended_at','company')
     
-class AllProfileInfoSerializer(serializers.ModelSerializer):
+class AllProfileInfoSerializer(ProfileSerializerBase):
     """
     Provides a comprehensive serialization of a CustomUser's profile,
     embedding their interests, skills, studies, and experiences directly in the output.
@@ -116,10 +177,6 @@ class AllProfileInfoSerializer(serializers.ModelSerializer):
     Kompetenser_intyg = serializers.SerializerMethodField()
     Studier = serializers.SerializerMethodField()
     Erfarenhet = serializers.SerializerMethodField()
-    member_since = serializers.DateTimeField(format='%Y-%m-%d')
-    CategoryLastupdate = serializers.SerializerMethodField('get_CategorysLastupdate') # Name should ideally be get_category_last_update
-    SubcategoryLastupdate = serializers.SerializerMethodField('get_SubCategorysLastupdate') # Name should ideally be get_subcategory_last_update
-    emailConfirmed = serializers.SerializerMethodField('get_emailConfirmed')
 
     class Meta:
         model = CustomUser
@@ -133,15 +190,6 @@ class AllProfileInfoSerializer(serializers.ModelSerializer):
         # If no interests are found, an empty list will be serialized, which is the desired behavior.
         intressen = Intressen.objects.filter(username=obj.id)
         return IntressenSerializer(intressen, many=True).data
-
-    def get_emailConfirmed(self, obj):
-        """Checks if the user's email address is verified."""
-        # NOTE: This method is duplicated from ProfileSerializer. Consider refactoring.
-        try:
-            email_confirmed = EmailAddress.objects.get(email=obj.email).verified
-        except EmailAddress.DoesNotExist:
-            email_confirmed = None
-        return email_confirmed
 
     def get_Kompetenser_intyg(self, obj):
         """Retrieves and serializes the user's skills/certificates."""
@@ -157,21 +205,3 @@ class AllProfileInfoSerializer(serializers.ModelSerializer):
         """Retrieves and serializes the user's work experiences."""
         erfarenheter = Erfarenhet.objects.filter(username=obj.id)
         return ErfarenhetSerializer(erfarenheter, many=True).data
-
-    def get_CategorysLastupdate(self, obj): # Name should ideally be get_category_last_update
-        """Retrieves the timestamp of the most recently updated ModelCategory."""
-        # NOTE: This method is duplicated from ProfileSerializer. Consider refactoring.
-        try:
-            category_last_update = ModelCategory.objects.all().latest('updatedAt').updatedAt
-        except ModelCategory.DoesNotExist:
-            category_last_update = None
-        return category_last_update
-            
-    def get_SubCategorysLastupdate(self, obj): # Name should ideally be get_subcategory_last_update
-        """Retrieves the timestamp of the most recently updated ModelSubCategory."""
-        # NOTE: This method is duplicated from ProfileSerializer. Consider refactoring.
-        try:
-            subcategory_last_update = ModelSubCategory.objects.all().latest('updatedAt').updatedAt
-        except ModelSubCategory.DoesNotExist:
-            subcategory_last_update = None
-        return subcategory_last_update
