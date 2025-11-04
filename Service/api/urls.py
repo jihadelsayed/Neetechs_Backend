@@ -1,5 +1,6 @@
 """API URL patterns for the Service app (v1)."""
 from django.urls import path
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework.decorators import api_view
 
 from Neetechs.api_router import ServicePostViewSet
@@ -21,12 +22,19 @@ from Service.api.views import (
     api_update_service_view,
     servicesListAPIView,
 )
+from Service.api.serializers import ServicePostCreateSerializer, ServicePostSerializer, ServicePostUpdateSerializer
 
 app_name = "services"
 
 service_collection_view = ServicePostViewSet.as_view({"get": "list"})
 
 
+@extend_schema(methods=["GET"], responses=ServicePostSerializer(many=True))
+@extend_schema(
+    methods=["POST"],
+    request=ServicePostCreateSerializer,
+    responses=ServicePostSerializer,
+)
 @api_view(["GET", "POST"])
 def services_collection(request, *args, **kwargs):
     """List services (GET) or create a service (POST)."""
@@ -35,6 +43,13 @@ def services_collection(request, *args, **kwargs):
     return service_collection_view(request, *args, **kwargs)
 
 
+@extend_schema(methods=["GET"], responses=ServicePostSerializer)
+@extend_schema(
+    methods=["PUT"],
+    request=ServicePostUpdateSerializer,
+    responses=ServicePostSerializer,
+)
+@extend_schema(methods=["DELETE"], responses={204: OpenApiResponse(description="Deleted")})
 @api_view(["GET", "PUT", "DELETE"])
 def services_detail(request, slug, *args, **kwargs):
     """Retrieve, update, or delete a service post."""

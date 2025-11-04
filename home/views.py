@@ -7,6 +7,7 @@ from pathlib import Path
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import LimitOffsetPagination
@@ -33,6 +34,19 @@ class HomeContainersAPIView(ListAPIView):
     pagination_class = LimitOffsetPagination
 
 @csrf_exempt
+@extend_schema(
+    request=None,
+    responses={202: OpenApiResponse(description="Accepted")},
+    parameters=[
+        OpenApiParameter(
+            name="X-Hub-Signature-256",
+            type=str,
+            location=OpenApiParameter.HEADER,
+            required=True,
+        )
+    ],
+    auth=[],
+)
 @api_view(["POST"])
 @authentication_classes([])  # disable all auth
 @permission_classes([DeployWebhookPermission])  # validate deploy secret header

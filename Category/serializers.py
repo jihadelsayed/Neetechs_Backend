@@ -1,7 +1,25 @@
 
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from Category.models import ModelCategory
+
+
+class ChildCategorySerializer(serializers.ModelSerializer):
+	"""Serializer used for documenting nested child categories."""
+	children = serializers.SerializerMethodField()
+
+	class Meta:
+		model = ModelCategory
+		fields = ('id', 'name', 'parent', 'children','description', 'updatedAt', 'createdAt', 'img')
+		ref_name = "CategoryChild"
+
+	@extend_schema_field('CategoryChild')
+	def get_children(self, obj):
+		children = ModelCategory.objects.filter(parent=obj)
+		serializer = ChildCategorySerializer(children, many=True, context=self.context)
+		return serializer.data
+
 
 class CategorySerializer(serializers.ModelSerializer):
 	"""
@@ -17,6 +35,7 @@ class CategorySerializer(serializers.ModelSerializer):
 		# including the custom 'children' field for nested categories.
 		fields = ('id', 'name', 'parent', 'children','description', 'updatedAt', 'createdAt', 'img')
 
+	@extend_schema_field(ChildCategorySerializer(many=True))
 	def get_children(self, obj):
 		"""
 		Retrieves and serializes the direct children of a given category instance.
@@ -24,7 +43,7 @@ class CategorySerializer(serializers.ModelSerializer):
 		"""
 		children = ModelCategory.objects.filter(parent=obj)
 		# Recursively uses the same serializer for children to maintain consistency.
-		serializer = self.__class__(children, many=True)
+		serializer = ChildCategorySerializer(children, many=True, context=self.context)
 		return serializer.data
 
 

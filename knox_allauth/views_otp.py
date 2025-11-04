@@ -6,26 +6,28 @@ from datetime import timedelta
 
 from django.utils import timezone
 from django.core.cache import cache
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
 from knox.models import AuthToken
 from django.conf import settings
 
 from .models import CustomUser
 from .twilio_utils import send_sms_otp
+from .serializers.auth import SendPhoneOTPSerializer, VerifyPhoneOTPSerializer
 
 logger = logging.getLogger(__name__)
 
 
-class SendPhoneOTP(APIView):
+class SendPhoneOTP(GenericAPIView):
     permission_classes = [AllowAny]
+    serializer_class = SendPhoneOTPSerializer
 
     def post(self, request):
-        phone = request.data.get("phone")
-        if not phone:
-            return Response({"detail": "Phone number is required."}, status=400)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        phone = serializer.validated_data["phone"]
 
         hashed_email = sha256(phone.encode()).hexdigest()[:10]
         placeholder_email = f"{hashed_email}@neetechs.sms"
@@ -51,12 +53,15 @@ class SendPhoneOTP(APIView):
         return Response({"detail": "OTP sent successfully."}, status=200)
 
 
-class VerifyPhoneOTP(APIView):
+class VerifyPhoneOTP(GenericAPIView):
     permission_classes = [AllowAny]
+    serializer_class = VerifyPhoneOTPSerializer
 
     def post(self, request):
-        phone = request.data.get("phone")
-        otp = request.data.get("otp")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        phone = serializer.validated_data["phone"]
+        otp = serializer.validated_data["otp"]
 
         ip = request.META.get("REMOTE_ADDR")
         device_id = request.headers.get("X-Device-ID", "")

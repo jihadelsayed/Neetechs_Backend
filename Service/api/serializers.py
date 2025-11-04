@@ -3,6 +3,7 @@ import os
 from django.conf import settings
 from django.core import serializers as ser
 from django.core.files.storage import FileSystemStorage, default_storage
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.serializers import ImageField
 
@@ -18,7 +19,14 @@ MIN_BODY_LENGTH = 20 # Minimum allowed length for body/description fields.
 
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class SubCategorySerializer(serializers.ModelSerializer):
+	"""Serializes all fields for ModelSubCategory instances."""
+	class Meta:
+		model = ModelSubCategory
+		fields = '__all__' # Includes all fields from the ModelSubCategory model.
+
+
+class ServiceCategorySerializer(serializers.ModelSerializer):
 	"""
 	Serializes ModelCategory instances, including its subcategories
 	via the `get_SubCategorys` method.
@@ -29,7 +37,9 @@ class CategorySerializer(serializers.ModelSerializer):
 		model = ModelCategory
 		# Specifies fields to include in the serialized output.
 		fields = ['pk', 'name', 'img', 'children']
+		ref_name = "ServiceCategory"
 
+	@extend_schema_field(SubCategorySerializer(many=True))
 	def get_SubCategorys(self, obj):
 		"""
 		Retrieves and serializes subcategories related to the given ModelCategory instance.
@@ -45,13 +55,6 @@ class AllCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ModelCategory
         fields = '__all__' # Includes all fields from the ModelCategory model.
-
-
-class SubCategorySerializer(serializers.ModelSerializer):
-    """Serializes all fields for ModelSubCategory instances."""
-    class Meta:
-        model = ModelSubCategory
-        fields = '__all__' # Includes all fields from the ModelSubCategory model.
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -131,11 +134,13 @@ class ServicePostSerializer(serializers.ModelSerializer):
 		fields = ['pk', 'expiration_date', 'stripeId', 'createdAt', 'enhet', 'likes', 'disLikes', 'picture', 'updatedAt', 'bedomning', 'title', 'AboutSeller', 'sellerName', 'slug', 'pris',
 		    'site_id', 'image', 'image2', 'image3', 'image4', 'image5', 'beskrivning', 'status', 'tillganligFran', 'tillganligTill', 'category', 'underCategory', 'country', 'state', 'city']
 
+	@extend_schema_field(serializers.CharField())
 	def get_site_id_from_employee(self, service_post):
 		"""Retrieves the site_id of the employee associated with the service post."""
 		site_id = service_post.employee.site_id
 		return site_id
 
+	@extend_schema_field(serializers.URLField())
 	def get_profilepicture_from_employee(self, service_post):
 		"""Retrieves the URL of the profile picture for the employee associated with the service post."""
 		# Note: Accessing .url might cause issues if the image file doesn't exist or storage fails.
@@ -330,10 +335,6 @@ class ServicePostCreateSerializer(serializers.ModelSerializer):
 		except KeyError:
 			raise serializers.ValidationError({"response": "You must have a title, some content, and an image."})
 	"""
-
-
-
-
 
 
 

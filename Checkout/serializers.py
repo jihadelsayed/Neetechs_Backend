@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from Service.models import ServicePost
 from knox_allauth.models import CustomUser
@@ -24,18 +25,21 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
 		# This includes standard model fields and the custom method fields defined above.
 		fields = ['quantity','pk','status','serviceId','employedIdd','ordered_at','customerIdd','servicename','employedname','customername','price','enhet','date']
 
+	@extend_schema_field(serializers.CharField())
 	def get_servicename(self, obj):
 		"""Retrieves the title of the ordered service."""
 		# Consider renaming Servicenam to service_name for Python naming conventions.
 		Servicenam = ServicePost.objects.get(pk=obj.serviceId).title
 		return Servicenam
 
+	@extend_schema_field(serializers.CharField())
 	def get_employedname(self, obj):
 		"""Retrieves the first name of the employee/provider associated with the order."""
 		# Consider renaming Employednam to employee_name.
 		Employednam = CustomUser.objects.get(site_id=obj.employedIdd).first_name
 		return Employednam
 
+	@extend_schema_field(serializers.CharField())
 	def get_customername(self, obj):
 		"""Retrieves the first name of the customer who placed the order."""
 		# Consider renaming Customernam to customer_name.
@@ -49,5 +53,4 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
 #	class Meta:
 #		model = ServiceOrder
 #		fields = ['pk','status','serviceId','employedId','ordered_at','customerId','price','enhet','enhet']
-
 

@@ -26,10 +26,10 @@ except Exception:
 
 try:
     from Service.models import ModelCategory, ModelSubCategory
-    from Service.api.serializers import CategorySerializer, SubCategorySerializer
+    from Service.api.serializers import ServiceCategorySerializer, SubCategorySerializer
 except Exception:
     ModelCategory = ModelSubCategory = None
-    CategorySerializer = SubCategorySerializer = None
+    ServiceCategorySerializer = SubCategorySerializer = None
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -131,10 +131,10 @@ class UserSerializer(serializers.ModelSerializer):
         return ExperienceSerializer(qs, many=True).data
 
     def get_Categories(self, obj):
-        if not (ModelCategory and CategorySerializer):
+        if not (ModelCategory and ServiceCategorySerializer):
             return []
         qs = ModelCategory.objects.all()
-        return CategorySerializer(qs, many=True).data
+        return ServiceCategorySerializer(qs, many=True).data
 
     def get_subCategories(self, obj):
         if not (ModelSubCategory and SubCategorySerializer):

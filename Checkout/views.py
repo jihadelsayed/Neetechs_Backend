@@ -20,15 +20,17 @@ from django.conf import settings
 
 #from Service.models import ServicePost
 from .serializers import ServiceOrderSerializer
-from chat.serializers import MessageSerializers
+from chat.serializers import MessageSerializer
 import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
 from knox.auth import TokenAuthentication
 
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiTypes
 
 # OrderService
+@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def api_order_service_view(request):
@@ -72,6 +74,7 @@ def api_order_service_view(request):
             return Response(data=data) # Consider returning a more specific success response or serialized data.
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['PATCH'])
 @permission_classes((IsAuthenticated,))
 def api_confirm_order_service_view(request):
@@ -104,7 +107,7 @@ def api_confirm_order_service_view(request):
             return messageInstance
 
         serializer = ServiceOrderSerializer(instance,data=data, partial=True)
-        messageSerializer = MessageSerializers(messageInstance,data=data, partial=True)
+        messageSerializer = MessageSerializer(messageInstance,data=data, partial=True)
         
         # Validate that the authenticated user is the customer associated with the order.
         if data['customerIdd'] == request.user.site_id:
@@ -116,7 +119,7 @@ def api_confirm_order_service_view(request):
             
             # Re-initialize serializers with the modified data for update
             serializer = ServiceOrderSerializer(instance, data=modified_data, partial=True)
-            messageSerializer = MessageSerializers(messageInstance, data=modified_data, partial=True)
+            messageSerializer = MessageSerializer(messageInstance, data=modified_data, partial=True)
 
             if serializer.is_valid():
                 serializer.save()
@@ -127,6 +130,7 @@ def api_confirm_order_service_view(request):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({"detail": "User not authorized to confirm this order."}, status=status.HTTP_403_FORBIDDEN)
 
+@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['PATCH'])
 @permission_classes((IsAuthenticated,))
 def api_canceled_order_service_view(request):
@@ -157,7 +161,7 @@ def api_canceled_order_service_view(request):
         if isinstance(messageInstance, Response): return messageInstance # Propagate error
 
         serializer = ServiceOrderSerializer(instance,data=data, partial=True)
-        messageSerializer = MessageSerializers(messageInstance,data=data, partial=True)
+        messageSerializer = MessageSerializer(messageInstance,data=data, partial=True)
 
         if data['customerIdd'] == request.user.site_id:
             modified_data = data.copy()
@@ -165,7 +169,7 @@ def api_canceled_order_service_view(request):
             modified_data['type'] = 'canceled'
 
             serializer = ServiceOrderSerializer(instance, data=modified_data, partial=True)
-            messageSerializer = MessageSerializers(messageInstance, data=modified_data, partial=True)
+            messageSerializer = MessageSerializer(messageInstance, data=modified_data, partial=True)
 
             if serializer.is_valid():
                 serializer.save()
@@ -209,6 +213,7 @@ def get_message(pk):
         return Response( {"error":"Given Message was not found."},status=status.HTTP_404_NOT_FOUND)
 
 # pawnMoney - This term might be domain-specific, referring to a type of payment.
+@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def api_pawn_Money_view(request):
@@ -260,6 +265,7 @@ def api_pawn_Money_view(request):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def api_renew_service_view(request):
@@ -303,6 +309,7 @@ def api_renew_service_view(request):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def api_customer_portal_view(request):
@@ -333,6 +340,7 @@ def api_customer_portal_view(request):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def api_subscription_view(request):
@@ -387,6 +395,7 @@ def api_subscription_view(request):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             
+@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['POST'])
 # Validate Stripe signatures before processing.
 @permission_classes((StripeWebhookPermission,))
@@ -469,6 +478,7 @@ def api_subscription_detail_webhook(request):
 
     return Response(data_object) # Return the Stripe data object for acknowledgment.
 
+@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def api_pay_Money_view(request):
@@ -512,9 +522,10 @@ def api_pay_Money_view(request):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@extend_schema(request=None, responses={200: ServiceOrderSerializer})
 @api_view(['GET', ])
 @permission_classes((IsAuthenticatedOrReadOnly, ))
-def api_detail_order_view(request, pk):
+def api_detail_order_view(request, id):
     """
     Retrieves and returns the details of a specific service order.
 
@@ -530,7 +541,7 @@ def api_detail_order_view(request, pk):
         - Error: HTTP 404 if the order is not found.
     """
     try:
-        order = ServiceOrder.objects.get(pk=pk)
+        order = ServiceOrder.objects.get(pk=id)
     except ServiceOrder.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -558,7 +569,15 @@ class api_purchase_orders_view(ListAPIView):
 
     def get_queryset(self):
         """Returns orders where the current user is the employee, ordered by newest first."""
-        return  ServiceOrder.objects.filter(employedIdd=self.request.user.site_id).order_by("-pk")
+        request = getattr(self, "request", None)
+        if (
+            getattr(self, "swagger_fake_view", False)
+            or not request
+            or not getattr(request, "user", None)
+            or not request.user.is_authenticated
+        ):
+            return ServiceOrder.objects.none()
+        return ServiceOrder.objects.filter(employedIdd=request.user.site_id).order_by("-pk")
 
 class api_requested_orders_view(ListAPIView):
     """
@@ -577,7 +596,15 @@ class api_requested_orders_view(ListAPIView):
 
     def get_queryset(self):
         """Returns orders where the current user is the customer, ordered by newest first."""
-        return  ServiceOrder.objects.filter(customerIdd=self.request.user.site_id).order_by("-pk")
+        request = getattr(self, "request", None)
+        if (
+            getattr(self, "swagger_fake_view", False)
+            or not request
+            or not getattr(request, "user", None)
+            or not request.user.is_authenticated
+        ):
+            return ServiceOrder.objects.none()
+        return ServiceOrder.objects.filter(customerIdd=request.user.site_id).order_by("-pk")
 
 class ordersListAPIView(ListAPIView):
     """

@@ -1,0 +1,6304 @@
+openapi: 3.0.3
+info:
+  title: Neetechs API
+  version: 1.0.0
+  description: OpenAPI for Neetechs Platform
+paths:
+  /api/v1/auth/email/resend/:
+    post:
+      operationId: api_v1_auth_email_resend_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailConfirmation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmailConfirmation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmailConfirmation'
+        required: true
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailConfirmation'
+          description: ''
+  /api/v1/auth/login/:
+    post:
+      operationId: api_v1_auth_login_create
+      description: |-
+        Check the credentials and return the REST Token
+        if the credentials are valid and authenticated.
+        Calls Django Auth login method to register User ID
+        in Django session framework
+
+        Accept the following POST parameters: username, password
+        Return the REST Framework Token Object's key.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+          description: ''
+  /api/v1/auth/logout/:
+    post:
+      operationId: api_v1_auth_logout_create
+      description: |-
+        Calls Django logout method and delete the Token object
+        assigned to the current User object.
+
+        Accepts/Returns nothing.
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /api/v1/auth/me/:
+    get:
+      operationId: api_v1_auth_me_retrieve
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUser'
+          description: ''
+  /api/v1/auth/oauth/facebook/:
+    post:
+      operationId: api_v1_auth_oauth_facebook_create
+      description: |-
+        class used for social authentications
+        example usage for facebook with access_token
+        -------------
+        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+
+        class FacebookLogin(SocialLoginView):
+            adapter_class = FacebookOAuth2Adapter
+        -------------
+
+        example usage for facebook with code
+
+        -------------
+        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+        from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+
+        class FacebookLogin(SocialLoginView):
+            adapter_class = FacebookOAuth2Adapter
+            client_class = OAuth2Client
+            callback_url = 'localhost:8000'
+        -------------
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialLogin'
+          description: ''
+  /api/v1/auth/oauth/google/:
+    post:
+      operationId: api_v1_auth_oauth_google_create
+      description: |-
+        class used for social authentications
+        example usage for facebook with access_token
+        -------------
+        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+
+        class FacebookLogin(SocialLoginView):
+            adapter_class = FacebookOAuth2Adapter
+        -------------
+
+        example usage for facebook with code
+
+        -------------
+        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+        from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+
+        class FacebookLogin(SocialLoginView):
+            adapter_class = FacebookOAuth2Adapter
+            client_class = OAuth2Client
+            callback_url = 'localhost:8000'
+        -------------
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialLogin'
+          description: ''
+  /api/v1/auth/otp/send/:
+    post:
+      operationId: api_v1_auth_otp_send_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendPhoneOTP'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendPhoneOTP'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendPhoneOTP'
+        required: true
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendPhoneOTP'
+          description: ''
+  /api/v1/auth/otp/verify/:
+    post:
+      operationId: api_v1_auth_otp_verify_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyPhoneOTP'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyPhoneOTP'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyPhoneOTP'
+        required: true
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyPhoneOTP'
+          description: ''
+  /api/v1/auth/password/set/:
+    post:
+      operationId: api_v1_auth_password_set_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetPassword'
+          description: ''
+  /api/v1/auth/register/:
+    post:
+      operationId: api_v1_auth_register_create
+      description: |-
+        Registers a new user.
+
+        Accepts the following POST parameters: username, email, password1, password2.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhoneOrEmailRegister'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PhoneOrEmailRegister'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PhoneOrEmailRegister'
+        required: true
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhoneOrEmailRegister'
+          description: ''
+  /api/v1/categories/:
+    get:
+      operationId: api_v1_categories_list
+      description: Helper mixin for read-only resources.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategoryList'
+          description: ''
+  /api/v1/categories/{name}/:
+    get:
+      operationId: api_v1_categories_retrieve
+      description: Helper mixin for read-only resources.
+      parameters:
+      - in: path
+        name: name
+        schema:
+          type: string
+          pattern: ^[^/]+$
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+  /api/v1/chat/:
+    get:
+      operationId: api_v1_chat_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedThreadSerializersList'
+          description: ''
+    post:
+      operationId: api_v1_chat_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreadSerializers'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ThreadSerializers'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ThreadSerializers'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadSerializers'
+          description: ''
+  /api/v1/chat/{id}/:
+    get:
+      operationId: api_v1_chat_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this thread.
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadSerializers'
+          description: ''
+    put:
+      operationId: api_v1_chat_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this thread.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreadSerializers'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ThreadSerializers'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ThreadSerializers'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadSerializers'
+          description: ''
+    patch:
+      operationId: api_v1_chat_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this thread.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedThreadSerializers'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedThreadSerializers'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedThreadSerializers'
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadSerializers'
+          description: ''
+    delete:
+      operationId: api_v1_chat_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this thread.
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/chat/thread/:
+    get:
+      operationId: api_v1_chat_thread_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedThreadSerializersList'
+          description: ''
+    post:
+      operationId: api_v1_chat_thread_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreadSerializers'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ThreadSerializers'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ThreadSerializers'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadSerializers'
+          description: ''
+  /api/v1/chat/thread/{id}/:
+    get:
+      operationId: api_v1_chat_thread_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this thread.
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadSerializers'
+          description: ''
+    put:
+      operationId: api_v1_chat_thread_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this thread.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreadSerializers'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ThreadSerializers'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ThreadSerializers'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadSerializers'
+          description: ''
+    patch:
+      operationId: api_v1_chat_thread_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this thread.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedThreadSerializers'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedThreadSerializers'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedThreadSerializers'
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadSerializers'
+          description: ''
+    delete:
+      operationId: api_v1_chat_thread_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this thread.
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/chat/threads/{thread_id}/messages/:
+    get:
+      operationId: chat_thread_messages_list
+      parameters:
+      - in: path
+        name: thread_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: chat_thread_message_create
+      parameters:
+      - in: path
+        name: thread_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Message'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Message'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /api/v1/chat/threads/{thread_id}/messages/{message_id}/:
+    get:
+      operationId: chat_thread_message_retrieve
+      parameters:
+      - in: path
+        name: message_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: thread_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+    put:
+      operationId: chat_thread_message_update
+      parameters:
+      - in: path
+        name: message_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: thread_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Message'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Message'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+    delete:
+      operationId: chat_thread_message_delete
+      parameters:
+      - in: path
+        name: message_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: thread_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '204':
+          description: Deleted
+  /api/v1/checkout/canceled/:
+    patch:
+      operationId: api_v1_checkout_canceled_partial_update
+      description: |-
+        Cancels an existing service order.
+
+        Method: PATCH
+        Permissions: IsAuthenticated
+        Request Data:
+            - orderId (int): Primary key of the ServiceOrder to cancel.
+            - messageId (int): Primary key of the Message associated with the cancellation.
+            - customerIdd (str): Site ID of the customer (for validation).
+            - Other fields to update.
+        Logic:
+            - Retrieves ServiceOrder and Message instances.
+            - Validates that the requesting user is the customer.
+            - Updates ServiceOrder status to "canceled".
+            - Updates Message type to "canceled".
+        Response:
+            - Success: Returns the modified request data.
+            - Error: Returns serializer errors or HTTP 400/403/404.
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/checkout/confirm/:
+    patch:
+      operationId: api_v1_checkout_confirm_partial_update
+      description: |-
+        Confirms an existing service order.
+
+        Method: PATCH
+        Permissions: IsAuthenticated
+        Request Data:
+            - orderId (int): Primary key of the ServiceOrder to confirm.
+            - messageId (int): Primary key of the Message associated with the confirmation.
+            - customerIdd (str): Site ID of the customer (for validation).
+            - Other fields to update on ServiceOrder or Message.
+        Logic:
+            - Retrieves the ServiceOrder and Message instances.
+            - Validates that the requesting user is the customer.
+            - Updates the status of the ServiceOrder to "confirmed".
+            - Updates the type of the Message to "confirmed".
+        Response:
+            - Success: Returns the modified request data.
+            - Error: Returns serializer errors or HTTP 400/404.
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/checkout/customerPortal/:
+    get:
+      operationId: api_v1_checkout_customerPortal_retrieve
+      description: |-
+        Creates and returns a URL for the Stripe Customer Billing Portal.
+
+        Method: GET
+        Permissions: IsAuthenticated
+        Logic:
+            - Retrieves the Stripe Customer ID for the authenticated user.
+            - Calls Stripe API to create a Billing Portal Session.
+        Response:
+            - Success: Returns the URL to the Stripe Customer Portal.
+            - Error: HTTP 404 if ServiceOrder.DoesNotExist (legacy).
+                     HTTP 500 for Stripe API errors.
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/checkout/order/:
+    post:
+      operationId: api_v1_checkout_order_create
+      description: |-
+        Handles the creation of a new service order.
+
+        Method: POST
+        Permissions: IsAuthenticated
+        Request Data:
+            - customerIdd (str): Site ID of the customer.
+            - employedIdd (str): Site ID of the employee/provider.
+            - message (str): Initial message related to the order.
+            - status (str, optional): Initial status, defaults to "requested".
+            - Other fields required by ServiceOrderSerializer.
+        Logic:
+            - Validates that the requesting user is the customer.
+            - Validates that the initial status is "requested".
+            - Saves the ServiceOrder instance.
+            - Creates or retrieves a personal chat thread between customer and employee.
+            - Creates a new message in the thread associated with the order.
+        Response:
+            - Success: Returns the original request data (consider returning serialized order).
+            - Error: Returns serializer errors with HTTP 400.
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/checkout/orders/{id}/:
+    get:
+      operationId: api_v1_checkout_orders_retrieve
+      description: |-
+        Retrieves and returns the details of a specific service order.
+
+        Method: GET
+        Permissions: IsAuthenticatedOrReadOnly (anyone can view order details if they have the PK).
+        Path Parameter:
+            - pk (int): Primary key of the ServiceOrder.
+        Logic:
+            - Fetches the ServiceOrder by its primary key.
+            - Serializes the order data.
+        Response:
+            - Success: Returns serialized ServiceOrder data.
+            - Error: HTTP 404 if the order is not found.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceOrder'
+          description: ''
+  /api/v1/checkout/pawn/:
+    post:
+      operationId: api_v1_checkout_pawn_create
+      description: |-
+        Creates a Stripe Checkout Session for a one-time payment (potentially for "pawning" a service).
+
+        Method: POST
+        Permissions: IsAuthenticated
+        Request Data:
+            - title (str): Title of the service/item.
+            - pk (str): Primary key or identifier for the service.
+            - pris (int): Price of the service in the smallest currency unit (e.g., öre for SEK).
+        Logic:
+            - Constructs a title for the Stripe product.
+            - Calls Stripe API to create a Checkout Session.
+        Response:
+            - Success: Returns the Stripe Checkout Session ID.
+            - Error: HTTP 404 if ServiceOrder.DoesNotExist (though ServiceOrder is not directly fetched here, this might be legacy).
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/checkout/pay/:
+    post:
+      operationId: api_v1_checkout_pay_create
+      description: |-
+        Handles payout creation via Stripe (conceptual - destination is hardcoded).
+
+        Method: POST
+        Permissions: IsAuthenticated
+        Request Data:
+            - title (str): Title of the service/item.
+            - pk (str): Primary key or identifier.
+            - (Assumes other necessary data for payout not explicitly shown in current logic)
+        Logic:
+            - Constructs a title.
+            - Calls Stripe API to create a Payout. **Note: `destination` is hardcoded to 'card_xyz',
+              which is a placeholder and will not work in a real scenario. Real implementation
+              would require valid connected account or bank account details.**
+        Response:
+            - Success: Returns the Stripe Payout ID.
+            - Error: HTTP 404 (legacy) or HTTP 500.
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/checkout/purchaseOrders/:
+    get:
+      operationId: api_v1_checkout_purchaseOrders_list
+      description: |-
+        Lists service orders where the authenticated user is the employee/provider.
+        Orders are listed in reverse primary key order (newest first).
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated
+        Filtering: Supports filtering by 'status' via query parameters.
+                   Supports searching and ordering via `SearchFilter` and `OrderingFilter`.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          title: 'Status of service:'
+          enum:
+          - canceled
+          - confirmed
+          - payed
+          - pend
+          - requested
+        description: |-
+          * `requested` - Requested
+          * `confirmed` - Confirmed
+          * `canceled` - Canceled
+          * `pend` - Pend
+          * `payed` - Payed
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedServiceOrderList'
+          description: ''
+  /api/v1/checkout/renew/:
+    post:
+      operationId: api_v1_checkout_renew_create
+      description: |-
+        Creates a Stripe Checkout Session for renewing a service, likely with a fixed price.
+
+        Method: POST
+        Permissions: IsAuthenticated
+        Request Data:
+            - slug (str): Slug of the service to be renewed (used in success_url).
+            - Potentially other data, though not explicitly used for Stripe session creation logic shown.
+        Logic:
+            - Uses the authenticated user's `stripeCustomerId`.
+            - Creates a Stripe Checkout Session with a predefined price ID ("price_1J0BwfIR19rXEZpRXxq2n3oM").
+        Response:
+            - Success: Returns the Stripe Checkout Session ID.
+            - Error: HTTP 404 if ServiceOrder.DoesNotExist (legacy exception handling).
+                     HTTP 500 for other errors.
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/checkout/requestedOrders/:
+    get:
+      operationId: api_v1_checkout_requestedOrders_list
+      description: |-
+        Lists service orders requested by the currently authenticated user (customer).
+        Orders are listed in reverse primary key order (newest first).
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated
+        Ordering: Supports ordering by 'pk', 'title', 'status'. (Note: 'title' is not a direct field on ServiceOrder).
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedServiceOrderList'
+          description: ''
+  /api/v1/checkout/subscribe/:
+    post:
+      operationId: api_v1_checkout_subscribe_create
+      description: |-
+        Handles creation of a Stripe Checkout Session for a subscription.
+
+        Method: POST
+        Permissions: IsAuthenticated
+        Request Data:
+            - type (str): Type of subscription (e.g., "premiumplanmonthly"). If "groundplan", no Stripe session is created.
+            - priceId (str): Stripe Price ID for the subscription plan.
+        Logic:
+            - If type is not "groundplan", creates a Stripe Checkout Session in 'subscription' mode.
+            - Uses the authenticated user's `stripeCustomerId`.
+        Response:
+            - Success (for non-groundplan): Returns the Stripe Checkout Session ID.
+            - Success (for groundplan): Returns the type of plan.
+            - Error: HTTP 404 (legacy) or HTTP 500.
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/checkout/webhook/:
+    post:
+      operationId: api_v1_checkout_webhook_create
+      description: |-
+        Handles incoming webhooks from Stripe for subscription and payment events.
+
+        Method: POST
+        Permissions: StripeWebhookPermission (secured by Stripe signature verification).
+        Request Data: Stripe event payload.
+        Logic:
+            - Verifies the Stripe webhook signature.
+            - Processes different event types:
+                - `invoice.paid`: (Currently no specific action) Indicates a successful subscription payment.
+                - `checkout.session.completed`: Handles post-payment actions like:
+                    - Extending service expiration date for specific one-time payments.
+                    - Updating user's subscription type in the local database.
+                - `invoice.payment_failed`: (Currently no specific action) Indicates a failed payment.
+        Response:
+            - Success: Returns the event data object.
+            - Error: Returns an error response if signature verification fails or an exception occurs.
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/home/containers/:
+    get:
+      operationId: api_v1_home_containers_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHomeContainersList'
+          description: ''
+  /api/v1/home/containers/{id}/:
+    get:
+      operationId: api_v1_home_containers_retrieve
+      description: Helper mixin for read-only resources.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Home container.
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HomeContainers'
+          description: ''
+  /api/v1/home/github-webhook/:
+    post:
+      operationId: api_v1_home_github_webhook_create
+      description: |-
+        Trigger the deployment script when GitHub sends a signed webhook request.
+
+        The request is authenticated by DeployWebhookPermission which validates the
+        ``X-Hub-Signature-256`` header (or the legacy ``X-DEPLOY-SECRET``).
+      parameters:
+      - in: header
+        name: X-Hub-Signature-256
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      responses:
+        '202':
+          description: Accepted
+  /api/v1/home/slider/:
+    get:
+      operationId: api_v1_home_slider_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHomeSliderList'
+          description: ''
+  /api/v1/home/slider/{id}/:
+    get:
+      operationId: api_v1_home_slider_retrieve
+      description: Helper mixin for read-only resources.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Home slider.
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HomeSlider'
+          description: ''
+  /api/v1/profile/:
+    get:
+      operationId: api_v1_profile_list
+      description: |-
+        Lists all user profiles (CustomUser instances) with filtering capabilities.
+        Supports listing, and filtering by various fields like site_id, profession, name, etc.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated
+        Filtering: Uses DjangoFilterBackend, SearchFilter, OrderingFilter.
+                   Filterable fields: 'first_name', 'site_id', 'about', 'profession', 'city', 'state', 'country'.
+                   Searchable fields: 'first_name', 'site_id', 'about', 'profession', 'city', 'state', 'country'.
+                   Orderable by: 'first_name'.
+      parameters:
+      - in: query
+        name: about
+        schema:
+          type: string
+      - in: query
+        name: city
+        schema:
+          type: string
+      - in: query
+        name: country
+        schema:
+          type: string
+      - in: query
+        name: first_name
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: profession
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: site_id
+        schema:
+          type: string
+      - in: query
+        name: state
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProfileList'
+          description: ''
+  /api/v1/profile/{site_id}/:
+    get:
+      operationId: api_v1_profile_retrieve
+      description: |-
+        API view for retrieving, updating, or deleting a specific user profile by site_id.
+        Interacts with the CustomUser model using ProfileSerializer.
+
+        Operations:
+            - GET: Retrieves a profile.
+            - PUT: Updates a profile.
+            - PATCH: Partially updates a profile.
+            - DELETE: Deletes a profile.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated (allows read, restricts write to authenticated users, though further checks might be needed for own-profile edits).
+      parameters:
+      - in: path
+        name: site_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+    put:
+      operationId: api_v1_profile_update
+      description: |-
+        API view for retrieving, updating, or deleting a specific user profile by site_id.
+        Interacts with the CustomUser model using ProfileSerializer.
+
+        Operations:
+            - GET: Retrieves a profile.
+            - PUT: Updates a profile.
+            - PATCH: Partially updates a profile.
+            - DELETE: Deletes a profile.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated (allows read, restricts write to authenticated users, though further checks might be needed for own-profile edits).
+      parameters:
+      - in: path
+        name: site_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Profile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Profile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Profile'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+    patch:
+      operationId: api_v1_profile_partial_update
+      description: |-
+        API view for retrieving, updating, or deleting a specific user profile by site_id.
+        Interacts with the CustomUser model using ProfileSerializer.
+
+        Operations:
+            - GET: Retrieves a profile.
+            - PUT: Updates a profile.
+            - PATCH: Partially updates a profile.
+            - DELETE: Deletes a profile.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated (allows read, restricts write to authenticated users, though further checks might be needed for own-profile edits).
+      parameters:
+      - in: path
+        name: site_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProfile'
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+    delete:
+      operationId: api_v1_profile_destroy
+      description: |-
+        API view for retrieving, updating, or deleting a specific user profile by site_id.
+        Interacts with the CustomUser model using ProfileSerializer.
+
+        Operations:
+            - GET: Retrieves a profile.
+            - PUT: Updates a profile.
+            - PATCH: Partially updates a profile.
+            - DELETE: Deletes a profile.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated (allows read, restricts write to authenticated users, though further checks might be needed for own-profile edits).
+      parameters:
+      - in: path
+        name: site_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/profile/{site_id}/info/:
+    get:
+      operationId: api_v1_profile_info_retrieve
+      description: |-
+        Retrieves all information for a specific user profile using their site_id.
+        Interacts with the CustomUser model using AllProfileInfoSerializer.
+
+        Operations:
+            - GET: Retrieves a specific profile by site_id.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated
+      parameters:
+      - in: path
+        name: site_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllProfileInfo'
+          description: ''
+  /api/v1/profile/competences/:
+    get:
+      operationId: api_v1_profile_competences_list
+      description: |-
+        Lists all CompetenceCertificate (Skills/Certificates) entries.
+        Supports filtering by name, username (FK ID), and username's site_id.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated
+        Filtering: Uses DjangoFilterBackend. Filterable fields: 'name', 'username', 'username__site_id'.
+      parameters:
+      - in: query
+        name: name
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: username
+        schema:
+          type: integer
+      - in: query
+        name: username__site_id
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCompetenceCertificateList'
+          description: ''
+  /api/v1/profile/competences/{id}/:
+    get:
+      operationId: api_v1_profile_competences_retrieve
+      description: |-
+        API view for retrieving, updating, or deleting a specific CompetenceCertificate (Skill/Certificate) entry by its ID.
+        Interacts with CompetenceCertificate model.
+
+        Operations:
+            - GET: Retrieves a skill/certificate.
+            - PUT: Updates a skill/certificate.
+            - DELETE: Deletes a skill/certificate.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompetenceCertificate'
+          description: ''
+    put:
+      operationId: api_v1_profile_competences_update
+      description: |-
+        API view for retrieving, updating, or deleting a specific CompetenceCertificate (Skill/Certificate) entry by its ID.
+        Interacts with CompetenceCertificate model.
+
+        Operations:
+            - GET: Retrieves a skill/certificate.
+            - PUT: Updates a skill/certificate.
+            - DELETE: Deletes a skill/certificate.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompetenceCertificate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CompetenceCertificate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CompetenceCertificate'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompetenceCertificate'
+          description: ''
+    delete:
+      operationId: api_v1_profile_competences_destroy
+      description: |-
+        API view for retrieving, updating, or deleting a specific CompetenceCertificate (Skill/Certificate) entry by its ID.
+        Interacts with CompetenceCertificate model.
+
+        Operations:
+            - GET: Retrieves a skill/certificate.
+            - PUT: Updates a skill/certificate.
+            - DELETE: Deletes a skill/certificate.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/profile/competences/create/:
+    post:
+      operationId: api_v1_profile_competences_create_create
+      description: |-
+        API view for creating CompetenceCertificate (Skills/Certificates) entries.
+        Interacts with CompetenceCertificate model using CompetenceCertificateSerializer.
+
+        Operations:
+            - POST: Creates a new skill/certificate entry.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated (though POST implies authenticated write).
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompetenceCertificate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CompetenceCertificate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CompetenceCertificate'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompetenceCertificate'
+          description: ''
+  /api/v1/profile/experience/:
+    get:
+      operationId: api_v1_profile_experience_list
+      description: |-
+        Lists all Experience (Experience) entries with pagination.
+        Supports filtering by name, username (FK ID), and username's site_id.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated
+        Filtering: Uses DjangoFilterBackend. Filterable fields: 'name', 'username', 'username__site_id'.
+        Pagination: LimitOffsetPagination.
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: name
+        schema:
+          type: string
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - in: query
+        name: username
+        schema:
+          type: integer
+      - in: query
+        name: username__site_id
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedExperienceList'
+          description: ''
+  /api/v1/profile/experience/{id}/:
+    get:
+      operationId: api_v1_profile_experience_retrieve
+      description: |-
+        API view for retrieving, updating, or deleting a specific Experience (Experience) entry by its ID.
+        Interacts with Experience model.
+
+        Operations:
+            - GET: Retrieves an experience entry.
+            - PUT: Updates an experience entry.
+            - DELETE: Deletes an experience entry.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Experience'
+          description: ''
+    put:
+      operationId: api_v1_profile_experience_update
+      description: |-
+        API view for retrieving, updating, or deleting a specific Experience (Experience) entry by its ID.
+        Interacts with Experience model.
+
+        Operations:
+            - GET: Retrieves an experience entry.
+            - PUT: Updates an experience entry.
+            - DELETE: Deletes an experience entry.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Experience'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Experience'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Experience'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Experience'
+          description: ''
+    delete:
+      operationId: api_v1_profile_experience_destroy
+      description: |-
+        API view for retrieving, updating, or deleting a specific Experience (Experience) entry by its ID.
+        Interacts with Experience model.
+
+        Operations:
+            - GET: Retrieves an experience entry.
+            - PUT: Updates an experience entry.
+            - DELETE: Deletes an experience entry.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/profile/experience/create/:
+    post:
+      operationId: api_v1_profile_experience_create_create
+      description: |-
+        API view for creating Experience (Experience) entries.
+        Interacts with Experience model using ExperienceSerializer.
+
+        Operations:
+            - POST: Creates a new experience entry.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Experience'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Experience'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Experience'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Experience'
+          description: ''
+  /api/v1/profile/interests/:
+    get:
+      operationId: api_v1_profile_interests_list
+      description: |-
+        Lists all Interest (Interests) entries with pagination.
+        Supports filtering by name, username (FK ID), and username's site_id.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated
+        Filtering: Uses DjangoFilterBackend. Filterable fields: 'name', 'username', 'username__site_id'.
+        Pagination: LimitOffsetPagination.
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: name
+        schema:
+          type: string
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - in: query
+        name: username
+        schema:
+          type: integer
+      - in: query
+        name: username__site_id
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInterestList'
+          description: ''
+  /api/v1/profile/interests/{id}/:
+    get:
+      operationId: api_v1_profile_interests_retrieve
+      description: |-
+        API view for retrieving, updating, or deleting a specific Interest (Interest) entry by its ID.
+        Interacts with Interest model.
+
+        Operations:
+            - GET: Retrieves an interest.
+            - PUT: Updates an interest.
+            - DELETE: Deletes an interest.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Interest'
+          description: ''
+    put:
+      operationId: api_v1_profile_interests_update
+      description: |-
+        API view for retrieving, updating, or deleting a specific Interest (Interest) entry by its ID.
+        Interacts with Interest model.
+
+        Operations:
+            - GET: Retrieves an interest.
+            - PUT: Updates an interest.
+            - DELETE: Deletes an interest.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Interest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Interest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Interest'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Interest'
+          description: ''
+    delete:
+      operationId: api_v1_profile_interests_destroy
+      description: |-
+        API view for retrieving, updating, or deleting a specific Interest (Interest) entry by its ID.
+        Interacts with Interest model.
+
+        Operations:
+            - GET: Retrieves an interest.
+            - PUT: Updates an interest.
+            - DELETE: Deletes an interest.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/profile/interests/create/:
+    post:
+      operationId: api_v1_profile_interests_create_create
+      description: |-
+        API view for creating Interest (Interests) entries.
+        Interacts with Interest model using InterestSerializer.
+
+        Operations:
+            - POST: Creates a new interest entry.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Interest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Interest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Interest'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Interest'
+          description: ''
+  /api/v1/profile/records/:
+    get:
+      operationId: api_v1_profile_records_retrieve
+      description: |-
+        API view for listing all profiles or creating/updating a profile.
+        Interacts with the CustomUser model using ProfileSerializer.
+
+        Operations:
+            - GET: Lists all CustomUser profiles.
+            - POST: Creates or potentially updates a CustomUser profile. The check
+                    `int(request.user.id) == int(request.data['username'])` suggests
+                    it might be intended for a user to update their own profile if `username` (user ID) is passed.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+    post:
+      operationId: api_v1_profile_records_create
+      description: |-
+        Handles POST request to create/update a profile.
+        It includes an authorization check and manual image variant setting.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Profile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Profile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Profile'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+  /api/v1/profile/studies/:
+    get:
+      operationId: api_v1_profile_studies_list
+      description: |-
+        Lists all Study (Studies) entries.
+        Supports filtering by name, username (FK ID), and username's site_id.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated
+        Filtering: Uses DjangoFilterBackend. Filterable fields: 'name', 'username', 'username__site_id'.
+      parameters:
+      - in: query
+        name: name
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: username
+        schema:
+          type: integer
+      - in: query
+        name: username__site_id
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStudyList'
+          description: ''
+  /api/v1/profile/studies/{id}/:
+    get:
+      operationId: api_v1_profile_studies_retrieve
+      description: |-
+        API view for retrieving, updating, or deleting a specific Study (Study) entry by its ID.
+        Interacts with Study model.
+
+        Operations:
+            - GET: Retrieves a study entry.
+            - PUT: Updates a study entry.
+            - DELETE: Deletes a study entry.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Study'
+          description: ''
+    put:
+      operationId: api_v1_profile_studies_update
+      description: |-
+        API view for retrieving, updating, or deleting a specific Study (Study) entry by its ID.
+        Interacts with Study model.
+
+        Operations:
+            - GET: Retrieves a study entry.
+            - PUT: Updates a study entry.
+            - DELETE: Deletes a study entry.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Study'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Study'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Study'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Study'
+          description: ''
+    delete:
+      operationId: api_v1_profile_studies_destroy
+      description: |-
+        API view for retrieving, updating, or deleting a specific Study (Study) entry by its ID.
+        Interacts with Study model.
+
+        Operations:
+            - GET: Retrieves a study entry.
+            - PUT: Updates a study entry.
+            - DELETE: Deletes a study entry.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/profile/studies/create/:
+    post:
+      operationId: api_v1_profile_studies_create_create
+      description: |-
+        API view for creating Study (Studies) entries.
+        Interacts with Study model using StudySerializer.
+
+        Operations:
+            - POST: Creates a new study entry.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticated.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Study'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Study'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Study'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Study'
+          description: ''
+  /api/v1/report/list/:
+    get:
+      operationId: api_v1_report_list_list
+      parameters:
+      - in: query
+        name: message
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: title
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReportList'
+          description: ''
+  /api/v1/report/post/:
+    get:
+      operationId: api_v1_report_post_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReportList'
+          description: ''
+    post:
+      operationId: api_v1_report_post_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Report'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Report'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Report'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+          description: ''
+  /api/v1/services/:
+    get:
+      operationId: api_v1_services_list
+      description: List services (GET) or create a service (POST).
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServicePost'
+          description: ''
+    post:
+      operationId: api_v1_services_create
+      description: List services (GET) or create a service (POST).
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServicePostCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ServicePostCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ServicePostCreate'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServicePost'
+          description: ''
+  /api/v1/services/{slug}/:
+    get:
+      operationId: api_v1_services_retrieve
+      description: Retrieve, update, or delete a service post.
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServicePost'
+          description: ''
+    put:
+      operationId: api_v1_services_update
+      description: Retrieve, update, or delete a service post.
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServicePostUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ServicePostUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ServicePostUpdate'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServicePost'
+          description: ''
+    patch:
+      operationId: api_v1_services_partial_update
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+          pattern: ^[^/]+$
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedServicePostUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedServicePostUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedServicePostUpdate'
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServicePostUpdate'
+          description: ''
+    delete:
+      operationId: api_v1_services_destroy
+      description: Retrieve, update, or delete a service post.
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '204':
+          description: Deleted
+  /api/v1/services/{slug}/is-employee/:
+    get:
+      operationId: api_v1_services_is_employee_retrieve
+      description: |-
+        Checks if the authenticated user is the employee (owner) of a specific ServicePost.
+        This is an ownership check endpoint.
+
+        Method: GET
+        Path Parameter: slug (str) - The slug of the service post.
+        Permissions: IsAuthenticated.
+        Response:
+            - HTTP 200 OK with {'response': "You have permission to edit that."} if user is owner.
+            - HTTP 200 OK with {'response': "You don't have permission to edit that."} if user is not owner.
+              (Consider returning HTTP 403 FORBIDDEN for "don't have permission" case for consistency).
+            - HTTP 404 NOT FOUND if the post does not exist.
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/services/{slug}/ownership/:
+    get:
+      operationId: api_v1_services_ownership_retrieve
+      description: |-
+        Checks if the authenticated user is the employee (owner) of a specific ServicePost.
+        This is an ownership check endpoint.
+
+        Method: GET
+        Path Parameter: slug (str) - The slug of the service post.
+        Permissions: IsAuthenticated.
+        Response:
+            - HTTP 200 OK with {'response': "You have permission to edit that."} if user is owner.
+            - HTTP 200 OK with {'response': "You don't have permission to edit that."} if user is not owner.
+              (Consider returning HTTP 403 FORBIDDEN for "don't have permission" case for consistency).
+            - HTTP 404 NOT FOUND if the post does not exist.
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/services/featured/:
+    get:
+      operationId: api_v1_services_featured_list
+      description: |-
+        Lists ServicePost instances that are either not expired or belong to users
+        with specific premium subscription types ('premiumplanMonthly', 'PremiumPlanYearly').
+        Supports pagination, searching, and ordering.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticatedOrReadOnly (public read access, authenticated writes if added later)
+        Pagination: PageNumberPagination
+        Filtering: SearchFilter (on title, beskrivning, slug, employee__username), OrderingFilter.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedServicePostList'
+          description: ''
+  /api/v1/services/filters/category/:
+    get:
+      operationId: api_v1_services_filters_category_list
+      description: Lists all service categories (ModelCategory instances).
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedServiceCategoryList'
+          description: ''
+  /api/v1/services/filters/city/:
+    get:
+      operationId: api_v1_services_filters_city_list
+      description: Lists distinct city names found in ServicePost instances.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCityList'
+          description: ''
+  /api/v1/services/filters/comments/:
+    get:
+      operationId: api_v1_services_filters_comments_list
+      description: Lists all comments (ModelComments instances).
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCommentsList'
+          description: ''
+  /api/v1/services/filters/country/:
+    get:
+      operationId: api_v1_services_filters_country_list
+      description: Lists all countries (ModelCountry instances).
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCountryList'
+          description: ''
+  /api/v1/services/filters/dislikes/:
+    get:
+      operationId: api_v1_services_filters_dislikes_list
+      description: |-
+        Lists dislikes for all ServicePost instances.
+        NOTE: Similar to LikesViewSet, this uses ServicePost as its queryset
+        and DisLikesSerializer, implying DisLikesSerializer handles the 'disLikes' field.
+        ModelDisLikes seems to have been removed or is not used here.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDisLikesList'
+          description: ''
+  /api/v1/services/filters/likes/:
+    get:
+      operationId: api_v1_services_filters_likes_list
+      description: |-
+        Lists likes for all ServicePost instances.
+        NOTE: This view uses ServicePost as its queryset and LikesSerializer.
+        This implies LikesSerializer is designed to work with ServicePost,
+        likely to show users who liked a post or the count of likes.
+        ModelLikes seems to have been removed or is not used here.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLikesList'
+          description: ''
+  /api/v1/services/filters/search/:
+    get:
+      operationId: api_v1_services_filters_search_list
+      description: |-
+        Lists ServicePost instances with extensive filtering capabilities.
+        Similar to ApiServiceListView, it filters by expiration date or employee subscription type.
+        Provides more detailed field-level filtering via DjangoFilterBackend.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticatedOrReadOnly (public read access, authenticated writes if added later)
+        Filtering: DjangoFilterBackend (on many fields), SearchFilter, OrderingFilter.
+      parameters:
+      - in: query
+        name: bedomning
+        schema:
+          type: number
+      - in: query
+        name: beskrivning
+        schema:
+          type: string
+      - in: query
+        name: category
+        schema:
+          type: string
+      - in: query
+        name: city
+        schema:
+          type: string
+      - in: query
+        name: country
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: pris
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: site_id
+        schema:
+          type: string
+      - in: query
+        name: slug
+        schema:
+          type: string
+      - in: query
+        name: state
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          title: Is published?
+          enum:
+          - draft
+          - published
+        description: |-
+          * `draft` - Draft
+          * `published` - Published
+      - in: query
+        name: tillganligFran
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: tillganligTill
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: title
+        schema:
+          type: string
+      - in: query
+        name: underCategory
+        schema:
+          type: string
+      - in: query
+        name: updatedAt
+        schema:
+          type: string
+          format: date-time
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedServicePostList'
+          description: ''
+  /api/v1/services/filters/state/:
+    get:
+      operationId: api_v1_services_filters_state_list
+      description: Lists all states/regions (ModelState instances).
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStateList'
+          description: ''
+  /api/v1/services/filters/sub_category/:
+    get:
+      operationId: api_v1_services_filters_sub_category_list
+      description: Lists all service subcategories (ModelSubCategory instances), ordered
+        by parent category.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubCategoryList'
+          description: ''
+  /api/v1/services/likes/toggle/:
+    post:
+      operationId: api_v1_services_likes_toggle_create
+      description: |-
+        Handles toggling likes/dislikes on a ServicePost.
+        This view allows an authenticated user to add or remove a like or dislike
+        from a specific service post.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Likes'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Likes'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Likes'
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/services/list/:
+    get:
+      operationId: api_v1_services_list_list
+      description: |-
+        Lists ServicePost instances that are either not expired or belong to users
+        with specific premium subscription types ('premiumplanMonthly', 'PremiumPlanYearly').
+        Supports pagination, searching, and ordering.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticatedOrReadOnly (public read access, authenticated writes if added later)
+        Pagination: PageNumberPagination
+        Filtering: SearchFilter (on title, beskrivning, slug, employee__username), OrderingFilter.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedServicePostList'
+          description: ''
+  /api/v1/services/reactions/:
+    post:
+      operationId: api_v1_services_reactions_create
+      description: |-
+        Handles toggling likes/dislikes on a ServicePost.
+        This view allows an authenticated user to add or remove a like or dislike
+        from a specific service post.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Likes'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Likes'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Likes'
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/services/search/:
+    get:
+      operationId: api_v1_services_search_list
+      description: |-
+        Lists ServicePost instances with extensive filtering capabilities.
+        Similar to ApiServiceListView, it filters by expiration date or employee subscription type.
+        Provides more detailed field-level filtering via DjangoFilterBackend.
+
+        Authentication: TokenAuthentication
+        Permissions: IsAuthenticatedOrReadOnly (public read access, authenticated writes if added later)
+        Filtering: DjangoFilterBackend (on many fields), SearchFilter, OrderingFilter.
+      parameters:
+      - in: query
+        name: bedomning
+        schema:
+          type: number
+      - in: query
+        name: beskrivning
+        schema:
+          type: string
+      - in: query
+        name: category
+        schema:
+          type: string
+      - in: query
+        name: city
+        schema:
+          type: string
+      - in: query
+        name: country
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: pris
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: site_id
+        schema:
+          type: string
+      - in: query
+        name: slug
+        schema:
+          type: string
+      - in: query
+        name: state
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          title: Is published?
+          enum:
+          - draft
+          - published
+        description: |-
+          * `draft` - Draft
+          * `published` - Published
+      - in: query
+        name: tillganligFran
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: tillganligTill
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: title
+        schema:
+          type: string
+      - in: query
+        name: underCategory
+        schema:
+          type: string
+      - in: query
+        name: updatedAt
+        schema:
+          type: string
+          format: date-time
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedServicePostList'
+          description: ''
+  /api/v1/trees/:
+    get:
+      operationId: api_v1_trees_list
+      description: |-
+        /api/trees [GET, POST]
+        /api/trees/{id} [GET, PATCH, DELETE]
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTreeList'
+          description: ''
+    post:
+      operationId: api_v1_trees_create
+      description: |-
+        /api/trees [GET, POST]
+        /api/trees/{id} [GET, PATCH, DELETE]
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tree'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Tree'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Tree'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tree'
+          description: ''
+  /api/v1/trees/{id}/:
+    get:
+      operationId: api_v1_trees_retrieve
+      description: |-
+        /api/trees [GET, POST]
+        /api/trees/{id} [GET, PATCH, DELETE]
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tree.
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tree'
+          description: ''
+    put:
+      operationId: api_v1_trees_update
+      description: |-
+        /api/trees [GET, POST]
+        /api/trees/{id} [GET, PATCH, DELETE]
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tree.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tree'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Tree'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Tree'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tree'
+          description: ''
+    patch:
+      operationId: api_v1_trees_partial_update
+      description: |-
+        /api/trees [GET, POST]
+        /api/trees/{id} [GET, PATCH, DELETE]
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tree.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTree'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTree'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTree'
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tree'
+          description: ''
+    delete:
+      operationId: api_v1_trees_destroy
+      description: |-
+        /api/trees [GET, POST]
+        /api/trees/{id} [GET, PATCH, DELETE]
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tree.
+        required: true
+      tags:
+      - api
+      security:
+      - knoxApiToken: []
+      responses:
+        '204':
+          description: No response body
+  /auth/facebook/:
+    post:
+      operationId: auth_facebook_create
+      description: |-
+        class used for social authentications
+        example usage for facebook with access_token
+        -------------
+        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+
+        class FacebookLogin(SocialLoginView):
+            adapter_class = FacebookOAuth2Adapter
+        -------------
+
+        example usage for facebook with code
+
+        -------------
+        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+        from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+
+        class FacebookLogin(SocialLoginView):
+            adapter_class = FacebookOAuth2Adapter
+            client_class = OAuth2Client
+            callback_url = 'localhost:8000'
+        -------------
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialLogin'
+          description: ''
+  /auth/google/:
+    post:
+      operationId: auth_google_create
+      description: |-
+        class used for social authentications
+        example usage for facebook with access_token
+        -------------
+        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+
+        class FacebookLogin(SocialLoginView):
+            adapter_class = FacebookOAuth2Adapter
+        -------------
+
+        example usage for facebook with code
+
+        -------------
+        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+        from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+
+        class FacebookLogin(SocialLoginView):
+            adapter_class = FacebookOAuth2Adapter
+            client_class = OAuth2Client
+            callback_url = 'localhost:8000'
+        -------------
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialLogin'
+          description: ''
+  /auth/login/:
+    post:
+      operationId: auth_login_create
+      description: |-
+        Check the credentials and return the REST Token
+        if the credentials are valid and authenticated.
+        Calls Django Auth login method to register User ID
+        in Django session framework
+
+        Accept the following POST parameters: username, password
+        Return the REST Framework Token Object's key.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+          description: ''
+  /auth/logout/:
+    post:
+      operationId: auth_logout_create
+      description: |-
+        Calls Django logout method and delete the Token object
+        assigned to the current User object.
+
+        Accepts/Returns nothing.
+      tags:
+      - auth
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /auth/otp/send/:
+    post:
+      operationId: auth_otp_send_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendPhoneOTP'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendPhoneOTP'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendPhoneOTP'
+        required: true
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendPhoneOTP'
+          description: ''
+  /auth/otp/verify/:
+    post:
+      operationId: auth_otp_verify_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyPhoneOTP'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyPhoneOTP'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyPhoneOTP'
+        required: true
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyPhoneOTP'
+          description: ''
+  /auth/password/change/:
+    post:
+      operationId: auth_password_change_create
+      description: |-
+        Calls Django Auth SetPasswordForm save method.
+
+        Accepts the following POST parameters: new_password1, new_password2
+        Returns the success/fail message.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /auth/password/reset/:
+    post:
+      operationId: auth_password_reset_create
+      description: |-
+        Calls Django Auth PasswordResetForm save method.
+
+        Accepts the following POST parameters: email
+        Returns the success/fail message.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+        required: true
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /auth/password/reset/confirm/:
+    post:
+      operationId: auth_password_reset_confirm_create
+      description: |-
+        Password reset e-mail link is confirmed, therefore
+        this resets the user's password.
+
+        Accepts the following POST parameters: token, uid,
+            new_password1, new_password2
+        Returns the success/fail message.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+        required: true
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /auth/register/:
+    post:
+      operationId: auth_register_create
+      description: |-
+        Registers a new user.
+
+        Accepts the following POST parameters: username, email, password1, password2.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhoneOrEmailRegister'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PhoneOrEmailRegister'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PhoneOrEmailRegister'
+        required: true
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhoneOrEmailRegister'
+          description: ''
+  /auth/user/:
+    get:
+      operationId: auth_user_retrieve
+      description: |-
+        Reads and updates UserModel fields
+        Accepts GET, PUT, PATCH methods.
+
+        Default accepted fields: username, first_name, last_name
+        Default display fields: pk, username, email, first_name, last_name
+        Read-only fields: pk, email
+
+        Returns UserModel fields.
+      tags:
+      - auth
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetails'
+          description: ''
+    put:
+      operationId: auth_user_update
+      description: |-
+        Reads and updates UserModel fields
+        Accepts GET, PUT, PATCH methods.
+
+        Default accepted fields: username, first_name, last_name
+        Default display fields: pk, username, email, first_name, last_name
+        Read-only fields: pk, email
+
+        Returns UserModel fields.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetails'
+          description: ''
+    patch:
+      operationId: auth_user_partial_update
+      description: |-
+        Reads and updates UserModel fields
+        Accepts GET, PUT, PATCH methods.
+
+        Default accepted fields: username, first_name, last_name
+        Default display fields: pk, username, email, first_name, last_name
+        Read-only fields: pk, email
+
+        Returns UserModel fields.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetails'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetails'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetails'
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetails'
+          description: ''
+  /set-password/:
+    post:
+      operationId: set_password_create
+      tags:
+      - set-password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+        required: true
+      security:
+      - knoxApiToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetPassword'
+          description: ''
+  /verify-email/again/:
+    post:
+      operationId: verify_email_again_create
+      tags:
+      - verify-email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailConfirmation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmailConfirmation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmailConfirmation'
+        required: true
+      security:
+      - knoxApiToken: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailConfirmation'
+          description: ''
+  /webhooks/github/:
+    post:
+      operationId: webhooks_github_create
+      description: |-
+        Trigger the deployment script when GitHub sends a signed webhook request.
+
+        The request is authenticated by DeployWebhookPermission which validates the
+        ``X-Hub-Signature-256`` header (or the legacy ``X-DEPLOY-SECRET``).
+      parameters:
+      - in: header
+        name: X-Hub-Signature-256
+        schema:
+          type: string
+        required: true
+      tags:
+      - webhooks
+      responses:
+        '202':
+          description: Accepted
+components:
+  schemas:
+    AllProfileInfo:
+      type: object
+      description: |-
+        Provides a comprehensive serialization of a CustomUser's profile,
+        embedding their interests, skills, studies, and experiences directly in the output.
+        Also includes category update timestamps and email confirmation status.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        stripeCustomerId:
+          type: string
+          readOnly: true
+          nullable: true
+        emailConfirmed:
+          type: boolean
+          nullable: true
+          readOnly: true
+        subscriptionType:
+          type: string
+          readOnly: true
+          nullable: true
+        Interest:
+          type: array
+          items:
+            $ref: '#/components/schemas/Interest'
+          readOnly: true
+        CompetenceCertificate:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompetenceCertificate'
+          readOnly: true
+        Study:
+          type: array
+          items:
+            $ref: '#/components/schemas/Study'
+          readOnly: true
+        Experience:
+          type: array
+          items:
+            $ref: '#/components/schemas/Experience'
+          readOnly: true
+        CategoryLastupdate:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        SubcategoryLastupdate:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        name:
+          type: string
+          nullable: true
+          maxLength: 50
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 50
+        phone:
+          type: string
+          nullable: true
+          maxLength: 15
+        site_id:
+          type: string
+          maxLength: 50
+        is_creator:
+          type: boolean
+        bio:
+          type: string
+          nullable: true
+          maxLength: 500
+        rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,1})?$
+        members:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        followers:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        earning:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        profession:
+          type: string
+          nullable: true
+          maxLength: 100
+        picture_medium:
+          type: string
+          format: uri
+          nullable: true
+        picture_small:
+          type: string
+          format: uri
+          nullable: true
+        picture_tag:
+          type: string
+          format: uri
+          nullable: true
+        location:
+          type: string
+          nullable: true
+          maxLength: 50
+        address1:
+          type: string
+          nullable: true
+          title: Address line 1
+          maxLength: 1024
+        address2:
+          type: string
+          nullable: true
+          title: Address line 2
+          maxLength: 1024
+        zip_code:
+          type: string
+          nullable: true
+          title: Postal Code
+          maxLength: 12
+        city:
+          type: string
+          nullable: true
+          title: Municipality
+          maxLength: 1024
+        state:
+          type: string
+          nullable: true
+          title: County/State
+          maxLength: 1024
+        country:
+          type: string
+          nullable: true
+          maxLength: 1024
+        member_since:
+          type: string
+          format: date-time
+          nullable: true
+        picture:
+          type: string
+          format: uri
+          nullable: true
+        Facebook_link:
+          type: string
+          readOnly: true
+          nullable: true
+        twitter:
+          type: string
+          nullable: true
+          maxLength: 120
+        profile_completed:
+          type: boolean
+        Linkdin_link:
+          type: string
+          readOnly: true
+          nullable: true
+        sms:
+          type: string
+          nullable: true
+          maxLength: 15
+        othersSocialMedia:
+          type: string
+          readOnly: true
+          nullable: true
+        about:
+          type: string
+          title: About me
+          maxLength: 120
+      required:
+      - CategoryLastupdate
+      - CompetenceCertificate
+      - Experience
+      - Facebook_link
+      - Interest
+      - Linkdin_link
+      - Study
+      - SubcategoryLastupdate
+      - email
+      - emailConfirmed
+      - id
+      - member_since
+      - othersSocialMedia
+      - stripeCustomerId
+      - subscriptionType
+    Category:
+      type: object
+      description: |-
+        Serializes ModelCategory instances.
+        Includes a 'children' field that recursively serializes child categories,
+        allowing for a nested representation of the category hierarchy.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        parent:
+          type: integer
+          nullable: true
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryChild'
+          readOnly: true
+        description:
+          type: string
+          maxLength: 896
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Date updated
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Date published
+        img:
+          type: string
+          format: uri
+      required:
+      - children
+      - createdAt
+      - description
+      - id
+      - name
+      - updatedAt
+    CategoryChild:
+      type: object
+      description: Serializer used for documenting nested child categories.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        parent:
+          type: integer
+          nullable: true
+        children:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          maxLength: 896
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Date updated
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Date published
+        img:
+          type: string
+          format: uri
+      required:
+      - children
+      - createdAt
+      - description
+      - id
+      - name
+      - updatedAt
+    City:
+      type: object
+      description: |-
+        Serializes only the 'city' field from ServicePost instances.
+        Likely used for specific use cases where only city information is needed.
+      properties:
+        city:
+          type: string
+          nullable: true
+          title: City/Municipality
+          maxLength: 1024
+    Comments:
+      type: object
+      description: Serializes all fields for ModelComments instances.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        comment:
+          type: string
+          title: Seller name
+          maxLength: 1024
+        postNumber:
+          type: integer
+      required:
+      - id
+      - postNumber
+    CompetenceCertificate:
+      type: object
+      description: |-
+        Serializes CompetenceCertificate (Skill/Certificate) model instances,
+        including the user's site_id.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        site_id:
+          type: string
+          readOnly: true
+        username:
+          type: integer
+        Added_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+      required:
+      - Added_at
+      - id
+      - name
+      - site_id
+      - updated_at
+      - username
+    Country:
+      type: object
+      description: Serializes all fields for ModelCountry instances.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 30
+      required:
+      - id
+      - name
+    CurrentUser:
+      type: object
+      description: Serializes essential CustomUser profile data.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        stripeCustomerId:
+          type: string
+          readOnly: true
+          nullable: true
+        emailConfirmed:
+          type: boolean
+          nullable: true
+          readOnly: true
+        subscriptionType:
+          type: string
+          readOnly: true
+          nullable: true
+        name:
+          type: string
+          nullable: true
+          maxLength: 50
+        CategoryLastupdate:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        SubcategoryLastupdate:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 50
+        phone:
+          type: string
+          nullable: true
+          maxLength: 15
+        site_id:
+          type: string
+          maxLength: 50
+        is_creator:
+          type: boolean
+        bio:
+          type: string
+          nullable: true
+          maxLength: 500
+        rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,1})?$
+        members:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        followers:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        earning:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        profession:
+          type: string
+          nullable: true
+          maxLength: 100
+        picture_medium:
+          type: string
+          format: uri
+          nullable: true
+        picture_small:
+          type: string
+          format: uri
+          nullable: true
+        picture_tag:
+          type: string
+          format: uri
+          nullable: true
+        location:
+          type: string
+          nullable: true
+          maxLength: 50
+        address1:
+          type: string
+          nullable: true
+          title: Address line 1
+          maxLength: 1024
+        address2:
+          type: string
+          nullable: true
+          title: Address line 2
+          maxLength: 1024
+        zip_code:
+          type: string
+          nullable: true
+          title: Postal Code
+          maxLength: 12
+        city:
+          type: string
+          nullable: true
+          title: Municipality
+          maxLength: 1024
+        state:
+          type: string
+          nullable: true
+          title: County/State
+          maxLength: 1024
+        country:
+          type: string
+          nullable: true
+          maxLength: 1024
+        member_since:
+          type: string
+          format: date-time
+          nullable: true
+        picture:
+          type: string
+          format: uri
+          nullable: true
+        Facebook_link:
+          type: string
+          readOnly: true
+          nullable: true
+        twitter:
+          type: string
+          nullable: true
+          maxLength: 120
+        profile_completed:
+          type: boolean
+        Linkdin_link:
+          type: string
+          readOnly: true
+          nullable: true
+        sms:
+          type: string
+          nullable: true
+          maxLength: 15
+        othersSocialMedia:
+          type: string
+          readOnly: true
+          nullable: true
+        about:
+          type: string
+          title: About me
+          maxLength: 120
+      required:
+      - CategoryLastupdate
+      - Facebook_link
+      - Linkdin_link
+      - SubcategoryLastupdate
+      - email
+      - emailConfirmed
+      - id
+      - member_since
+      - othersSocialMedia
+      - stripeCustomerId
+      - subscriptionType
+    DisLikes:
+      type: object
+      description: |-
+        Serializes only the 'disLikes' field from ServicePost instances.
+        Likely used for operations specifically related to service post dislikes.
+      properties:
+        disLikes:
+          type: array
+          items:
+            type: integer
+            title: DisLikes
+    EmailConfirmation:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    Experience:
+      type: object
+      description: Serializes Experience (Experience) model instances, including the
+        user's site_id.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        site_id:
+          type: string
+          readOnly: true
+        username:
+          type: integer
+        Added_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        plats:
+          type: string
+          maxLength: 100
+        content:
+          type: string
+        started_at:
+          type: string
+          maxLength: 100
+        ended_at:
+          type: string
+          maxLength: 100
+        company:
+          type: string
+          maxLength: 100
+      required:
+      - Added_at
+      - company
+      - content
+      - ended_at
+      - id
+      - name
+      - plats
+      - site_id
+      - started_at
+      - updated_at
+      - username
+    HomeContainers:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        description:
+          type: string
+          maxLength: 500
+        name:
+          type: string
+          maxLength: 100
+        img_x_large:
+          type: string
+          format: uri
+      required:
+      - description
+      - id
+      - name
+    HomeSlider:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        description:
+          type: string
+          maxLength: 500
+        name:
+          type: string
+          maxLength: 100
+        img_x_large:
+          type: string
+          format: uri
+      required:
+      - description
+      - id
+      - name
+    Interest:
+      type: object
+      description: Serializes Interest (Interest) model instances, including the user's
+        site_id.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        site_id:
+          type: string
+          readOnly: true
+        username:
+          type: integer
+        Added_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+      required:
+      - Added_at
+      - id
+      - name
+      - site_id
+      - updated_at
+      - username
+    Likes:
+      type: object
+      description: |-
+        Serializes only the 'likes' field from ServicePost instances.
+        Likely used for operations specifically related to service post likes.
+      properties:
+        likes:
+          type: array
+          items:
+            type: integer
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+      - password
+    Message:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          readOnly: true
+        orderId:
+          type: string
+        type:
+          type: string
+        thread:
+          type: integer
+        sender:
+          type: integer
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        text:
+          type: string
+        sender_name:
+          type: string
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - sender
+      - sender_name
+      - text
+      - thread
+      - updated_at
+      - uuid
+    PaginatedCategoryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+    PaginatedCityList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/City'
+    PaginatedCommentsList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comments'
+    PaginatedCompetenceCertificateList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompetenceCertificate'
+    PaginatedCountryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Country'
+    PaginatedDisLikesList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DisLikes'
+    PaginatedExperienceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Experience'
+    PaginatedHomeContainersList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/HomeContainers'
+    PaginatedHomeSliderList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/HomeSlider'
+    PaginatedInterestList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Interest'
+    PaginatedLikesList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Likes'
+    PaginatedProfileList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Profile'
+    PaginatedReportList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Report'
+    PaginatedServiceCategoryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceCategory'
+    PaginatedServiceOrderList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceOrder'
+    PaginatedServicePostList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServicePost'
+    PaginatedStateList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/State'
+    PaginatedStudyList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Study'
+    PaginatedSubCategoryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubCategory'
+    PaginatedThreadSerializersList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ThreadSerializers'
+    PaginatedTreeList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tree'
+    PasswordChange:
+      type: object
+      properties:
+        new_password1:
+          type: string
+          maxLength: 128
+        new_password2:
+          type: string
+          maxLength: 128
+      required:
+      - new_password1
+      - new_password2
+    PasswordReset:
+      type: object
+      description: Serializer for requesting a password reset e-mail.
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    PasswordResetConfirm:
+      type: object
+      description: Serializer for confirming a password reset attempt.
+      properties:
+        new_password1:
+          type: string
+          maxLength: 128
+        new_password2:
+          type: string
+          maxLength: 128
+        uid:
+          type: string
+        token:
+          type: string
+      required:
+      - new_password1
+      - new_password2
+      - token
+      - uid
+    PatchedProfile:
+      type: object
+      description: Serializes essential CustomUser profile data.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        stripeCustomerId:
+          type: string
+          readOnly: true
+          nullable: true
+        emailConfirmed:
+          type: boolean
+          nullable: true
+          readOnly: true
+        subscriptionType:
+          type: string
+          readOnly: true
+          nullable: true
+        name:
+          type: string
+          nullable: true
+          maxLength: 50
+        CategoryLastupdate:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        SubcategoryLastupdate:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 50
+        phone:
+          type: string
+          nullable: true
+          maxLength: 15
+        site_id:
+          type: string
+          maxLength: 50
+        is_creator:
+          type: boolean
+        bio:
+          type: string
+          nullable: true
+          maxLength: 500
+        rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,1})?$
+        members:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        followers:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        earning:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        profession:
+          type: string
+          nullable: true
+          maxLength: 100
+        picture_medium:
+          type: string
+          format: uri
+          nullable: true
+        picture_small:
+          type: string
+          format: uri
+          nullable: true
+        picture_tag:
+          type: string
+          format: uri
+          nullable: true
+        location:
+          type: string
+          nullable: true
+          maxLength: 50
+        address1:
+          type: string
+          nullable: true
+          title: Address line 1
+          maxLength: 1024
+        address2:
+          type: string
+          nullable: true
+          title: Address line 2
+          maxLength: 1024
+        zip_code:
+          type: string
+          nullable: true
+          title: Postal Code
+          maxLength: 12
+        city:
+          type: string
+          nullable: true
+          title: Municipality
+          maxLength: 1024
+        state:
+          type: string
+          nullable: true
+          title: County/State
+          maxLength: 1024
+        country:
+          type: string
+          nullable: true
+          maxLength: 1024
+        member_since:
+          type: string
+          format: date-time
+          nullable: true
+        picture:
+          type: string
+          format: uri
+          nullable: true
+        Facebook_link:
+          type: string
+          readOnly: true
+          nullable: true
+        twitter:
+          type: string
+          nullable: true
+          maxLength: 120
+        profile_completed:
+          type: boolean
+        Linkdin_link:
+          type: string
+          readOnly: true
+          nullable: true
+        sms:
+          type: string
+          nullable: true
+          maxLength: 15
+        othersSocialMedia:
+          type: string
+          readOnly: true
+          nullable: true
+        about:
+          type: string
+          title: About me
+          maxLength: 120
+    PatchedServicePostUpdate:
+      type: object
+      description: |-
+        Serializer for updating existing ServicePost instances.
+        Includes a specific subset of fields that are considered updatable.
+      properties:
+        title:
+          type: string
+          maxLength: 50
+        expiration_date:
+          type: string
+          format: date-time
+          nullable: true
+        stripeId:
+          type: string
+          nullable: true
+          maxLength: 200
+        pris:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        enhet:
+          type: string
+          nullable: true
+          maxLength: 30
+        image:
+          type: string
+          format: uri
+        image2:
+          type: string
+          format: uri
+          nullable: true
+        image3:
+          type: string
+          format: uri
+          nullable: true
+        image4:
+          type: string
+          format: uri
+          nullable: true
+        image5:
+          type: string
+          format: uri
+          nullable: true
+        beskrivning:
+          type: string
+          maxLength: 500
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status68aEnum'
+          title: Is published?
+        tillganligFran:
+          type: string
+          format: date-time
+        tillganligTill:
+          type: string
+          format: date-time
+        category:
+          type: string
+          nullable: true
+          maxLength: 1024
+        underCategory:
+          type: string
+          nullable: true
+          maxLength: 1024
+        country:
+          type: string
+          nullable: true
+          maxLength: 1024
+        state:
+          type: string
+          nullable: true
+          title: State/County
+          maxLength: 1024
+        city:
+          type: string
+          nullable: true
+          title: City/Municipality
+          maxLength: 1024
+    PatchedThreadSerializers:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          readOnly: true
+        LastMessageText:
+          type: string
+          readOnly: true
+        LastMessageDate:
+          type: string
+          format: date-time
+          readOnly: true
+        ThreadName:
+          type: string
+          nullable: true
+          maxLength: 50
+        thread_type:
+          $ref: '#/components/schemas/ThreadTypeEnum'
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        users:
+          type: array
+          items:
+            type: integer
+        FriendName:
+          type: string
+          readOnly: true
+        FriendImg:
+          type: string
+          format: uri
+          readOnly: true
+    PatchedTree:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        is_public:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        owner:
+          type: integer
+          readOnly: true
+        owner_email:
+          type: string
+          format: email
+          readOnly: true
+    PatchedUserDetails:
+      type: object
+      description: User model w/o password
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        email:
+          type: string
+          format: email
+          readOnly: true
+          title: Email address
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 50
+        last_name:
+          type: string
+          maxLength: 150
+    PhoneOrEmailRegister:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: true
+          title: Email address
+          maxLength: 254
+        phone:
+          type: string
+          nullable: true
+          maxLength: 15
+        password:
+          type: string
+          writeOnly: true
+        name:
+          type: string
+          nullable: true
+          maxLength: 50
+      required:
+      - password
+    Profile:
+      type: object
+      description: Serializes essential CustomUser profile data.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        stripeCustomerId:
+          type: string
+          readOnly: true
+          nullable: true
+        emailConfirmed:
+          type: boolean
+          nullable: true
+          readOnly: true
+        subscriptionType:
+          type: string
+          readOnly: true
+          nullable: true
+        name:
+          type: string
+          nullable: true
+          maxLength: 50
+        CategoryLastupdate:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        SubcategoryLastupdate:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 50
+        phone:
+          type: string
+          nullable: true
+          maxLength: 15
+        site_id:
+          type: string
+          maxLength: 50
+        is_creator:
+          type: boolean
+        bio:
+          type: string
+          nullable: true
+          maxLength: 500
+        rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,1})?$
+        members:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        followers:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        earning:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        profession:
+          type: string
+          nullable: true
+          maxLength: 100
+        picture_medium:
+          type: string
+          format: uri
+          nullable: true
+        picture_small:
+          type: string
+          format: uri
+          nullable: true
+        picture_tag:
+          type: string
+          format: uri
+          nullable: true
+        location:
+          type: string
+          nullable: true
+          maxLength: 50
+        address1:
+          type: string
+          nullable: true
+          title: Address line 1
+          maxLength: 1024
+        address2:
+          type: string
+          nullable: true
+          title: Address line 2
+          maxLength: 1024
+        zip_code:
+          type: string
+          nullable: true
+          title: Postal Code
+          maxLength: 12
+        city:
+          type: string
+          nullable: true
+          title: Municipality
+          maxLength: 1024
+        state:
+          type: string
+          nullable: true
+          title: County/State
+          maxLength: 1024
+        country:
+          type: string
+          nullable: true
+          maxLength: 1024
+        member_since:
+          type: string
+          format: date-time
+          nullable: true
+        picture:
+          type: string
+          format: uri
+          nullable: true
+        Facebook_link:
+          type: string
+          readOnly: true
+          nullable: true
+        twitter:
+          type: string
+          nullable: true
+          maxLength: 120
+        profile_completed:
+          type: boolean
+        Linkdin_link:
+          type: string
+          readOnly: true
+          nullable: true
+        sms:
+          type: string
+          nullable: true
+          maxLength: 15
+        othersSocialMedia:
+          type: string
+          readOnly: true
+          nullable: true
+        about:
+          type: string
+          title: About me
+          maxLength: 120
+      required:
+      - CategoryLastupdate
+      - Facebook_link
+      - Linkdin_link
+      - SubcategoryLastupdate
+      - email
+      - emailConfirmed
+      - id
+      - member_since
+      - othersSocialMedia
+      - stripeCustomerId
+      - subscriptionType
+    Report:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        addedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Added at
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Updated at
+        title:
+          type: string
+          maxLength: 100
+        orderNumber:
+          type: string
+          maxLength: 100
+        type:
+          type: string
+          maxLength: 500
+        message:
+          type: string
+          maxLength: 500
+        image:
+          type: string
+          format: uri
+      required:
+      - addedAt
+      - id
+      - message
+      - orderNumber
+      - title
+      - type
+      - updatedAt
+    RestAuthDetail:
+      type: object
+      properties:
+        detail:
+          type: string
+          readOnly: true
+      required:
+      - detail
+    SendPhoneOTP:
+      type: object
+      properties:
+        phone:
+          type: string
+          maxLength: 32
+      required:
+      - phone
+    ServiceCategory:
+      type: object
+      description: |-
+        Serializes ModelCategory instances, including its subcategories
+        via the `get_SubCategorys` method.
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        name:
+          type: string
+          title: Category
+          maxLength: 100
+        img:
+          type: string
+          format: uri
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubCategory'
+          readOnly: true
+      required:
+      - children
+      - name
+      - pk
+    ServiceOrder:
+      type: object
+      description: |-
+        Serializes ServiceOrder instances, enriching the output with related
+        service name, employee name, and customer name via SerializerMethodFields.
+      properties:
+        quantity:
+          type: string
+          maxLength: 50
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ServiceOrderStatusEnum'
+          title: 'Status of service:'
+        serviceId:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        employedIdd:
+          type: string
+          maxLength: 50
+        ordered_at:
+          type: string
+          format: date-time
+          nullable: true
+        customerIdd:
+          type: string
+          maxLength: 50
+        servicename:
+          type: string
+          readOnly: true
+        employedname:
+          type: string
+          readOnly: true
+        customername:
+          type: string
+          readOnly: true
+        price:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        enhet:
+          type: string
+          maxLength: 50
+        date:
+          type: string
+          maxLength: 500
+      required:
+      - customerIdd
+      - customername
+      - date
+      - employedIdd
+      - employedname
+      - enhet
+      - pk
+      - quantity
+      - servicename
+    ServiceOrderStatusEnum:
+      enum:
+      - requested
+      - confirmed
+      - canceled
+      - pend
+      - payed
+      type: string
+      description: |-
+        * `requested` - Requested
+        * `confirmed` - Confirmed
+        * `canceled` - Canceled
+        * `pend` - Pend
+        * `payed` - Payed
+    ServicePost:
+      type: object
+      description: |-
+        Serializes ServicePost instances for read operations, including related employee
+        information like site_id and profile picture URL.
+        It also explicitly formats DateTimeFields.
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        expiration_date:
+          type: string
+          format: date-time
+        stripeId:
+          type: string
+          nullable: true
+          maxLength: 200
+        createdAt:
+          type: string
+          format: date-time
+        enhet:
+          type: string
+          nullable: true
+          maxLength: 30
+        likes:
+          type: array
+          items:
+            type: integer
+        disLikes:
+          type: array
+          items:
+            type: integer
+            title: DisLikes
+        picture:
+          type: string
+          format: uri
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+        bedomning:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,1})?$
+        title:
+          type: string
+          maxLength: 50
+        AboutSeller:
+          type: string
+          nullable: true
+          title: About Seller
+          maxLength: 1024
+        sellerName:
+          type: string
+          nullable: true
+          title: Seller Name
+          maxLength: 1024
+        slug:
+          type: string
+          maxLength: 500
+          pattern: ^[-a-zA-Z0-9_]+$
+        pris:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        site_id:
+          type: string
+          readOnly: true
+        image:
+          type: string
+          format: uri
+        image2:
+          type: string
+          format: uri
+          nullable: true
+        image3:
+          type: string
+          format: uri
+          nullable: true
+        image4:
+          type: string
+          format: uri
+          nullable: true
+        image5:
+          type: string
+          format: uri
+          nullable: true
+        beskrivning:
+          type: string
+          maxLength: 500
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status68aEnum'
+          title: Is published?
+        tillganligFran:
+          type: string
+          format: date-time
+        tillganligTill:
+          type: string
+          format: date-time
+        category:
+          type: string
+          nullable: true
+          maxLength: 1024
+        underCategory:
+          type: string
+          nullable: true
+          maxLength: 1024
+        country:
+          type: string
+          nullable: true
+          maxLength: 1024
+        state:
+          type: string
+          nullable: true
+          title: State/County
+          maxLength: 1024
+        city:
+          type: string
+          nullable: true
+          title: City/Municipality
+          maxLength: 1024
+      required:
+      - picture
+      - pk
+      - pris
+      - site_id
+      - title
+    ServicePostCreate:
+      type: object
+      description: |-
+        Serializer for creating new ServicePost instances.
+        Defines the fields required for creating a new service post.
+      properties:
+        title:
+          type: string
+          maxLength: 50
+        expiration_date:
+          type: string
+          format: date-time
+          nullable: true
+        stripeId:
+          type: string
+          nullable: true
+          maxLength: 200
+        enhet:
+          type: string
+          nullable: true
+          maxLength: 30
+        employee:
+          type: integer
+          readOnly: true
+        pris:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        image:
+          type: string
+          format: uri
+        image2:
+          type: string
+          format: uri
+          nullable: true
+        image3:
+          type: string
+          format: uri
+          nullable: true
+        image4:
+          type: string
+          format: uri
+          nullable: true
+        image5:
+          type: string
+          format: uri
+          nullable: true
+        beskrivning:
+          type: string
+          maxLength: 500
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status68aEnum'
+          title: Is published?
+        tillganligFran:
+          type: string
+          format: date-time
+        tillganligTill:
+          type: string
+          format: date-time
+        category:
+          type: string
+          nullable: true
+          maxLength: 1024
+        underCategory:
+          type: string
+          nullable: true
+          maxLength: 1024
+        country:
+          type: string
+          nullable: true
+          maxLength: 1024
+        state:
+          type: string
+          nullable: true
+          title: State/County
+          maxLength: 1024
+        city:
+          type: string
+          nullable: true
+          title: City/Municipality
+          maxLength: 1024
+      required:
+      - employee
+      - pris
+      - title
+    ServicePostUpdate:
+      type: object
+      description: |-
+        Serializer for updating existing ServicePost instances.
+        Includes a specific subset of fields that are considered updatable.
+      properties:
+        title:
+          type: string
+          maxLength: 50
+        expiration_date:
+          type: string
+          format: date-time
+          nullable: true
+        stripeId:
+          type: string
+          nullable: true
+          maxLength: 200
+        pris:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        enhet:
+          type: string
+          nullable: true
+          maxLength: 30
+        image:
+          type: string
+          format: uri
+        image2:
+          type: string
+          format: uri
+          nullable: true
+        image3:
+          type: string
+          format: uri
+          nullable: true
+        image4:
+          type: string
+          format: uri
+          nullable: true
+        image5:
+          type: string
+          format: uri
+          nullable: true
+        beskrivning:
+          type: string
+          maxLength: 500
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status68aEnum'
+          title: Is published?
+        tillganligFran:
+          type: string
+          format: date-time
+        tillganligTill:
+          type: string
+          format: date-time
+        category:
+          type: string
+          nullable: true
+          maxLength: 1024
+        underCategory:
+          type: string
+          nullable: true
+          maxLength: 1024
+        country:
+          type: string
+          nullable: true
+          maxLength: 1024
+        state:
+          type: string
+          nullable: true
+          title: State/County
+          maxLength: 1024
+        city:
+          type: string
+          nullable: true
+          title: City/Municipality
+          maxLength: 1024
+      required:
+      - pris
+      - title
+    SetPassword:
+      type: object
+      properties:
+        password:
+          type: string
+          writeOnly: true
+          minLength: 6
+      required:
+      - password
+    SocialLogin:
+      type: object
+      properties:
+        access_token:
+          type: string
+        code:
+          type: string
+        id_token:
+          type: string
+    State:
+      type: object
+      description: Serializes all fields for ModelState instances.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Category
+          maxLength: 100
+        img:
+          type: string
+          format: uri
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Date published
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Date updated
+        employee:
+          type: integer
+      required:
+      - createdAt
+      - employee
+      - id
+      - name
+      - updatedAt
+    Status68aEnum:
+      enum:
+      - draft
+      - published
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `published` - Published
+    Study:
+      type: object
+      description: Serializes Study (Study) model instances, including the user's
+        site_id.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        site_id:
+          type: string
+          readOnly: true
+        username:
+          type: integer
+        Added_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        plats:
+          type: string
+          maxLength: 100
+        content:
+          type: string
+        started_at:
+          type: string
+          maxLength: 100
+        ended_at:
+          type: string
+          maxLength: 100
+        degree:
+          type: string
+          maxLength: 100
+      required:
+      - Added_at
+      - content
+      - degree
+      - ended_at
+      - id
+      - name
+      - plats
+      - site_id
+      - started_at
+      - updated_at
+      - username
+    SubCategory:
+      type: object
+      description: Serializes all fields for ModelSubCategory instances.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Under category
+          maxLength: 100
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Date published
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Date updated
+        Category:
+          type: integer
+      required:
+      - Category
+      - createdAt
+      - id
+      - name
+      - updatedAt
+    ThreadSerializers:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          readOnly: true
+        LastMessageText:
+          type: string
+          readOnly: true
+        LastMessageDate:
+          type: string
+          format: date-time
+          readOnly: true
+        ThreadName:
+          type: string
+          nullable: true
+          maxLength: 50
+        thread_type:
+          $ref: '#/components/schemas/ThreadTypeEnum'
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        users:
+          type: array
+          items:
+            type: integer
+        FriendName:
+          type: string
+          readOnly: true
+        FriendImg:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - FriendImg
+      - FriendName
+      - LastMessageDate
+      - LastMessageText
+      - created_at
+      - id
+      - updated_at
+      - users
+      - uuid
+    ThreadTypeEnum:
+      enum:
+      - personal
+      - group
+      type: string
+      description: |-
+        * `personal` - Personal
+        * `group` - Group
+    Tree:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        is_public:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        owner:
+          type: integer
+          readOnly: true
+        owner_email:
+          type: string
+          format: email
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - owner
+      - owner_email
+      - slug
+      - title
+    UserDetails:
+      type: object
+      description: User model w/o password
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        email:
+          type: string
+          format: email
+          readOnly: true
+          title: Email address
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 50
+        last_name:
+          type: string
+          maxLength: 150
+      required:
+      - email
+      - pk
+    VerifyPhoneOTP:
+      type: object
+      properties:
+        phone:
+          type: string
+          maxLength: 32
+        otp:
+          type: string
+          maxLength: 6
+          minLength: 4
+      required:
+      - otp
+      - phone
+  securitySchemes:
+    knoxApiToken:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"

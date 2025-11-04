@@ -8,7 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from knox.auth import TokenAuthentication
 from rest_framework import views, viewsets
 from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import GenericAPIView, ListAPIView
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -48,7 +48,7 @@ class ProfileListView(ListAPIView):
     search_fields = ['first_name', 'site_id', 'about','profession', 'city','state','country']
 
 
-class ProfileCollectionView(views.APIView):
+class ProfileCollectionView(GenericAPIView):
     """
     API view for listing all profiles or creating/updating a profile.
     Interacts with the CustomUser model using ProfileSerializer.
@@ -62,9 +62,11 @@ class ProfileCollectionView(views.APIView):
     Authentication: TokenAuthentication
     Permissions: IsAuthenticated
     """
+    serializer_class = ProfileSerializer
+
     def get(self, request):
-        Profiles = CustomUser.objects.all()
-        serializer = ProfileSerializer(Profiles,many=True)
+        profiles = CustomUser.objects.all()
+        serializer = self.get_serializer(profiles, many=True)
         return Response(serializer.data, status=200)
 
     def post(self, request):
@@ -72,8 +74,7 @@ class ProfileCollectionView(views.APIView):
         Handles POST request to create/update a profile.
         It includes an authorization check and manual image variant setting.
         """
-        data= request.data
-        serializer = ProfileSerializer(data=data)
+        serializer = self.get_serializer(data=request.data)
         # Authorization check: Ensures the authenticated user matches the username (ID) in the request data.
         if serializer.is_valid() and int(request.user.id) == int(request.data.get('username')): # Use .get for safety
             # Manually setting image variants. This might be simplified if the model uses ImageSpecField or similar from imagekit to auto-generate variants.
@@ -91,7 +92,7 @@ class ProfileCollectionView(views.APIView):
     filter_backends = [DjangoFilterBackend] 
     filterset_fields = ['site_id', 'in_stock'] # 'in_stock' is not a field on CustomUser model.
 
-class ProfileInfoView(views.APIView):
+class ProfileInfoView(GenericAPIView):
     """
     Retrieves all information for a specific user profile using their site_id.
     Interacts with the CustomUser model using AllProfileInfoSerializer.
@@ -102,6 +103,8 @@ class ProfileInfoView(views.APIView):
     Authentication: TokenAuthentication
     Permissions: IsAuthenticated
     """
+    serializer_class = AllProfileInfoSerializer
+
     def get_object(self,site_id):
         """
         Retrieves a CustomUser instance by its site_id.
@@ -118,13 +121,13 @@ class ProfileInfoView(views.APIView):
         instance = self.get_object(site_id)
         if isinstance(instance, Response): # Handle error response from get_object
             return instance
-        serializer = AllProfileInfoSerializer(instance)
+        serializer = self.get_serializer(instance)
         return Response(serializer.data, status=200)
 
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
 
-class ProfileDetailView(views.APIView):
+class ProfileDetailView(GenericAPIView):
     """
     API view for retrieving, updating, or deleting a specific user profile by site_id.
     Interacts with the CustomUser model using ProfileSerializer.
@@ -138,6 +141,8 @@ class ProfileDetailView(views.APIView):
     Authentication: TokenAuthentication
     Permissions: IsAuthenticated (allows read, restricts write to authenticated users, though further checks might be needed for own-profile edits).
     """
+    serializer_class = ProfileSerializer
+
     def get_object(self,site_id):
         """
         Retrieves a CustomUser instance by its site_id.
@@ -151,15 +156,16 @@ class ProfileDetailView(views.APIView):
 
     def get(self, request,site_id=None):
         instance = self.get_object(site_id)
-        if isinstance(instance, Response): return instance
-        serializer = ProfileSerializer(instance)
+        if isinstance(instance, Response):
+            return instance
+        serializer = self.get_serializer(instance)
         return Response(serializer.data, status=200)
 
     def put(self, request,site_id=None):
-        data= request.data
         instance = self.get_object(site_id)
-        if isinstance(instance, Response): return instance
-        serializer = ProfileSerializer(instance,data=data)
+        if isinstance(instance, Response):
+            return instance
+        serializer = self.get_serializer(instance, data=request.data)
         if serializer.is_valid():
             # Manually setting image variants. This might be simplified if the model uses ImageSpecField.
             if 'picture' in request.data:
@@ -171,10 +177,10 @@ class ProfileDetailView(views.APIView):
         return Response(serializer.errors,status=400)
 
     def patch(self, request,site_id=None):
-        data= request.data
         instance = self.get_object(site_id)
-        if isinstance(instance, Response): return instance
-        serializer = ProfileSerializer(instance,data=data, partial=True)
+        if isinstance(instance, Response):
+            return instance
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
         if serializer.is_valid():
             # Manually setting image variants if 'picture' is part of the patch data.
             # if 'picture' in request.data and request.data['picture'] != instance.picture:
@@ -211,7 +217,7 @@ class CompetenceListView(ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['name','username','username__site_id']
 
-class CompetenceCreateView(views.APIView):
+class CompetenceCreateView(GenericAPIView):
     """
     API view for creating CompetenceCertificate (Skills/Certificates) entries.
     Interacts with CompetenceCertificate model using CompetenceCertificateSerializer.
@@ -222,9 +228,10 @@ class CompetenceCreateView(views.APIView):
     Authentication: TokenAuthentication
     Permissions: IsAuthenticated (though POST implies authenticated write).
     """
+    serializer_class = CompetenceCertificateSerializer
+
     def post(self, request):
-        data= request.data
-        serializer = CompetenceCertificateSerializer(data=data)
+        serializer = self.get_serializer(data=request.data)
         # Authorization check: Ensures the authenticated user's ID matches the 'username' (FK ID) in the request data.
         if serializer.is_valid() and int(request.user.id) == int(request.data.get('username')):
             serializer.save()
@@ -235,7 +242,7 @@ class CompetenceCreateView(views.APIView):
     permission_classes = [IsAuthenticated]
 
 
-class CompetenceDetailView(views.APIView):
+class CompetenceDetailView(GenericAPIView):
     """
     API view for retrieving, updating, or deleting a specific CompetenceCertificate (Skill/Certificate) entry by its ID.
     Interacts with CompetenceCertificate model.
@@ -248,6 +255,8 @@ class CompetenceDetailView(views.APIView):
     Authentication: TokenAuthentication
     Permissions: IsAuthenticated.
     """
+    serializer_class = CompetenceCertificateSerializer
+
     def get_object(self,id):
         """
         Retrieves a CompetenceCertificate instance by its ID.
@@ -261,15 +270,17 @@ class CompetenceDetailView(views.APIView):
 
     def get(self, request,id=None):
         instance = self.get_object(id)
-        if isinstance(instance, Response): return instance
-        serializer = CompetenceCertificateSerializer(instance)
+        if isinstance(instance, Response):
+            return instance
+        serializer = self.get_serializer(instance)
         return Response(serializer.data, status=200)
 
     def put(self, request,id=None):
         data= request.data
         instance = self.get_object(id)
-        if isinstance(instance, Response): return instance
-        serializer = CompetenceCertificateSerializer(instance,data=data)
+        if isinstance(instance, Response):
+            return instance
+        serializer = self.get_serializer(instance,data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=200)
@@ -302,7 +313,7 @@ class InterestListView(ListAPIView):
     filterset_fields = ['name','username','username__site_id']
     pagination_class = LimitOffsetPagination
 
-class InterestCreateView(views.APIView):
+class InterestCreateView(GenericAPIView):
     """
     API view for creating Interest (Interests) entries.
     Interacts with Interest model using InterestSerializer.
@@ -313,9 +324,10 @@ class InterestCreateView(views.APIView):
     Authentication: TokenAuthentication
     Permissions: IsAuthenticated.
     """
+    serializer_class = InterestSerializer
+
     def post(self, request):
-        data= request.data
-        serializer = InterestSerializer(data=data)
+        serializer = self.get_serializer(data=request.data)
         # Authorization check: Ensures the authenticated user's ID matches the 'username' (FK ID) in the request data.
         if serializer.is_valid() and int(request.user.id) == int(request.data.get('username')):
             serializer.save()
@@ -325,7 +337,7 @@ class InterestCreateView(views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
 
-class InterestDetailView(views.APIView):
+class InterestDetailView(GenericAPIView):
     """
     API view for retrieving, updating, or deleting a specific Interest (Interest) entry by its ID.
     Interacts with Interest model.
@@ -338,6 +350,8 @@ class InterestDetailView(views.APIView):
     Authentication: TokenAuthentication
     Permissions: IsAuthenticated.
     """
+    serializer_class = InterestSerializer
+
     def get_object(self,id):
         """
         Retrieves an Interest instance by its ID.
@@ -351,15 +365,17 @@ class InterestDetailView(views.APIView):
 
     def get(self, request,id=None):
         instance = self.get_object(id)
-        if isinstance(instance, Response): return instance
-        serializer = InterestSerializer(instance)
+        if isinstance(instance, Response):
+            return instance
+        serializer = self.get_serializer(instance)
         return Response(serializer.data, status=200)
 
     def put(self, request,id=None):
         data= request.data
         instance = self.get_object(id)
-        if isinstance(instance, Response): return instance
-        serializer = InterestSerializer(instance,data=data)
+        if isinstance(instance, Response):
+            return instance
+        serializer = self.get_serializer(instance,data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=200)
@@ -392,7 +408,7 @@ class StudyListView(ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['name','username','username__site_id']
 
-class StudyCreateView(views.APIView):
+class StudyCreateView(GenericAPIView):
     """
     API view for creating Study (Studies) entries.
     Interacts with Study model using StudySerializer.
@@ -403,9 +419,10 @@ class StudyCreateView(views.APIView):
     Authentication: TokenAuthentication
     Permissions: IsAuthenticated.
     """
+    serializer_class = StudySerializer
+
     def post(self, request):
-        data= request.data
-        serializer = StudySerializer(data=data)
+        serializer = self.get_serializer(data=request.data)
         # Authorization check: Ensures the authenticated user's ID matches the 'username' (FK ID) in the request data.
         if serializer.is_valid() and int(request.user.id) == int(request.data.get('username')):
             serializer.save()
@@ -452,7 +469,7 @@ class userStudyAPIView(views.APIView):
     permission_classes = [IsAuthenticated]
     lookupfield = 'site_id' # DRF's generic views use lookup_field, not lookupfield.
 
-class StudyDetailView(views.APIView):
+class StudyDetailView(GenericAPIView):
     """
     API view for retrieving, updating, or deleting a specific Study (Study) entry by its ID.
     Interacts with Study model.
@@ -465,6 +482,8 @@ class StudyDetailView(views.APIView):
     Authentication: TokenAuthentication
     Permissions: IsAuthenticated.
     """
+    serializer_class = StudySerializer
+
     def get_object(self,id):
         """
         Retrieves a Study instance by its ID.
@@ -478,15 +497,17 @@ class StudyDetailView(views.APIView):
 
     def get(self, request,id=None):
         instance = self.get_object(id)
-        if isinstance(instance, Response): return instance
-        serializer = StudySerializer(instance)
+        if isinstance(instance, Response):
+            return instance
+        serializer = self.get_serializer(instance)
         return Response(serializer.data, status=200)
 
     def put(self, request,id=None):
         data= request.data
         instance = self.get_object(id)
-        if isinstance(instance, Response): return instance
-        serializer = StudySerializer(instance,data=data)
+        if isinstance(instance, Response):
+            return instance
+        serializer = self.get_serializer(instance,data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=200)
@@ -519,7 +540,7 @@ class ExperienceListView(ListAPIView):
     filterset_fields = ['name','username','username__site_id']
     pagination_class = LimitOffsetPagination
 
-class ExperienceCreateView(views.APIView):
+class ExperienceCreateView(GenericAPIView):
     """
     API view for creating Experience (Experience) entries.
     Interacts with Experience model using ExperienceSerializer.
@@ -530,9 +551,10 @@ class ExperienceCreateView(views.APIView):
     Authentication: TokenAuthentication
     Permissions: IsAuthenticated.
     """
+    serializer_class = ExperienceSerializer
+
     def post(self, request):
-        data= request.data
-        serializer = ExperienceSerializer(data=data)
+        serializer = self.get_serializer(data=request.data)
         # Authorization check: Ensures the authenticated user's ID matches the 'username' (FK ID) in the request data.
         if serializer.is_valid() and int(request.user.id) == int(request.data.get('username')):
             serializer.save()
@@ -542,7 +564,7 @@ class ExperienceCreateView(views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
 
-class ExperienceDetailView(views.APIView):
+class ExperienceDetailView(GenericAPIView):
     """
     API view for retrieving, updating, or deleting a specific Experience (Experience) entry by its ID.
     Interacts with Experience model.
@@ -555,6 +577,8 @@ class ExperienceDetailView(views.APIView):
     Authentication: TokenAuthentication
     Permissions: IsAuthenticated.
     """
+    serializer_class = ExperienceSerializer
+
     def get_object(self,id):
         """
         Retrieves an Experience instance by its ID.
@@ -568,15 +592,17 @@ class ExperienceDetailView(views.APIView):
 
     def get(self, request,id=None):
         instance = self.get_object(id)
-        if isinstance(instance, Response): return instance
-        serializer = ExperienceSerializer(instance)
+        if isinstance(instance, Response):
+            return instance
+        serializer = self.get_serializer(instance)
         return Response(serializer.data, status=200)
 
     def put(self, request,id=None):
         data= request.data
         instance = self.get_object(id)
-        if isinstance(instance, Response): return instance
-        serializer = ExperienceSerializer(instance, data=data)
+        if isinstance(instance, Response):
+            return instance
+        serializer = self.get_serializer(instance, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=200)

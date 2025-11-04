@@ -1,3 +1,5 @@
+import uuid
+
 from chat.managers import ThreadManager
 from django.db import models
 from Neetechs import settings
@@ -17,6 +19,7 @@ class Thread(TrackingModel):
     ThreadName = models.CharField(max_length=50, null=True, blank=True)
     thread_type = models.CharField(max_length=15, choices=THREAD_TYPE, default='personal')
     users = models.ManyToManyField(settings.AUTH_USER_MODEL)
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
 
     objects = ThreadManager()
 
@@ -32,6 +35,7 @@ class Message(TrackingModel):
     orderId = models.TextField(default="none")
     type = models.TextField(default="none")
     created_at = models.DateTimeField(auto_now=True)
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
 
     def __str__(self) -> str:
         return f'From <Thread - {self.thread}>'

@@ -24,6 +24,8 @@ class ListReportAPIView(ListAPIView):
 
 
 class ReportAPIView(ListAPIView):
+    serializer_class = ReportSerializer
+    queryset = ReportMoudel.objects.all()
     def post(self, request):
         data= request.data
         serializer = ReportSerializer(data=data)

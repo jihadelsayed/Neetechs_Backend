@@ -5,6 +5,7 @@ and related data for the Service application.
 #from Service.utils import rotate_image # Assuming not used as per cleanup instruction for api_create_service_view
 from django.db.models.query_utils import Q
 from django.utils import timezone
+from drf_spectacular.utils import OpenApiResponse, OpenApiTypes, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -20,7 +21,19 @@ from knox.auth import TokenAuthentication
 #from rest_framework.authentication import TokenAuthentication # Removed as per cleanup
 
 from Service.models import ModelComments,ServicePost,ModelCategory,ModelSubCategory,ModelCountry,ModelState
-from Service.api.serializers import LikesSerializer,DisLikesSerializer, CommentsSerializer,ServicePostSerializer, ServicePostUpdateSerializer, ServicePostCreateSerializer,CategorySerializer,SubCategorySerializer,CountrySerializer,StateSerializer,CitySerializer
+from Service.api.serializers import (
+    CitySerializer,
+    CountrySerializer,
+    DisLikesSerializer,
+    LikesSerializer,
+    ServiceCategorySerializer,
+    ServicePostCreateSerializer,
+    ServicePostSerializer,
+    ServicePostUpdateSerializer,
+    StateSerializer,
+    SubCategorySerializer,
+    CommentsSerializer,
+)
 
 from django.conf import settings
 
@@ -38,7 +51,7 @@ class CategoryViewSet(ListAPIView):
 	"""Lists all service categories (ModelCategory instances)."""
 	authentication_classes = (TokenAuthentication,) # Specifies Knox token authentication.
 	permission_classes = (IsAuthenticatedOrReadOnly,) # Allows unrestricted access to this view.
-	serializer_class = CategorySerializer # Serializer for ModelCategory instances.
+	serializer_class = ServiceCategorySerializer # Serializer for ModelCategory instances.
 	queryset = ModelCategory.objects.all() # Retrieves all ModelCategory objects.
 	
 class SubCategoryViewSet(ListAPIView):
@@ -94,6 +107,10 @@ class PostLikesAPIView(views.APIView):
 	# - postNumber (int): ID of the ServicePost to like/dislike.
 	# - likeType (str): "add one like", "remove one like", "add one dislike", "remove one dislike".
 	# - LikeDisLike (int): 1 for like operations, 0 for dislike operations.
+	@extend_schema(
+		request=LikesSerializer,
+		responses={200: OpenApiResponse(OpenApiTypes.OBJECT)},
+	)
 	def post(self, request):
 		data= request.data
 		serializer = LikesSerializer(data=data) # Uses LikesSerializer, likely for initial validation of 'userid' if it's part of that serializer.
@@ -328,6 +345,10 @@ def api_update_service_view(request, slug):
 	return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
+@extend_schema(
+    request=None,
+    responses={200: OpenApiResponse(OpenApiTypes.OBJECT)},
+)
 @api_view(['GET',])
 @permission_classes((IsAuthenticated,))
 def api_is_employee_of_servicepost(request, slug):

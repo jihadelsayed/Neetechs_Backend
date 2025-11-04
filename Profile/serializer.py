@@ -1,4 +1,5 @@
 from allauth.account.models import EmailAddress
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from knox_allauth.models import CustomUser
@@ -36,6 +37,7 @@ class ProfileSerializerBase(serializers.ModelSerializer):
         source="other_social_media", allow_blank=True, allow_null=True, read_only=True
     )
 
+    @extend_schema_field(serializers.DateTimeField(allow_null=True))
     def get_CategoryLastupdate(self, obj):
         """Timestamp of the most recently updated category."""
 
@@ -45,6 +47,7 @@ class ProfileSerializerBase(serializers.ModelSerializer):
             category_last_update = None
         return category_last_update
 
+    @extend_schema_field(serializers.DateTimeField(allow_null=True))
     def get_SubcategoryLastupdate(self, obj):
         """Timestamp of the most recently updated sub-category."""
 
@@ -54,6 +57,7 @@ class ProfileSerializerBase(serializers.ModelSerializer):
             subcategory_last_update = None
         return subcategory_last_update
 
+    @extend_schema_field(serializers.BooleanField(allow_null=True))
     def get_emailConfirmed(self, obj):
         """Whether the user's primary email is verified via allauth."""
 
@@ -116,6 +120,7 @@ class InterestSerializer(serializers.ModelSerializer):
     Serializes Interest (Interest) model instances, including the user's site_id.
     """
     site_id = serializers.SerializerMethodField() # Custom field to include user's site_id.
+    @extend_schema_field(serializers.CharField())
     def get_site_id(self, obj):
         """Retrieves the site_id of the user associated with this interest."""
         return obj.username.site_id
@@ -130,6 +135,7 @@ class CompetenceCertificateSerializer(serializers.ModelSerializer):
     including the user's site_id.
     """
     site_id = serializers.SerializerMethodField() # Custom field to include user's site_id.
+    @extend_schema_field(serializers.CharField())
     def get_site_id(self, obj):
         """Retrieves the site_id of the user associated with this skill/certificate."""
         return obj.username.site_id
@@ -143,6 +149,7 @@ class StudySerializer(serializers.ModelSerializer):
     Serializes Study (Study) model instances, including the user's site_id.
     """
     site_id = serializers.SerializerMethodField() # Custom field to include user's site_id.
+    @extend_schema_field(serializers.CharField())
     def get_site_id(self, obj):
         """Retrieves the site_id of the user associated with this study entry."""
         return obj.username.site_id
@@ -158,6 +165,7 @@ class ExperienceSerializer(serializers.ModelSerializer):
     Serializes Experience (Experience) model instances, including the user's site_id.
     """
     site_id = serializers.SerializerMethodField() # Custom field to include user's site_id.
+    @extend_schema_field(serializers.CharField())
     def get_site_id(self, obj):
         """Retrieves the site_id of the user associated with this experience entry."""
         return obj.username.site_id
@@ -184,6 +192,7 @@ class AllProfileInfoSerializer(ProfileSerializerBase):
         fields = ('id', 'stripeCustomerId', 'emailConfirmed', 'subscriptionType', 'Interest', 'CompetenceCertificate', 'Study', 'Experience', 'CategoryLastupdate', 'SubcategoryLastupdate', 'email', 'name', 'first_name', 'phone', 'site_id', 'is_creator', 'bio', 'rating', 'members',
 		          'followers', 'earning', 'profession', 'picture_medium', 'picture_small', 'picture_tag', 'location', 'address1', 'address2', 'zip_code', 'city', 'state', 'country', 'member_since', 'picture','Facebook_link','twitter','profile_completed','Linkdin_link','sms','othersSocialMedia','about')
 
+    @extend_schema_field(serializers.ListSerializer(child=InterestSerializer()))
     def get_Interest(self, obj):
         """Retrieves and serializes the user's interests."""
         # .filter() returns a queryset, which doesn't raise DoesNotExist.
@@ -191,16 +200,19 @@ class AllProfileInfoSerializer(ProfileSerializerBase):
         interest = Interest.objects.filter(username=obj.id)
         return InterestSerializer(interest, many=True).data
 
+    @extend_schema_field(serializers.ListSerializer(child=CompetenceCertificateSerializer()))
     def get_CompetenceCertificate(self, obj):
         """Retrieves and serializes the user's skills/certificates."""
         competence_intyg = CompetenceCertificate.objects.filter(username=obj.id)
         return CompetenceCertificateSerializer(competence_intyg, many=True).data
 
+    @extend_schema_field(serializers.ListSerializer(child=StudySerializer()))
     def get_Study(self, obj):
         """Retrieves and serializes the user's studies."""
         study = Study.objects.filter(username=obj.id)
         return StudySerializer(study, many=True).data
 
+    @extend_schema_field(serializers.ListSerializer(child=ExperienceSerializer()))
     def get_Experience(self, obj):
         """Retrieves and serializes the user's work experiences."""
         experienceer = Experience.objects.filter(username=obj.id)

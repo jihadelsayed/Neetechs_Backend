@@ -41,6 +41,20 @@ REST_FRAMEWORK.update(
 
 APPEND_SLASH = True
 
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Neetechs API",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "COMPONENT_NO_READ_ONLY_REQUIRED": True,
+    "ENUM_NAME_OVERRIDES": {"status": "ServiceOrderStatus"},
+    "COMPONENT_NAME_OVERRIDES": {
+        # disambiguate duplicate Category serializers
+        "Category": "CategoryPublic",
+    },
+    "PREPROCESSING_HOOKS": [],
+}
+
 # Optional: make it easy to see which settings loaded when DEBUG is on
 if globals().get("DEBUG"):
     loaded_from = _target

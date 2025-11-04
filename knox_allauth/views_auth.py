@@ -3,9 +3,9 @@ import stripe
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework import status
+from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from dj_rest_auth.registration.views import RegisterView, SocialLoginView
 from dj_rest_auth.views import LoginView
@@ -18,6 +18,10 @@ from .models import CustomUser
 from .utils import create_knox_token
 from .serializers.user import KnoxSerializer
 from .serializers.register import PhoneOrEmailRegisterSerializer
+from .serializers.auth import (
+    CurrentUserSerializer,
+    EmailConfirmationSerializer,
+)
 from Profile.serializer import ProfileSerializer
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -87,11 +91,15 @@ class GoogleLogin(SocialLoginView_):
     adapter_class = GoogleOAuth2Adapter
 
 
-class EmailConfirmation(APIView):
+class EmailConfirmation(GenericAPIView):
     permission_classes = [AllowAny]
+    serializer_class = EmailConfirmationSerializer
 
     def post(self, request):
-        user = get_object_or_404(CustomUser, email=request.data.get("email"))
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data["email"]
+        user = get_object_or_404(CustomUser, email=email)
         if user.emailaddress_set.filter(verified=True).exists():
             return Response({"message": "This email is already verified. Try to login and logout again to refresh the app."}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -101,9 +109,10 @@ class EmailConfirmation(APIView):
             return Response({"message": "This email does not exist, please create a new account"}, status=status.HTTP_403_FORBIDDEN)
 
 
-class CurrentUserView(APIView):
+class CurrentUserView(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = CurrentUserSerializer
 
     def get(self, request):
-        serializer = ProfileSerializer(request.user)
+        serializer = self.get_serializer(request.user)
         return Response(serializer.data)
