@@ -1,3 +1,4 @@
+from typing import Any, Dict, List
 
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
@@ -14,8 +15,10 @@ class ChildCategorySerializer(serializers.ModelSerializer):
 		fields = ('id', 'name', 'parent', 'children','description', 'updatedAt', 'createdAt', 'img')
 		ref_name = "CategoryChild"
 
-	@extend_schema_field('CategoryChild')
-	def get_children(self, obj):
+	@extend_schema_field(
+		{"type": "array", "items": {"$ref": "#/components/schemas/CategoryChild"}}
+	)
+	def get_children(self, obj: ModelCategory) -> List[Dict[str, Any]]:
 		children = ModelCategory.objects.filter(parent=obj)
 		serializer = ChildCategorySerializer(children, many=True, context=self.context)
 		return serializer.data
@@ -36,7 +39,7 @@ class CategorySerializer(serializers.ModelSerializer):
 		fields = ('id', 'name', 'parent', 'children','description', 'updatedAt', 'createdAt', 'img')
 
 	@extend_schema_field(ChildCategorySerializer(many=True))
-	def get_children(self, obj):
+	def get_children(self, obj: ModelCategory) -> List[Dict[str, Any]]:
 		"""
 		Retrieves and serializes the direct children of a given category instance.
 		This method is called by the 'children' SerializerMethodField.

@@ -47,7 +47,10 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
     "COMPONENT_NO_READ_ONLY_REQUIRED": True,
-    "ENUM_NAME_OVERRIDES": {"status": "ServiceOrderStatus"},
+    "ENUM_NAME_OVERRIDES": {
+        "ServiceOrder.status": "ServiceOrderStatus",
+        "ServicePost.status": "ServicePostStatus",
+    },
     "COMPONENT_NAME_OVERRIDES": {
         # disambiguate duplicate Category serializers
         "Category": "CategoryPublic",
