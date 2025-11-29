@@ -9,9 +9,9 @@ info:
     all endpoints require a Knox API token supplied in the `Authorization`
     header (`Token <key>`).
 servers:
-  - url: https://api.neetechs.com
+  - url: https://server.neetechs.com
     description: Production
-  - url: https://staging-api.neetechs.com
+  - url: https://staging-server.neetechs.com
     description: Staging
   - url: http://localhost:8000
     description: Local development

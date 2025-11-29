@@ -34,6 +34,9 @@ api_v1_patterns = [
     path("home/", include(("home.urls", "home"), namespace="home")),
     path("", include((router.urls, "api-v1"), namespace="api-v1")),
     path("auth/", include(("Neetechs.urls_auth", "api-auth"), namespace="api-auth")),
+    path("api/digital-product/", include("DigitalProduct.urls")),
+path("payments/", include("payments.urls")),
+
 ]
 
 urlpatterns = [
@@ -47,6 +50,8 @@ urlpatterns = [
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     path("webhooks/github/", github_webhook, name="github-webhook"),
+    path("payments/", include("payments.urls")),
+
     path("", include("knox_allauth.urls", namespace="knox_allauth")),
 ]
 

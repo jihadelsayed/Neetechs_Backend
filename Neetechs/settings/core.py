@@ -22,10 +22,16 @@ AUTH_USER_MODEL = "knox_allauth.CustomUser"
 ROOT_URLCONF = "Neetechs.urls"
 WSGI_APPLICATION = "Neetechs.wsgi.application"
 ASGI_APPLICATION = "Neetechs.asgi.application"
+STATIC_URL = f"https://neetechs-static.s3.us-east-1.amazonaws.com/"
 
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"  # harmless, even with S3
+STATICFILES_DIRS = [
+    BASE_DIR / "static"  # only if your project has /static/
+]
+
+# STATIC_URL = "/static/"
+# STATIC_ROOT = BASE_DIR / "staticfiles"
+# STATICFILES_DIRS = [BASE_DIR / "static"]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media_cdn"
@@ -35,3 +41,8 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+FRONTEND_SUCCESS_URL = config("FRONTEND_SUCCESS_URL")
+FRONTEND_CANCEL_URL = config("FRONTEND_CANCEL_URL")
+STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
+STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET")
+SITE_ID = 1
