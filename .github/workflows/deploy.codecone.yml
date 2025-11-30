@@ -40,8 +40,8 @@ jobs:
 
             echo ">>> Installing dependencies"
             pip install --upgrade pip wheel
-            if [ -f requirements.linux.txt ]; then
-              pip install -r requirements.linux.txt --upgrade
+            if [ -f requirements.txt ]; then
+              pip install -r requirements.txt --upgrade
             elif [ -f requirements.txt ]; then
               pip install -r requirements.txt --upgrade
             fi
