@@ -53,6 +53,8 @@ jobs:
             python manage.py migrate --noinput
 
             echo ">>> Collecting static files"
+            rm -rf staticfiles/
+
             python manage.py collectstatic --noinput
 
             deactivate
