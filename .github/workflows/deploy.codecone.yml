@@ -1,0 +1,61 @@
+name: Deploy Django to CloudCone
+
+on:
+  push:
+    branches: [ "main" ]        # change if you deploy from another branch
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "22" "${{ secrets.SSH_HOST_NEETECHS }}" >> ~/.ssh/known_hosts
+
+      - name: Remote deploy
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.SSH_HOST_NEETECHS }}     # e.g. server.neetechs.com
+          username: ${{ secrets.SSH_USER_NEETECHS }}          # e.g. root or deploy
+          key: ${{ secrets.SSH_KEY_NEETECHS }}                # private key
+          port: 22
+          script: |
+            set -e
+
+            cd /srv/neetechs/app
+
+            echo ">>> Pulling latest code"
+            git pull
+
+            echo ">>> Activating virtualenv"
+            if [ -d "venv" ]; then
+              source venv/bin/activate
+            else
+              python3 -m venv venv
+              source venv/bin/activate
+            fi
+
+            echo ">>> Installing dependencies"
+            pip install --upgrade pip wheel
+            if [ -f requirements.linux.txt ]; then
+              pip install -r requirements.linux.txt --upgrade
+            elif [ -f requirements.txt ]; then
+              pip install -r requirements.txt --upgrade
+            fi
+
+            echo ">>> Running migrations"
+            # Best practice: migrations should already be committed.
+            # If you insist on auto-creating:
+            # python manage.py makemigrations --noinput
+            python manage.py migrate --noinput
+
+            echo ">>> Collecting static files"
+            python manage.py collectstatic --noinput
+
+            deactivate
+
+            echo ">>> Restarting gunicorn"
+            sudo systemctl restart gunicorn-neetechs
