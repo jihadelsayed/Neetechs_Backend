@@ -50,7 +50,7 @@ class DigitalProduct(models.Model):
     file = models.FileField(
         storage=ProductsStorage(),
         upload_to="digital_products/files/",
-        blank=True,
+        blank=True, 
         null=True,
     )
 
