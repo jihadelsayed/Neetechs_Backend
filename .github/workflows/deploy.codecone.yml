@@ -49,13 +49,13 @@ jobs:
             echo ">>> Running migrations"
             # Best practice: migrations should already be committed.
             # If you insist on auto-creating:
-            # python manage.py makemigrations --noinput
+            python manage.py makemigrations --noinput
             python manage.py migrate --noinput
 
             echo ">>> Collecting static files"
-            rm -rf staticfiles/
+            # rm -rf staticfiles/
 
-            python manage.py collectstatic --noinput
+            # python manage.py collectstatic --noinput
 
             deactivate
 
