@@ -2,7 +2,7 @@ name: Deploy Django to CloudCone
 
 on:
   push:
-    branches: [ "main" ]        # change if you deploy from another branch
+    branches: [ "main" ]       # change if you deploy from another branch
   workflow_dispatch: {}
 
 jobs:
