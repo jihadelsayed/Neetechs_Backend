@@ -1,0 +1,314 @@
+INSERT INTO "DigitalProduct_digitalproduct" (
+    "category_id",
+    "title",
+    "slug",
+    "short_description",
+    "description",
+    "stripe_price_id",
+    "thumbnail",
+    "file",
+    "version",
+    "is_active",
+    "created_at",
+    "updated_at"
+) VALUES
+-- 1
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'study-systems'),
+ 'AI Study System for University Students',
+ 'ai-study-system-for-university-students',
+ 'Full AI-powered study workflow + planners + prompts.',
+ 'Complete AI-powered study system with workflows, planners, and prompts designed for university students.',
+ 'stripe_pending_ai_study_system',
+ 'thumbs/ai-study-system.png',
+ 'files/ai-study-system.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 2
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'study-systems'),
+ 'Focus & Productivity System (AI Edition)',
+ 'focus-productivity-system-ai-edition',
+ 'Daily/weekly planners, AI routines, productivity workflows.',
+ 'A focus and productivity framework with AI routines, daily and weekly planners, and ready-made productivity workflows.',
+ 'stripe_pending_focus_productivity',
+ 'thumbs/focus-productivity-system.png',
+ 'files/focus-productivity-system.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 3
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'study-systems'),
+ 'Exam Prep System (AI Flashcards + Prompts)',
+ 'exam-prep-system-ai-flashcards-prompts',
+ 'AI-powered revision + flashcards + study strategy pack.',
+ 'Exam preparation kit combining AI-generated flashcards, revision prompts, and structured study strategies.',
+ 'stripe_pending_exam_prep',
+ 'thumbs/exam-prep-system.png',
+ 'files/exam-prep-system.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 4
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'ai-prompt-packs'),
+ 'ChatGPT Master Prompt Pack (2025 Edition)',
+ 'chatgpt-master-prompt-pack-2025-edition',
+ '300+ prompts for coding, business, writing, and learning.',
+ 'Master library of 300+ tested ChatGPT prompts covering coding, business, content creation, learning, and productivity.',
+ 'stripe_pending_chatgpt_master_2025',
+ 'thumbs/chatgpt-master-pack.png',
+ 'files/chatgpt-master-pack.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 5
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'ai-prompt-packs'),
+ 'Developer Prompt Pack',
+ 'developer-prompt-pack',
+ 'Coding-specific prompts for debugging, refactoring, documentation.',
+ 'Prompt toolkit for developers: debugging, refactoring, documentation, test generation, and code review prompts.',
+ 'stripe_pending_dev_pack',
+ 'thumbs/developer-prompt-pack.png',
+ 'files/developer-prompt-pack.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 6
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'ai-prompt-packs'),
+ 'Content Creator Prompt Pack',
+ 'content-creator-prompt-pack',
+ 'Prompts for shorts, reels, posts, storytelling, and hooks.',
+ 'Prompt pack for content creators: hooks, storytelling structures, caption ideas, and scripts for shorts, reels, and posts.',
+ 'stripe_pending_creator_prompt_pack',
+ 'thumbs/content-creator-prompt-pack.png',
+ 'files/content-creator-prompt-pack.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 7
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'content-packs'),
+ 'Tech Creator Content Pack',
+ 'tech-creator-content-pack',
+ 'Scripts, hooks, CTAs, captions for tech content creators.',
+ 'Done-for-you scripts, hooks, CTAs, and caption templates tailored for tech content creators.',
+ 'stripe_pending_tech_creator_pack',
+ 'thumbs/tech-creator-content-pack.png',
+ 'files/tech-creator-content-pack.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 8
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'content-packs'),
+ '30-Day Short-Form Video Pack',
+ '30-day-short-form-video-pack',
+ '30 ready-to-post videos scripts + captions + ideas.',
+ '30-day short-form content calendar with ready-to-use video scripts, caption ideas, and posting plan.',
+ 'stripe_pending_30day_short_form',
+ 'thumbs/30-day-short-form-pack.png',
+ 'files/30-day-short-form-pack.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 9
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'content-packs'),
+ '100 Viral Hooks Pack',
+ '100-viral-hooks-pack',
+ 'Hook templates sorted by niche/angle.',
+ 'Pack of 100+ viral hook templates organized by niche, content type, and angle for higher retention.',
+ 'stripe_pending_100_viral_hooks',
+ 'thumbs/100-viral-hooks-pack.png',
+ 'files/100-viral-hooks-pack.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 10
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'automation-templates'),
+ 'Python Automation Scripts Bundle',
+ 'python-automation-scripts-bundle',
+ '10+ automation scripts for scraping, posting, workflows.',
+ 'Bundle of Python automation scripts for scraping, posting, and connecting tools into repeatable workflows.',
+ 'stripe_pending_python_automation',
+ 'thumbs/python-automation-bundle.png',
+ 'files/python-automation-bundle.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 11
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'automation-templates'),
+ 'Zapier Automation Starter Kit',
+ 'zapier-automation-starter-kit',
+ 'Pre-built zaps + workflows + integrations.',
+ 'Starter kit of pre-built Zapier workflows with documentation and integration examples for creators and small businesses.',
+ 'stripe_pending_zapier_kit',
+ 'thumbs/zapier-starter-kit.png',
+ 'files/zapier-starter-kit.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 12
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'automation-templates'),
+ 'AI Business Automation System',
+ 'ai-business-automation-system',
+ 'Lead gen + email + funnel workflows.',
+ 'Automation system for lead generation, email follow-up, and simple funnels powered by AI templates.',
+ 'stripe_pending_ai_business_auto',
+ 'thumbs/ai-business-automation-system.png',
+ 'files/ai-business-automation-system.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 13
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'coding-resources'),
+ 'Full-Stack Developer Starter Kit',
+ 'full-stack-developer-starter-kit',
+ 'Angular + Django starter templates + best practices.',
+ 'Starter kit for full-stack devs with Angular + Django templates, structure, and best-practice setups.',
+ 'stripe_pending_fullstack_kit',
+ 'thumbs/fullstack-starter-kit.png',
+ 'files/fullstack-starter-kit.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 14
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'coding-resources'),
+ 'CS Student Survival Pack',
+ 'cs-student-survival-pack',
+ 'Cheat sheets, roadmaps, study templates.',
+ 'Collection of cheat sheets, roadmaps, and study templates specifically for CS students.',
+ 'stripe_pending_cs_survival',
+ 'thumbs/cs-survival-pack.png',
+ 'files/cs-survival-pack.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 15
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'tech-career-kits'),
+ 'Tech Interview Prep Kit',
+ 'tech-interview-prep-kit',
+ 'LeetCode patterns, system design notes, cheat sheets.',
+ 'Interview prep kit with LeetCode pattern breakdowns, system design notes, and quick-reference cheat sheets.',
+ 'stripe_pending_tech_interview',
+ 'thumbs/tech-interview-prep-kit.png',
+ 'files/tech-interview-prep-kit.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 16
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'tech-career-kits'),
+ 'Resume + Portfolio Pack (for Developers)',
+ 'resume-portfolio-pack-for-developers',
+ 'Resume templates + portfolio layout + case study examples.',
+ 'Pack of resume templates, portfolio layouts, and case study examples tailored to software developers.',
+ 'stripe_pending_resume_portfolio',
+ 'thumbs/resume-portfolio-pack.png',
+ 'files/resume-portfolio-pack.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 17
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'tech-career-kits'),
+ 'LinkedIn Optimization Pack',
+ 'linkedin-optimization-pack',
+ 'Templates, scripts, headline formulas.',
+ 'Optimization kit for LinkedIn: headline formulas, about-section templates, outreach scripts, and content ideas.',
+ 'stripe_pending_linkedin_pack',
+ 'thumbs/linkedin-optimization-pack.png',
+ 'files/linkedin-optimization-pack.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 18
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'design-packs'),
+ 'UI Design Starter Pack',
+ 'ui-design-starter-pack',
+ 'UI components, layouts, color palettes.',
+ 'Starter UI design kit with reusable components, layout ideas, and curated color palettes.',
+ 'stripe_pending_ui_design',
+ 'thumbs/ui-design-starter-pack.png',
+ 'files/ui-design-starter-pack.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 19
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'design-packs'),
+ 'Branding & Social Template Pack',
+ 'branding-social-template-pack',
+ 'IG/LinkedIn templates, logos, brand assets.',
+ 'Branding and social media template pack with IG/LinkedIn layouts, simple logo concepts, and brand assets.',
+ 'stripe_pending_branding_social',
+ 'thumbs/branding-social-pack.png',
+ 'files/branding-social-pack.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+),
+-- 20
+(
+ (SELECT id FROM "DigitalProduct_digitalproductcategory" WHERE slug = 'other-digital-products'),
+ 'Digital Creator Toolbox',
+ 'digital-creator-toolbox',
+ 'Mixed tools: planners, templates, scripts.',
+ 'Mixed toolkit of planners, templates, prompts, and simple scripts for digital creators.',
+ 'stripe_pending_creator_toolbox',
+ 'thumbs/digital-creator-toolbox.png',
+ 'files/digital-creator-toolbox.zip',
+ 1,
+ TRUE,
+ NOW(),
+ NOW()
+);
