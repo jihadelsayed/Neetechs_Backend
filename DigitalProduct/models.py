@@ -3,7 +3,7 @@ from django.utils.text import slugify
 from django.conf import settings
 
 from Neetechs.settings.storage import ProductsStorage, UploadsStorage
-
+ 
 
 class DigitalProductCategory(models.Model):
     name = models.CharField(max_length=120, unique=True)
