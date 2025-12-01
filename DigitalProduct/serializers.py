@@ -1,16 +1,17 @@
 from rest_framework import serializers
-from .models import DigitalProduct, DigitalProductCategory
-
-
-class DigitalProductCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DigitalProductCategory
-        fields = ["id", "name", "slug"]
+from .models import DigitalProduct, DigitalProductBundle
 
 
 class DigitalProductListSerializer(serializers.ModelSerializer):
-    category = DigitalProductCategorySerializer(read_only=True)
-    thumbnail_url = serializers.SerializerMethodField()
+    bullets = serializers.ListField(
+        child=serializers.CharField(),
+        required=False
+    )
+    whatsInside = serializers.ListField(
+        source="whats_inside",
+        child=serializers.CharField(),
+        required=False
+    )
 
     class Meta:
         model = DigitalProduct
@@ -19,21 +20,23 @@ class DigitalProductListSerializer(serializers.ModelSerializer):
             "title",
             "slug",
             "short_description",
-            "price",  # we'll add property below
-            "category",
-            "thumbnail_url",
-            "version",
+            "thumbnail",
+            "stripe_price_id",
+            "bullets",
+            "whatsInside",
         ]
-
-    def get_thumbnail_url(self, obj):
-        if obj.thumbnail and hasattr(obj.thumbnail, "url"):
-            return obj.thumbnail.url
-        return None
 
 
 class DigitalProductDetailSerializer(serializers.ModelSerializer):
-    category = DigitalProductCategorySerializer(read_only=True)
-    thumbnail_url = serializers.SerializerMethodField()
+    bullets = serializers.ListField(
+        child=serializers.CharField(),
+        required=False
+    )
+    whatsInside = serializers.ListField(
+        source="whats_inside",
+        child=serializers.CharField(),
+        required=False
+    )
 
     class Meta:
         model = DigitalProduct
@@ -43,14 +46,13 @@ class DigitalProductDetailSerializer(serializers.ModelSerializer):
             "slug",
             "short_description",
             "description",
-            "price",
-            "category",
-            "thumbnail_url",
-            "version",
+            "thumbnail",
+            "file",
             "stripe_price_id",
+            "version",
+            "is_active",
+            "created_at",
+            "updated_at",
+            "bullets",
+            "whatsInside",
         ]
-
-    def get_thumbnail_url(self, obj):
-        if obj.thumbnail and hasattr(obj.thumbnail, "url"):
-            return obj.thumbnail.url
-        return None

@@ -40,6 +40,10 @@ class DigitalProduct(models.Model):
         help_text="Stripe Price ID for this product.",
     )
 
+    # NEW FIELDS
+    bullets = models.JSONField(default=list, blank=True)
+    whats_inside = models.JSONField(default=list, blank=True)
+
     thumbnail = models.ImageField(
         storage=UploadsStorage(),
         upload_to="digital_products/thumbnails/",
@@ -50,7 +54,7 @@ class DigitalProduct(models.Model):
     file = models.FileField(
         storage=ProductsStorage(),
         upload_to="digital_products/files/",
-        blank=True, 
+        blank=True,
         null=True,
     )
 
@@ -76,7 +80,6 @@ class DigitalProduct(models.Model):
                 slug = f"{base}-{idx}"
             self.slug = slug
         super().save(*args, **kwargs)
-
 
 class DigitalProductBundle(models.Model):
     title = models.CharField(max_length=255)

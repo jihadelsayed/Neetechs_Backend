@@ -20,6 +20,7 @@ def digital_product_list(request):
     return Response(serializer.data)
 
 
+
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def digital_product_detail(request, slug):
