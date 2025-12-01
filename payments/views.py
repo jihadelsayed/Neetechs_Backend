@@ -6,9 +6,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework import status
 
 from knox_allauth.models import CustomUser  # adjust if your user model is elsewhere
 from DigitalProduct.models import (
@@ -26,8 +25,9 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 def stripe_webhook(request):
     """
     Stripe webhook endpoint:
-    - checkout.session.completed for single products or bundles
-    - uses metadata: user_id, digital_product_id, bundle_id
+    - Handles checkout.session.completed for single products or bundles
+    - Uses metadata: user_id (optional), digital_product_id, bundle_id
+    - For guests: attaches/creates a user from the Stripe email.
     """
     payload = request.body
     sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
@@ -39,9 +39,7 @@ def stripe_webhook(request):
             sig_header=sig_header,
             secret=endpoint_secret,
         )
-    except ValueError:
-        return HttpResponse(status=400)
-    except stripe.error.SignatureVerificationError:
+    except (ValueError, stripe.error.SignatureVerificationError):
         return HttpResponse(status=400)
 
     if event["type"] == "checkout.session.completed":
@@ -52,12 +50,30 @@ def stripe_webhook(request):
         product_id = metadata.get("digital_product_id")
         bundle_id = metadata.get("bundle_id")
 
-        if not user_id:
-            return HttpResponse(status=200)
+        user = None
 
-        try:
-            user = CustomUser.objects.get(id=user_id)
-        except CustomUser.DoesNotExist:
+        # 1) Logged-in user passed from frontend
+        if user_id:
+            try:
+                user = CustomUser.objects.get(id=user_id)
+            except CustomUser.DoesNotExist:
+                user = None
+
+        # 2) Guest checkout → try to attach/create user by email
+        if not user:
+            customer_details = session.get("customer_details") or {}
+            email = customer_details.get("email")
+            if email:
+                # Adjust defaults to match your CustomUser fields
+                user, _ = CustomUser.objects.get_or_create(
+                    email=email,
+                    defaults={
+                        "username": email,  # if username is required/unique
+                    },
+                )
+
+        # If we still don't have a user, just stop
+        if not user:
             return HttpResponse(status=200)
 
         # Single product purchase
@@ -95,11 +111,12 @@ def stripe_webhook(request):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def create_checkout_session(request):
     """
     Create Stripe Checkout session for a single digital product.
     Expects: { "product_id": <int> }
+    Works for both logged-in and guest users.
     """
     product_id = request.data.get("product_id")
 
@@ -116,6 +133,14 @@ def create_checkout_session(request):
             {"detail": "Product missing Stripe price ID"}, status=500
         )
 
+    user = request.user if request.user.is_authenticated else None
+
+    metadata = {
+        "digital_product_id": str(product.id),
+    }
+    if user:
+        metadata["user_id"] = str(user.id)
+
     session = stripe.checkout.Session.create(
         mode="payment",
         payment_method_types=["card"],
@@ -127,21 +152,19 @@ def create_checkout_session(request):
         ],
         success_url=settings.FRONTEND_SUCCESS_URL,
         cancel_url=settings.FRONTEND_CANCEL_URL,
-        metadata={
-            "user_id": request.user.id,
-            "digital_product_id": str(product.id),
-        },
+        metadata=metadata,
     )
 
     return Response({"checkout_url": session.url})
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def create_bundle_checkout_session(request):
     """
     Create Stripe Checkout session for a bundle.
     Expects: { "bundle_id": <int> }
+    Works for both logged-in and guest users.
     """
     bundle_id = request.data.get("bundle_id")
 
@@ -158,6 +181,14 @@ def create_bundle_checkout_session(request):
             {"detail": "Bundle missing Stripe price ID"}, status=500
         )
 
+    user = request.user if request.user.is_authenticated else None
+
+    metadata = {
+        "bundle_id": str(bundle.id),
+    }
+    if user:
+        metadata["user_id"] = str(user.id)
+
     session = stripe.checkout.Session.create(
         mode="payment",
         payment_method_types=["card"],
@@ -169,10 +200,7 @@ def create_bundle_checkout_session(request):
         ],
         success_url=settings.FRONTEND_SUCCESS_URL,
         cancel_url=settings.FRONTEND_CANCEL_URL,
-        metadata={
-            "user_id": request.user.id,
-            "bundle_id": str(bundle.id),
-        },
+        metadata=metadata,
     )
 
     return Response({"checkout_url": session.url})
