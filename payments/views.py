@@ -117,6 +117,7 @@ def create_checkout_session(request):
     Create Stripe Checkout session for a single digital product.
     Expects: { "product_id": <int> }
     Works for both logged-in and guest users.
+    Uses Stripe PRODUCT id stored in `stripe_price_id` + local numeric price.
     """
     product_id = request.data.get("product_id")
 
@@ -128,9 +129,15 @@ def create_checkout_session(request):
     except DigitalProduct.DoesNotExist:
         return Response({"detail": "Product not found"}, status=404)
 
+    # Here stripe_price_id actually holds the Stripe PRODUCT id (prod_...)
     if not product.stripe_price_id:
         return Response(
-            {"detail": "Product missing Stripe price ID"}, status=500
+            {"detail": "Product missing Stripe product ID"}, status=500
+        )
+
+    if product.price is None:
+        return Response(
+            {"detail": "Product missing local price value"}, status=500
         )
 
     user = request.user if request.user.is_authenticated else None
@@ -141,15 +148,18 @@ def create_checkout_session(request):
     if user:
         metadata["user_id"] = str(user.id)
 
+    amount_cents = int(product.price * 100)
+
     session = stripe.checkout.Session.create(
         mode="payment",
         payment_method_types=["card"],
         line_items=[
             {
-                # "currency": "usd",
-
-                "product": product.stripe_price_id,
-                # "price": product.stripe_price_id,
+                "price_data": {
+                    "currency": "usd",                # change if needed
+                    "product": product.stripe_price_id,  # prod_...
+                    "unit_amount": amount_cents,      # in cents
+                },
                 "quantity": 1,
             }
         ],
@@ -168,6 +178,7 @@ def create_bundle_checkout_session(request):
     Create Stripe Checkout session for a bundle.
     Expects: { "bundle_id": <int> }
     Works for both logged-in and guest users.
+    Uses Stripe PRODUCT id stored in `bundle.stripe_price_id` + local bundle price.
     """
     bundle_id = request.data.get("bundle_id")
 
@@ -181,7 +192,12 @@ def create_bundle_checkout_session(request):
 
     if not bundle.stripe_price_id:
         return Response(
-            {"detail": "Bundle missing Stripe price ID"}, status=500
+            {"detail": "Bundle missing Stripe product ID"}, status=500
+        )
+
+    if bundle.price is None:
+        return Response(
+            {"detail": "Bundle missing local price value"}, status=500
         )
 
     user = request.user if request.user.is_authenticated else None
@@ -192,14 +208,18 @@ def create_bundle_checkout_session(request):
     if user:
         metadata["user_id"] = str(user.id)
 
+    amount_cents = int(bundle.price * 100)
+
     session = stripe.checkout.Session.create(
         mode="payment",
         payment_method_types=["card"],
         line_items=[
             {
-                                "product": bundle.stripe_price_id,
-                "currency": "usd",
-                # "price": bundle.stripe_price_id,
+                "price_data": {
+                    "currency": "usd",                   # change if needed
+                    "product": bundle.stripe_price_id,   # prod_...
+                    "unit_amount": amount_cents,
+                },
                 "quantity": 1,
             }
         ],
