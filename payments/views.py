@@ -146,7 +146,7 @@ def create_checkout_session(request):
         payment_method_types=["card"],
         line_items=[
             {
-                "currency": "usd",
+                # "currency": "usd",
 
                 "product": product.stripe_price_id,
                 # "price": product.stripe_price_id,
