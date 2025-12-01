@@ -17,7 +17,6 @@ from DigitalProduct.models import (
     DigitalProductBundlePurchase,
 )
 
-# Stripe secret key from your .env
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
@@ -31,7 +30,7 @@ def stripe_webhook(request):
     """
     payload = request.body
     sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
-    endpoint_secret = settings.STRIPE_WEBHOOK_SECRET  # set in .env
+    endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
 
     try:
         event = stripe.Webhook.construct_event(
@@ -64,15 +63,11 @@ def stripe_webhook(request):
             customer_details = session.get("customer_details") or {}
             email = customer_details.get("email")
             if email:
-                # Adjust defaults to match your CustomUser fields
                 user, _ = CustomUser.objects.get_or_create(
                     email=email,
-                    defaults={
-                        "username": email,  # if username is required/unique
-                    },
+                    defaults={"username": email},
                 )
 
-        # If we still don't have a user, just stop
         if not user:
             return HttpResponse(status=200)
 
@@ -117,7 +112,7 @@ def create_checkout_session(request):
     Create Stripe Checkout session for a single digital product.
     Expects: { "product_id": <int> }
     Works for both logged-in and guest users.
-    Uses Stripe PRODUCT id stored in `stripe_product_id` + local numeric price.
+    Uses local price + inline product_data (no stored Stripe product id needed).
     """
     product_id = request.data.get("product_id")
 
@@ -129,12 +124,6 @@ def create_checkout_session(request):
     except DigitalProduct.DoesNotExist:
         return Response({"detail": "Product not found"}, status=404)
 
-    # Here stripe_product_id actually holds the Stripe PRODUCT id (prod_...)
-    if not product.stripe_product_id:
-        return Response(
-            {"detail": "Product missing Stripe product ID"}, status=500
-        )
-
     if product.price is None:
         return Response(
             {"detail": "Product missing local price value"}, status=500
@@ -142,9 +131,7 @@ def create_checkout_session(request):
 
     user = request.user if request.user.is_authenticated else None
 
-    metadata = {
-        "digital_product_id": str(product.id),
-    }
+    metadata = {"digital_product_id": str(product.id)}
     if user:
         metadata["user_id"] = str(user.id)
 
@@ -156,9 +143,15 @@ def create_checkout_session(request):
         line_items=[
             {
                 "price_data": {
-                    "currency": "usd",                # change if needed
-                    "product": product.stripe_product_id,  # prod_...
-                    "unit_amount": amount_cents,      # in cents
+                    "currency": "usd",          # change if not USD
+                    "unit_amount": amount_cents,
+                    "product_data": {
+                        "name": product.title,
+                        "description": product.short_description,
+                        "metadata": {
+                            "digital_product_id": str(product.id),
+                        },
+                    },
                 },
                 "quantity": 1,
             }
@@ -178,7 +171,7 @@ def create_bundle_checkout_session(request):
     Create Stripe Checkout session for a bundle.
     Expects: { "bundle_id": <int> }
     Works for both logged-in and guest users.
-    Uses Stripe PRODUCT id stored in `bundle.stripe_product_id` + local bundle price.
+    Uses local price + inline product_data (no stored Stripe product id needed).
     """
     bundle_id = request.data.get("bundle_id")
 
@@ -190,11 +183,6 @@ def create_bundle_checkout_session(request):
     except DigitalProductBundle.DoesNotExist:
         return Response({"detail": "Bundle not found"}, status=404)
 
-    if not bundle.stripe_product_id:
-        return Response(
-            {"detail": "Bundle missing Stripe product ID"}, status=500
-        )
-
     if bundle.price is None:
         return Response(
             {"detail": "Bundle missing local price value"}, status=500
@@ -202,9 +190,7 @@ def create_bundle_checkout_session(request):
 
     user = request.user if request.user.is_authenticated else None
 
-    metadata = {
-        "bundle_id": str(bundle.id),
-    }
+    metadata = {"bundle_id": str(bundle.id)}
     if user:
         metadata["user_id"] = str(user.id)
 
@@ -216,9 +202,15 @@ def create_bundle_checkout_session(request):
         line_items=[
             {
                 "price_data": {
-                    "currency": "usd",                   # change if needed
-                    "product": bundle.stripe_product_id,   # prod_...
+                    "currency": "usd",
                     "unit_amount": amount_cents,
+                    "product_data": {
+                        "name": bundle.title,
+                        "description": bundle.short_description,
+                        "metadata": {
+                            "bundle_id": str(bundle.id),
+                        },
+                    },
                 },
                 "quantity": 1,
             }
