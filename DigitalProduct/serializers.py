@@ -30,6 +30,8 @@ class DigitalProductListSerializer(serializers.ModelSerializer):
             "updated_at",
             "bullets",
             "whatsInside",
+                        "price",
+            "badge",
         ]
 
 
@@ -43,7 +45,10 @@ class DigitalProductDetailSerializer(serializers.ModelSerializer):
         child=serializers.CharField(),
         required=False
     )
-
+    faqs = serializers.ListField(
+        child=serializers.DictField(),
+        required=False
+    )
     class Meta:
         model = DigitalProduct
         fields = [
@@ -61,4 +66,7 @@ class DigitalProductDetailSerializer(serializers.ModelSerializer):
             "updated_at",
             "bullets",
             "whatsInside",
+            "faqs",
+            "price",
+            "badge",
         ]

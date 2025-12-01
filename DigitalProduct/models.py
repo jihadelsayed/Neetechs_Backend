@@ -63,6 +63,9 @@ class DigitalProduct(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    faqs = models.JSONField(default=list, blank=True)  # [{q: "...", a: "..."}, ...]
+    price = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    badge = models.CharField(max_length=100, blank=True)
 
     class Meta:
         ordering = ["-created_at"]
