@@ -30,7 +30,7 @@ class DigitalProductListSerializer(serializers.ModelSerializer):
             "updated_at",
             "bullets",
             "whatsInside",
-                        "price",
+            "price",
             "badge",
         ]
 
