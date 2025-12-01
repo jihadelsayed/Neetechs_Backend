@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterField(
             model_name='digitalproduct',
-            name='stripe_product_id',
+            name='stripe_price_id',
             field=models.CharField(blank=True, help_text='Stripe Price ID for this product.', max_length=120),
         ),
         migrations.AlterField(
@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('slug', models.SlugField(blank=True, max_length=255, unique=True)),
                 ('short_description', models.CharField(blank=True, max_length=300)),
                 ('description', models.TextField(blank=True)),
-                ('stripe_product_id', models.CharField(blank=True, help_text='Stripe Price ID for the whole bundle.', max_length=120)),
+                ('stripe_price_id', models.CharField(blank=True, help_text='Stripe Price ID for the whole bundle.', max_length=120)),
                 ('thumbnail', models.ImageField(blank=True, null=True, storage=Neetechs.settings.storage.UploadsStorage(), upload_to='digital_products/bundles/')),
                 ('is_active', models.BooleanField(default=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),

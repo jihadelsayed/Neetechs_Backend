@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                 ('slug', models.SlugField(blank=True, max_length=255, unique=True)),
                 ('short_description', models.CharField(blank=True, max_length=300)),
                 ('description', models.TextField(blank=True)),
-                ('stripe_product_id', models.CharField(blank=True, help_text='Stripe Price ID for this product (rec or one-time).', max_length=120)),
+                ('stripe_price_id', models.CharField(blank=True, help_text='Stripe Price ID for this product (rec or one-time).', max_length=120)),
                 ('thumbnail', models.ImageField(blank=True, null=True, storage=Neetechs.settings.storage.UploadsStorage(), upload_to='digital_products/thumbnails/')),
                 ('file', models.FileField(blank=True, null=True, storage=Neetechs.settings.storage.ProductsStorage(), upload_to='digital_products/files/')),
                 ('version', models.PositiveIntegerField(default=1)),
