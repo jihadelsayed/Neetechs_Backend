@@ -146,7 +146,10 @@ def create_checkout_session(request):
         payment_method_types=["card"],
         line_items=[
             {
-                "price": product.stripe_price_id,
+                "currency": "usd",
+
+                "product": product.stripe_product_id,
+                # "price": product.stripe_price_id,
                 "quantity": 1,
             }
         ],
@@ -194,7 +197,9 @@ def create_bundle_checkout_session(request):
         payment_method_types=["card"],
         line_items=[
             {
-                "price": bundle.stripe_price_id,
+                                "product": bundle.stripe_product_id,
+                "currency": "usd",
+                # "price": bundle.stripe_price_id,
                 "quantity": 1,
             }
         ],
