@@ -34,7 +34,7 @@ class DigitalProduct(models.Model):
     short_description = models.CharField(max_length=300, blank=True)
     description = models.TextField(blank=True)
 
-    stripe_price_id = models.CharField(
+    stripe_product_id = models.CharField(
         max_length=120,
         blank=True,
         help_text="Stripe Price ID for this product.",
@@ -96,7 +96,7 @@ class DigitalProductBundle(models.Model):
         blank=True,
     )
 
-    stripe_price_id = models.CharField(
+    stripe_product_id = models.CharField(
         max_length=120,
         blank=True,
         help_text="Stripe Price ID for the whole bundle.",

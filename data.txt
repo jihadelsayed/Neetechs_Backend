@@ -4,7 +4,7 @@ INSERT INTO "DigitalProduct_digitalproduct" (
     "slug",
     "short_description",
     "description",
-    "stripe_price_id",
+    "stripe_product_id",
     "thumbnail",
     "file",
     "version",
