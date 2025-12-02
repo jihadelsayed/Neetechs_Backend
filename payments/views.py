@@ -156,7 +156,7 @@ def create_checkout_session(request):
                 "quantity": 1,
             }
         ],
-        success_url=settings.FRONTEND_SUCCESS_URL,
+        success_url=f"{settings.FRONTEND_SUCCESS_URL}?session_id={{CHECKOUT_SESSION_ID}}",
         cancel_url=settings.FRONTEND_CANCEL_URL,
         metadata=metadata,
     )
@@ -215,9 +215,66 @@ def create_bundle_checkout_session(request):
                 "quantity": 1,
             }
         ],
-        success_url=settings.FRONTEND_SUCCESS_URL,
+        success_url=f"{settings.FRONTEND_SUCCESS_URL}?session_id={{CHECKOUT_SESSION_ID}}",
         cancel_url=settings.FRONTEND_CANCEL_URL,
         metadata=metadata,
     )
 
     return Response({"checkout_url": session.url})
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def checkout_session_detail(request, session_id):
+    """
+    Public endpoint:
+    - Frontend sends session_id from Stripe redirect (?session_id=...)
+    - We call Stripe to verify and return minimal info for Angular
+    """
+    try:
+        session = stripe.checkout.Session.retrieve(
+            session_id,
+            expand=["line_items"]
+        )
+    except stripe.error.InvalidRequestError:
+        return Response({"detail": "Invalid session id"}, status=400)
+
+    metadata = session.get("metadata", {}) or {}
+
+    product_name = None
+    product_slug = None
+    download_url = None
+
+    product_id = metadata.get("digital_product_id")
+    bundle_id = metadata.get("bundle_id")
+
+    # Single digital product
+    if product_id:
+        try:
+            product = DigitalProduct.objects.get(id=product_id)
+            product_name = product.title
+            product_slug = product.slug
+            # عدّل هذا حسب اسم حقل الرابط عندك في الموديل (مثلاً download_url أو file.url إلخ)
+            download_url = getattr(product, "download_url", None)
+        except DigitalProduct.DoesNotExist:
+            pass
+
+    # Bundle
+    elif bundle_id:
+        try:
+            bundle = DigitalProductBundle.objects.get(id=bundle_id)
+            product_name = bundle.title
+            product_slug = bundle.slug
+            download_url = getattr(bundle, "download_url", None)
+        except DigitalProductBundle.DoesNotExist:
+            pass
+
+    data = {
+        "id": session.id,
+        "status": session.payment_status,  # "paid", "unpaid", etc.
+        "product_name": product_name,
+        "product_slug": product_slug,
+        "download_url": download_url,
+        "amount_total": session.get("amount_total"),
+        "currency": session.get("currency"),
+    }
+    return Response(data)
