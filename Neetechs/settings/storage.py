@@ -28,7 +28,7 @@ class UploadsStorage(S3Boto3Storage):
     bucket_name = AWS_UPLOADS_BUCKET_NAME
     default_acl = None
     location = ""
-    custom_domain = f"{bucket_name}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+    custom_domain = f"cdn.neetechs.com"
 
 
 class ProductsStorage(S3Boto3Storage):
