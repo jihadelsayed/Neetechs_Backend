@@ -52,7 +52,7 @@ urlpatterns = [
     path("webhooks/github/", github_webhook, name="github-webhook"),
     path("payments/", include("payments.urls")),
 
-    path("", include("knox_allauth.urls", namespace="knox_allauth")),
+    path("", include("accounts.urls", namespace="accounts")),
 ]
 
 legacy_redirect_patterns = [

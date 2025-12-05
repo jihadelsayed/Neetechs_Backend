@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from Service.models import ServicePost
-from knox_allauth.models import CustomUser
+from accounts.models import User
 from .models import ServiceOrder
 
 from django.conf import settings
@@ -36,14 +36,14 @@ class ServiceOrderSerializer(serializers.ModelSerializer):
 	def get_employedname(self, obj):
 		"""Retrieves the first name of the employee/provider associated with the order."""
 		# Consider renaming Employednam to employee_name.
-		Employednam = CustomUser.objects.get(site_id=obj.employedIdd).first_name
+		Employednam = User.objects.get(site_id=obj.employedIdd).first_name
 		return Employednam
 
 	@extend_schema_field(serializers.CharField())
 	def get_customername(self, obj):
 		"""Retrieves the first name of the customer who placed the order."""
 		# Consider renaming Customernam to customer_name.
-		Customernam = CustomUser.objects.get(site_id=obj.customerIdd).first_name
+		Customernam = User.objects.get(site_id=obj.customerIdd).first_name
 		return Customernam
 
 

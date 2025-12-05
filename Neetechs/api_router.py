@@ -16,7 +16,7 @@ from Service.api.serializers import (
     ServicePostUpdateSerializer,
 )
 from chat.viewsets import ThreadViewSet  # existing chat viewset
-from knox_allauth.models import CustomUser
+from accounts.models import User
 from Profile.serializer import ProfileSerializer
 from home.models import HomeSliderMoudel, HomeContainersModel
 from home.serializer import HomeSliderSerializer, HomeContainersSerializer
@@ -119,7 +119,7 @@ class ServicePostViewSet(viewsets.ModelViewSet):
 
 
 class ProfileViewSet(ReadOnlyViewSet):
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()
     serializer_class = ProfileSerializer
     lookup_field = "site_id"
     lookup_value_regex = "[^/]+"

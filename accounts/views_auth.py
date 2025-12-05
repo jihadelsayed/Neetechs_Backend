@@ -14,7 +14,7 @@ from allauth.account.utils import complete_signup, send_email_confirmation
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 
-from .models import CustomUser
+from .models import User
 from .utils import create_knox_token
 from .serializers.user import KnoxSerializer
 from .serializers.register import PhoneOrEmailRegisterSerializer
@@ -57,7 +57,7 @@ class KnoxRegisterView(RegisterView):
         token = create_knox_token(None, user, None)
 
         identifier = self.request.data.get("email") or self.request.data.get("phone")
-        instance = CustomUser.objects.filter(email=identifier).first() or CustomUser.objects.filter(phone=identifier).first()
+        instance = User.objects.filter(email=identifier).first() or User.objects.filter(phone=identifier).first()
 
         profile_data = self.request.data.copy()
         profile_data["stripeCustomerId"] = customer.id
@@ -99,7 +99,7 @@ class EmailConfirmation(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data["email"]
-        user = get_object_or_404(CustomUser, email=email)
+        user = get_object_or_404(User, email=email)
         if user.emailaddress_set.filter(verified=True).exists():
             return Response({"message": "This email is already verified. Try to login and logout again to refresh the app."}, status=status.HTTP_400_BAD_REQUEST)
         try:

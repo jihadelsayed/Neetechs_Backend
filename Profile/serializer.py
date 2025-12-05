@@ -2,7 +2,7 @@ from allauth.account.models import EmailAddress
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from knox_allauth.models import CustomUser
+from accounts.models import User
 from Service.models import ModelCategory, ModelSubCategory
 
 from .models import Experience, Interest, CompetenceCertificate, Study
@@ -70,11 +70,11 @@ class ProfileSerializerBase(serializers.ModelSerializer):
 
 class ProfileSerializer(ProfileSerializerBase):
     """
-    Serializes essential CustomUser profile data.
+    Serializes essential User profile data.
     """
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = (
             "id",
             "stripeCustomerId",
@@ -177,7 +177,7 @@ class ExperienceSerializer(serializers.ModelSerializer):
     
 class AllProfileInfoSerializer(ProfileSerializerBase):
     """
-    Provides a comprehensive serialization of a CustomUser's profile,
+    Provides a comprehensive serialization of a User's profile,
     embedding their interests, skills, studies, and experiences directly in the output.
     Also includes category update timestamps and email confirmation status.
     """
@@ -187,7 +187,7 @@ class AllProfileInfoSerializer(ProfileSerializerBase):
     Experience = serializers.SerializerMethodField()
 
     class Meta:
-        model = CustomUser
+        model = User
         # Specifies all fields to be included for a comprehensive profile view.
         fields = ('id', 'stripeCustomerId', 'emailConfirmed', 'subscriptionType', 'Interest', 'CompetenceCertificate', 'Study', 'Experience', 'CategoryLastupdate', 'SubcategoryLastupdate', 'email', 'name', 'first_name', 'phone', 'site_id', 'is_creator', 'bio', 'rating', 'members',
 		          'followers', 'earning', 'profession', 'picture_medium', 'picture_small', 'picture_tag', 'location', 'address1', 'address2', 'zip_code', 'city', 'state', 'country', 'member_since', 'picture','Facebook_link','twitter','profile_completed','Linkdin_link','sms','othersSocialMedia','about')

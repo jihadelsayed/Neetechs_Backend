@@ -18,7 +18,7 @@ from .webauthn_view import (
     complete_authentication,
 )
 
-app_name = "knox_allauth"
+app_name = "accounts"
 
 urlpatterns = [
     path("auth/login/", KnoxLoginView.as_view(), name="login"),

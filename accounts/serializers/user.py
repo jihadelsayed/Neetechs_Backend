@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from allauth.account.models import EmailAddress
 
-from ..models import CustomUser as User
+from ..models import User as User
 
 # Optional imports from other apps (guarded so this file doesn't explode if they aren't installed yet)
 try:

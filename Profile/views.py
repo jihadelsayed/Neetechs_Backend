@@ -13,7 +13,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from knox_allauth.models import CustomUser
+from accounts.models import User
 
 from .models import Experience, Interest, CompetenceCertificate, Study
 from .serializer import (AllProfileInfoSerializer, ExperienceSerializer,
@@ -23,7 +23,7 @@ from .serializer import (AllProfileInfoSerializer, ExperienceSerializer,
 
 class ProfileListView(ListAPIView):
     """
-    Lists all user profiles (CustomUser instances) with filtering capabilities.
+    Lists all user profiles (User instances) with filtering capabilities.
     Supports listing, and filtering by various fields like site_id, profession, name, etc.
     
     Authentication: TokenAuthentication
@@ -33,7 +33,7 @@ class ProfileListView(ListAPIView):
                Searchable fields: 'first_name', 'site_id', 'about', 'profession', 'city', 'state', 'country'.
                Orderable by: 'first_name'.
     """
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()
     serializer_class = ProfileSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated]
@@ -51,11 +51,11 @@ class ProfileListView(ListAPIView):
 class ProfileCollectionView(GenericAPIView):
     """
     API view for listing all profiles or creating/updating a profile.
-    Interacts with the CustomUser model using ProfileSerializer.
+    Interacts with the User model using ProfileSerializer.
 
     Operations:
-        - GET: Lists all CustomUser profiles.
-        - POST: Creates or potentially updates a CustomUser profile. The check 
+        - GET: Lists all User profiles.
+        - POST: Creates or potentially updates a User profile. The check 
                 `int(request.user.id) == int(request.data['username'])` suggests
                 it might be intended for a user to update their own profile if `username` (user ID) is passed.
     
@@ -65,7 +65,7 @@ class ProfileCollectionView(GenericAPIView):
     serializer_class = ProfileSerializer
 
     def get(self, request):
-        profiles = CustomUser.objects.all()
+        profiles = User.objects.all()
         serializer = self.get_serializer(profiles, many=True)
         return Response(serializer.data, status=200)
 
@@ -90,12 +90,12 @@ class ProfileCollectionView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     # filter_backends and filterset_fields here seem to be from a ListAPIView context and might not be fully effective on a standard APIView.
     filter_backends = [DjangoFilterBackend] 
-    filterset_fields = ['site_id', 'in_stock'] # 'in_stock' is not a field on CustomUser model.
+    filterset_fields = ['site_id', 'in_stock'] # 'in_stock' is not a field on User model.
 
 class ProfileInfoView(GenericAPIView):
     """
     Retrieves all information for a specific user profile using their site_id.
-    Interacts with the CustomUser model using AllProfileInfoSerializer.
+    Interacts with the User model using AllProfileInfoSerializer.
 
     Operations:
         - GET: Retrieves a specific profile by site_id.
@@ -107,14 +107,14 @@ class ProfileInfoView(GenericAPIView):
 
     def get_object(self,site_id):
         """
-        Retrieves a CustomUser instance by its site_id.
+        Retrieves a User instance by its site_id.
         Returns a Response object directly on error, which is unconventional.
         """
         try:
             # Returning Response directly from get_object on error is unconventional.
             # Typically, one would raise Http404 and let DRF handle the response.
-            return CustomUser.objects.get(site_id=site_id)
-        except CustomUser.DoesNotExist:
+            return User.objects.get(site_id=site_id)
+        except User.DoesNotExist:
             return Response( {"error":"Given Profile was not found."},status=404)
 
     def get(self, request,site_id=None):
@@ -130,7 +130,7 @@ class ProfileInfoView(GenericAPIView):
 class ProfileDetailView(GenericAPIView):
     """
     API view for retrieving, updating, or deleting a specific user profile by site_id.
-    Interacts with the CustomUser model using ProfileSerializer.
+    Interacts with the User model using ProfileSerializer.
 
     Operations:
         - GET: Retrieves a profile.
@@ -145,13 +145,13 @@ class ProfileDetailView(GenericAPIView):
 
     def get_object(self,site_id):
         """
-        Retrieves a CustomUser instance by its site_id.
+        Retrieves a User instance by its site_id.
         Returns a Response object directly on error, which is unconventional.
         """
         try:
             # Returning Response directly from get_object on error is unconventional.
-            return CustomUser.objects.get(site_id=site_id)
-        except CustomUser.DoesNotExist:
+            return User.objects.get(site_id=site_id)
+        except User.DoesNotExist:
             return Response( {"error":"Given Profile was not found."},status=404)
 
     def get(self, request,site_id=None):

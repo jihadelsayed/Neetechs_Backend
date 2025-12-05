@@ -17,7 +17,7 @@ DEBUG = bool_env("DEBUG", False)
 
 ALLOWED_HOSTS = csv_env("ALLOWED_HOSTS", "")
 CSRF_TRUSTED_ORIGINS = csv_env("CSRF_TRUSTED_ORIGINS", "")
-AUTH_USER_MODEL = "knox_allauth.CustomUser"
+AUTH_USER_MODEL = "accounts.User"
 
 ROOT_URLCONF = "Neetechs.urls"
 WSGI_APPLICATION = "Neetechs.wsgi.application"

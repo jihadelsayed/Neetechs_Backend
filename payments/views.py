@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from knox_allauth.models import CustomUser  # adjust if your user model is elsewhere
+from accounts.models import User  # adjust if your user model is elsewhere
 from DigitalProduct.models import (
     DigitalProduct,
     DigitalProductPurchase,
@@ -54,8 +54,8 @@ def stripe_webhook(request):
         # 1) Logged-in user passed from frontend
         if user_id:
             try:
-                user = CustomUser.objects.get(id=user_id)
-            except CustomUser.DoesNotExist:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
                 user = None
 
         # 2) Guest checkout → try to attach/create user by email
@@ -63,7 +63,7 @@ def stripe_webhook(request):
             customer_details = session.get("customer_details") or {}
             email = customer_details.get("email")
             if email:
-                user, _ = CustomUser.objects.get_or_create(
+                user, _ = User.objects.get_or_create(
                     email=email,
                     defaults={"username": email},
                 )

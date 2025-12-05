@@ -9,7 +9,7 @@ as well as search functionality. These views typically render HTML templates.
 """
 from Service.forms import CreateServicePostForm, UpdateServicePostForm
 
-from knox_allauth.models import CustomUser
+from accounts.models import User
 
 
 def create_service_view(request):
@@ -39,7 +39,7 @@ def create_service_view(request):
 	if form.is_valid():
 		obj = form.save(commit=False)
 		# Associate the post with the currently authenticated user.
-		employee = CustomUser.objects.filter(email=user.email).first()
+		employee = User.objects.filter(email=user.email).first()
 		obj.employee = employee
 		obj.save()
 		form = CreateServicePostForm() # Reset form after successful save.

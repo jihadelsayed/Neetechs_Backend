@@ -2,7 +2,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from chat.models import Message, Thread
-from knox_allauth.models import CustomUser
+from accounts.models import User
 
 class MessageSerializer(serializers.ModelSerializer):
     sender_name = serializers.SerializerMethodField(source="site_id.site_id")
@@ -62,9 +62,9 @@ class ThreadSerializers(serializers.ModelSerializer):
     def get_friend_name(self, obj):
         friend_site_id = obj.ThreadName.replace(self.context['request'].user.site_id, "")
         if friend_site_id == "":
-            FriendName = CustomUser.objects.get(site_id=self.context['request'].user.site_id).first_name
+            FriendName = User.objects.get(site_id=self.context['request'].user.site_id).first_name
         else:
-            FriendName = CustomUser.objects.get(site_id=friend_site_id).first_name
+            FriendName = User.objects.get(site_id=friend_site_id).first_name
         return FriendName
 
     @extend_schema_field(serializers.CharField())
@@ -82,9 +82,9 @@ class ThreadSerializers(serializers.ModelSerializer):
     def get_friend_img(self, obj):
         friend_site_id = obj.ThreadName.replace(self.context['request'].user.site_id, "")
         if friend_site_id == "":
-            FriendImg = CustomUser.objects.get(site_id=self.context['request'].user.site_id).picture.url
+            FriendImg = User.objects.get(site_id=self.context['request'].user.site_id).picture.url
         else:
-            FriendImg = CustomUser.objects.get(site_id=friend_site_id).picture.url
+            FriendImg = User.objects.get(site_id=friend_site_id).picture.url
         return FriendImg
 
 

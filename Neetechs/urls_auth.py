@@ -2,7 +2,7 @@
 from django.urls import path
 from dj_rest_auth.views import LogoutView
 
-from knox_allauth.views_auth import (
+from accounts.views_auth import (
     KnoxLoginView,
     KnoxRegisterView,
     FacebookLogin,
@@ -10,8 +10,8 @@ from knox_allauth.views_auth import (
     EmailConfirmation,
     CurrentUserView,
 )
-from knox_allauth.views_otp import SendPhoneOTP, VerifyPhoneOTP
-from knox_allauth.views_set_password import SetPasswordView
+from accounts.views_otp import SendPhoneOTP, VerifyPhoneOTP
+from accounts.views_set_password import SetPasswordView
 
 app_name = "auth"
 

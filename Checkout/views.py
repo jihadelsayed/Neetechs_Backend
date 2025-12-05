@@ -5,7 +5,7 @@ and related checkout processes within the Neetechs platform.
 from chat.consumers import get_or_create_personal_thread
 from chat.models import Message, Thread
 from datetime import timedelta
-from knox_allauth.models import CustomUser
+from accounts.models import User
 from Service.models import ServicePost
 from Neetechs.settings import STRIPE_WEBHOOK_SECRET
 from Neetechs.permissions import ReadOnlyOrStaff, StripeWebhookPermission
@@ -68,7 +68,7 @@ def api_order_service_view(request):
             # Get or create a chat thread for this order.
             thread_obj = get_or_create_personal_thread(data['customerIdd'],data['employedIdd'])
             threadid = Thread.objects.get(ThreadName=thread_obj.ThreadName)
-            userid = CustomUser.objects.get(site_id=data['customerIdd'])
+            userid = User.objects.get(site_id=data['customerIdd'])
             # Create an initial message related to the service request.
             Message.objects.create(thread=threadid,sender=userid,text=data['message'],orderId=orderSerializer.pk,type="requested")
             return Response(data=data) # Consider returning a more specific success response or serialized data.
@@ -457,7 +457,7 @@ def api_subscription_detail_webhook(request):
             stripe_customer_id = data_object.get('customer')
             if stripe_customer_id:
                 try:
-                    customer = CustomUser.objects.get(stripeCustomerId=stripe_customer_id)
+                    customer = User.objects.get(stripeCustomerId=stripe_customer_id)
                     # Determine new subscription type based on amount or price ID (more robust).
                     # This example uses amount_total, which might be less reliable than price ID.
                     if data_object.get('amount_total') == 4900: # Example: 49.00 SEK for monthly premium.
@@ -466,8 +466,8 @@ def api_subscription_detail_webhook(request):
                     elif data_object.get('amount_total') == 49900: # Example: 499.00 SEK for yearly premium.
                         customer.subscriptionType = 'premiumplanyearly'
                         customer.save(update_fields=['subscriptionType'])
-                except CustomUser.DoesNotExist:
-                    print(f"CustomUser with stripeCustomerId {stripe_customer_id} not found.")
+                except User.DoesNotExist:
+                    print(f"User with stripeCustomerId {stripe_customer_id} not found.")
 
     elif event_type == 'invoice.payment_failed':
         # Logic for when a subscription payment fails.

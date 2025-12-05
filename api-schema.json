@@ -1301,7 +1301,7 @@ paths:
     get:
       operationId: api_v1_profile_list
       description: |-
-        Lists all user profiles (CustomUser instances) with filtering capabilities.
+        Lists all user profiles (User instances) with filtering capabilities.
         Supports listing, and filtering by various fields like site_id, profession, name, etc.
 
         Authentication: TokenAuthentication
@@ -1373,7 +1373,7 @@ paths:
       operationId: api_v1_profile_retrieve
       description: |-
         API view for retrieving, updating, or deleting a specific user profile by site_id.
-        Interacts with the CustomUser model using ProfileSerializer.
+        Interacts with the User model using ProfileSerializer.
 
         Operations:
             - GET: Retrieves a profile.
@@ -1404,7 +1404,7 @@ paths:
       operationId: api_v1_profile_update
       description: |-
         API view for retrieving, updating, or deleting a specific user profile by site_id.
-        Interacts with the CustomUser model using ProfileSerializer.
+        Interacts with the User model using ProfileSerializer.
 
         Operations:
             - GET: Retrieves a profile.
@@ -1447,7 +1447,7 @@ paths:
       operationId: api_v1_profile_partial_update
       description: |-
         API view for retrieving, updating, or deleting a specific user profile by site_id.
-        Interacts with the CustomUser model using ProfileSerializer.
+        Interacts with the User model using ProfileSerializer.
 
         Operations:
             - GET: Retrieves a profile.
@@ -1489,7 +1489,7 @@ paths:
       operationId: api_v1_profile_destroy
       description: |-
         API view for retrieving, updating, or deleting a specific user profile by site_id.
-        Interacts with the CustomUser model using ProfileSerializer.
+        Interacts with the User model using ProfileSerializer.
 
         Operations:
             - GET: Retrieves a profile.
@@ -1517,7 +1517,7 @@ paths:
       operationId: api_v1_profile_info_retrieve
       description: |-
         Retrieves all information for a specific user profile using their site_id.
-        Interacts with the CustomUser model using AllProfileInfoSerializer.
+        Interacts with the User model using AllProfileInfoSerializer.
 
         Operations:
             - GET: Retrieves a specific profile by site_id.
@@ -2082,11 +2082,11 @@ paths:
       operationId: api_v1_profile_records_retrieve
       description: |-
         API view for listing all profiles or creating/updating a profile.
-        Interacts with the CustomUser model using ProfileSerializer.
+        Interacts with the User model using ProfileSerializer.
 
         Operations:
-            - GET: Lists all CustomUser profiles.
-            - POST: Creates or potentially updates a CustomUser profile. The check
+            - GET: Lists all User profiles.
+            - POST: Creates or potentially updates a User profile. The check
                     `int(request.user.id) == int(request.data['username'])` suggests
                     it might be intended for a user to update their own profile if `username` (user ID) is passed.
 
@@ -3832,7 +3832,7 @@ components:
     AllProfileInfo:
       type: object
       description: |-
-        Provides a comprehensive serialization of a CustomUser's profile,
+        Provides a comprehensive serialization of a User's profile,
         embedding their interests, skills, studies, and experiences directly in the output.
         Also includes category update timestamps and email confirmation status.
       properties:
@@ -4179,7 +4179,7 @@ components:
       - name
     CurrentUser:
       type: object
-      description: Serializes essential CustomUser profile data.
+      description: Serializes essential User profile data.
       properties:
         id:
           type: integer
@@ -5067,7 +5067,7 @@ components:
       - uid
     PatchedProfile:
       type: object
-      description: Serializes essential CustomUser profile data.
+      description: Serializes essential User profile data.
       properties:
         id:
           type: integer
@@ -5411,7 +5411,7 @@ components:
       - password
     Profile:
       type: object
-      description: Serializes essential CustomUser profile data.
+      description: Serializes essential User profile data.
       properties:
         id:
           type: integer

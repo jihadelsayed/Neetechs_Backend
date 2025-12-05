@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from knox.models import AuthToken
 from django.conf import settings
 
-from .models import CustomUser
+from .models import User
 from .twilio_utils import send_sms_otp
 from .serializers.auth import SendPhoneOTPSerializer, VerifyPhoneOTPSerializer
 
@@ -32,7 +32,7 @@ class SendPhoneOTP(GenericAPIView):
         hashed_email = sha256(phone.encode()).hexdigest()[:10]
         placeholder_email = f"{hashed_email}@neetechs.sms"
 
-        user, _ = CustomUser.objects.get_or_create(
+        user, _ = User.objects.get_or_create(
             phone=phone,
             defaults={"email": placeholder_email, "name": "PhoneUser"},
         )
@@ -72,8 +72,8 @@ class VerifyPhoneOTP(GenericAPIView):
             return Response({"detail": "Too many failed attempts. Try again in 1 hour."}, status=429)
 
         try:
-            user = CustomUser.objects.get(phone=phone)
-        except CustomUser.DoesNotExist:
+            user = User.objects.get(phone=phone)
+        except User.DoesNotExist:
             return Response({"detail": "User not found."}, status=404)
 
         if not user.phone_otp or user.phone_otp != otp:

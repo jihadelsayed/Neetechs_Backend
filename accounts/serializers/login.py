@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
 from allauth.account.models import EmailAddress
 
-from ..models import CustomUser
+from ..models import User
 
 
 class PhoneOrEmailLoginSerializer(serializers.Serializer):
@@ -28,15 +28,15 @@ class PhoneOrEmailLoginSerializer(serializers.Serializer):
             # If credentials failed, check if account exists but has no password
             try:
                 user_obj = (
-                    CustomUser.objects.get(email__iexact=identifier)
+                    User.objects.get(email__iexact=identifier)
                     if "@" in identifier
-                    else CustomUser.objects.get(phone=identifier)
+                    else User.objects.get(phone=identifier)
                 )
                 if not user_obj.has_usable_password():
                     raise serializers.ValidationError(
                         {"detail": _("This user has no password. Login via phone OTP, then set a password.")}
                     )
-            except CustomUser.DoesNotExist:
+            except User.DoesNotExist:
                 pass
             raise serializers.ValidationError({"detail": _("Invalid phone/email or password.")})
 

@@ -4,7 +4,7 @@ from Checkout.models import ServiceOrder
 from channels.consumer import SyncConsumer, AsyncConsumer
 from asgiref.sync import async_to_sync, sync_to_async
 from knox.auth import TokenAuthentication
-from knox_allauth.models import CustomUser
+from accounts.models import User
 from chat.models import Thread, Message
 import json
 from channels.db import database_sync_to_async
@@ -117,8 +117,8 @@ def get_or_create_personal_thread(userowner, friendusername):
         except Thread.DoesNotExist:
             return Thread.objects.get(ThreadName=namethread)
     except Thread.DoesNotExist:
-        user1 = CustomUser.objects.get(site_id=userowner)
-        user2 = CustomUser.objects.get(site_id=friendusername)
+        user1 = User.objects.get(site_id=userowner)
+        user2 = User.objects.get(site_id=friendusername)
         thread = Thread.objects.create(ThreadName=threadName)
         thread.users.add(user1)
         thread.users.add(user2)
@@ -129,7 +129,7 @@ def get_or_create_personal_thread(userowner, friendusername):
 @database_sync_to_async
 def storeMessage(self, text):
     threadid = Thread.objects.get(ThreadName=self.thread_obj.ThreadName)
-    userid = CustomUser.objects.get(site_id=self.userowner)
+    userid = User.objects.get(site_id=self.userowner)
     Message.objects.create(thread=threadid, sender=userid, text=text)
 
 
@@ -137,8 +137,8 @@ def storeMessage(self, text):
 def sendNotification(self, messag, friend, owner, room_name):
     from firebase_admin import messaging
     from firebase_admin.messaging import Notification
-    friendusername = CustomUser.objects.get(site_id=friend).pk
-    friendusernameTest = CustomUser.objects.get(site_id=friend)
+    friendusername = User.objects.get(site_id=friend).pk
+    friendusernameTest = User.objects.get(site_id=friend)
     print(friendusername)
 
     FCMDevice.objects.filter(user=friendusername, active=True).send_message(
@@ -173,7 +173,7 @@ def sendNotification(self, messag, friend, owner, room_name):
 @database_sync_to_async
 def storeOrder(self, text):
     threadid = Thread.objects.get(ThreadName=self.thread_obj.ThreadName)
-    #userid = CustomUser.objects.get(site_id=self.userowner)
+    #userid = User.objects.get(site_id=self.userowner)
     ServiceOrder.objects.create(
         thread=threadid, customerIdd=self.userowner, employedIdd=self.friendusername)
 
@@ -190,7 +190,7 @@ def get_user_from_auth_key(token):
     token_key = TokenAuthentication.model.objects.get(token_key=token[:8])
     if token_key:
         uid = token_key.user_id
-        user = CustomUser.objects.filter(id=uid).first()
+        user = User.objects.filter(id=uid).first()
         site_id = token_key.user.site_id
         return site_id
     else:

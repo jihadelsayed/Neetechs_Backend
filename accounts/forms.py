@@ -1,40 +1,58 @@
-
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 
-from .models import CustomUser
+from .models import User
 
 
-class CustomUserCreationForm(UserCreationForm):
-    class Meta:
-        model = CustomUser
-        fields = ("email", "name", "phone")
+class UserCreationForm(UserCreationForm):
+    """
+    Used in admin when adding a new user.
+    """
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        # What the admin “Add user” form will ask for
+        fields = ("email", "username", "display_name", "phone")
 
     def clean_email(self):
         email = self.cleaned_data.get("email")
-        if email and CustomUser.objects.filter(email__iexact=email).exists():
+        if email and User.objects.filter(email__iexact=email).exists():
             raise ValidationError("A user with this email already exists.")
         return email
 
+    def clean_username(self):
+        username = self.cleaned_data.get("username")
+        if username and User.objects.filter(username__iexact=username).exists():
+            raise ValidationError("A user with this username already exists.")
+        return username
+
     def clean_phone(self):
         phone = self.cleaned_data.get("phone")
-        if phone and CustomUser.objects.filter(phone=phone).exists():
+        if phone and User.objects.filter(phone=phone).exists():
             raise ValidationError("A user with this phone already exists.")
         return phone
 
 
-class CustomUserChangeForm(UserChangeForm):
-    password = None  # hide unusable raw password field in admin edit
+class UserChangeForm(UserChangeForm):
+    """
+    Used in admin when editing an existing user.
+    We don’t expose the raw password field; DjangoUserAdmin will still
+    handle password change via the built-in “Change password” form.
+    """
+
+    password = None  # hide the hashed password field on the main edit form
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = (
             "email",
-            "name",
+            "username",
+            "display_name",
             "first_name",
+            "last_name",
             "phone",
-            "sms",
+            "site_id",
             "is_admin",
             "is_creator",
             "profession",
@@ -72,5 +90,6 @@ class CustomUserChangeForm(UserChangeForm):
 
 
 class UserLoginForm(forms.Form):
+    # This one can stay as-is; depends on how your login view works
     identifier = forms.CharField(label="Email or Phone")
     password = forms.CharField(widget=forms.PasswordInput)

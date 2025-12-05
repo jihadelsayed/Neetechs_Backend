@@ -34,7 +34,7 @@ class ThreadViewSet(viewsets.ModelViewSet):
     #    print(threadName)
      #   try:
            # user = Thread.objects.get(users)
-            #site_id = CustomUser.objects.get(site_id=user)
+            #site_id = User.objects.get(site_id=user)
     #        th = Thread.objects.filter(ThreadName=threadName)
      #   except Thread.DoesNotExist as e:
       #      return Response( {"error":"Given Thread was not found."},status=404)

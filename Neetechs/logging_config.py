@@ -16,7 +16,7 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
-        'knox_allauth.views_otp': {
+        'accounts.views_otp': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
