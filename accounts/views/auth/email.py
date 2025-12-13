@@ -7,12 +7,14 @@ from rest_framework.response import Response
 
 from allauth.account.models import EmailAddress
 from allauth.account.utils import send_email_confirmation
+from drf_spectacular.utils import extend_schema
+
 
 from ...serializers.auth import EmailConfirmationSerializer
 
 User = get_user_model()
 
-
+@extend_schema(tags=["accounts-security"])
 class EmailConfirmation(GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = EmailConfirmationSerializer

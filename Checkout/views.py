@@ -30,7 +30,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiTypes
 
 # OrderService
-@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
+@extend_schema(request=None, 
+               tags=["order-service"],
+               responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def api_order_service_view(request):
@@ -74,7 +76,10 @@ def api_order_service_view(request):
             return Response(data=data) # Consider returning a more specific success response or serialized data.
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
+@extend_schema(request=None,
+               
+               tags=["order-service"],
+               esponses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['PATCH'])
 @permission_classes((IsAuthenticated,))
 def api_confirm_order_service_view(request):
@@ -130,7 +135,9 @@ def api_confirm_order_service_view(request):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({"detail": "User not authorized to confirm this order."}, status=status.HTTP_403_FORBIDDEN)
 
-@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
+@extend_schema(request=None,
+               tags=["order-service"],
+               esponses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['PATCH'])
 @permission_classes((IsAuthenticated,))
 def api_canceled_order_service_view(request):
@@ -213,7 +220,10 @@ def get_message(pk):
         return Response( {"error":"Given Message was not found."},status=status.HTTP_404_NOT_FOUND)
 
 # pawnMoney - This term might be domain-specific, referring to a type of payment.
-@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
+@extend_schema(request=None,
+               
+                tags=["order-service"],
+               responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def api_pawn_Money_view(request):
@@ -265,7 +275,9 @@ def api_pawn_Money_view(request):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
+@extend_schema(request=None, 
+               tags=["order-service"],
+               esponses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def api_renew_service_view(request):
@@ -309,7 +321,8 @@ def api_renew_service_view(request):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
+@extend_schema(request=None,                tags=["order-service"],
+responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def api_customer_portal_view(request):
@@ -340,7 +353,8 @@ def api_customer_portal_view(request):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
+@extend_schema(request=None,                tags=["order-service"],
+responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def api_subscription_view(request):
@@ -395,7 +409,8 @@ def api_subscription_view(request):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             
-@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
+@extend_schema(request=None,                tags=["order-service"],
+responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['POST'])
 # Validate Stripe signatures before processing.
 @permission_classes((StripeWebhookPermission,))
@@ -478,7 +493,8 @@ def api_subscription_detail_webhook(request):
 
     return Response(data_object) # Return the Stripe data object for acknowledgment.
 
-@extend_schema(request=None, responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
+@extend_schema(request=None,                tags=["order-service"],
+responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def api_pay_Money_view(request):
@@ -522,7 +538,8 @@ def api_pay_Money_view(request):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@extend_schema(request=None, responses={200: ServiceOrderSerializer})
+@extend_schema(request=None,                tags=["order-service"],
+responses={200: ServiceOrderSerializer})
 @api_view(['GET', ])
 @permission_classes((IsAuthenticatedOrReadOnly, ))
 def api_detail_order_view(request, id):
@@ -548,6 +565,7 @@ def api_detail_order_view(request, id):
     serializer = ServiceOrderSerializer(order)
     return Response(serializer.data)
 
+@extend_schema(tags=["order-service"])
 class api_purchase_orders_view(ListAPIView):
     """
     Lists service orders where the authenticated user is the employee/provider.
@@ -578,6 +596,7 @@ class api_purchase_orders_view(ListAPIView):
         ):
             return ServiceOrder.objects.none()
         return ServiceOrder.objects.filter(employedIdd=request.user.site_id).order_by("-pk")
+@extend_schema(tags=["order-service"])
 
 class api_requested_orders_view(ListAPIView):
     """
@@ -605,6 +624,7 @@ class api_requested_orders_view(ListAPIView):
         ):
             return ServiceOrder.objects.none()
         return ServiceOrder.objects.filter(customerIdd=request.user.site_id).order_by("-pk")
+@extend_schema(tags=["order-service"])
 
 class ordersListAPIView(ListAPIView):
     """
