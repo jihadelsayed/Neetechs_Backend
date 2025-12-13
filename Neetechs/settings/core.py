@@ -16,7 +16,15 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = bool_env("DEBUG", False)
 
 ALLOWED_HOSTS = csv_env("ALLOWED_HOSTS", "")
-CSRF_TRUSTED_ORIGINS = csv_env("CSRF_TRUSTED_ORIGINS", "")
+# CSRF_TRUSTED_ORIGINS = csv_env("CSRF_TRUSTED_ORIGINS", "")
+CSRF_TRUSTED_ORIGINS = [
+  "https://neetechs.com",
+  "https://server.neetechs.com",
+  "https://accounts.neetechs.com",
+  "https://accounts.theislamicnation.com",
+      "https://theislamicnation.com",
+    "https://neetechpanel.asuscomm.com"
+]
 AUTH_USER_MODEL = "accounts.User"
 
 ROOT_URLCONF = "Neetechs.urls"

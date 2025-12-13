@@ -23,9 +23,20 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:4200",
     "https://neetechs.com",
     "https://server.neetechs.com",
+      "https://accounts.neetechs.com",
+  "https://accounts.theislamicnation.com",
+
     "https://theislamicnation.com",
     "https://neetechpanel.asuscomm.com"
 
+]
+CSRF_TRUSTED_ORIGINS = [
+  "https://neetechs.com",
+  "https://server.neetechs.com",
+  "https://accounts.neetechs.com",
+  "https://accounts.theislamicnation.com",
+      "https://theislamicnation.com",
+    "https://neetechpanel.asuscomm.com"
 ]
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
