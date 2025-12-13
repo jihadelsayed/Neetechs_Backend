@@ -5,7 +5,7 @@ from dj_rest_auth.views import LoginView
 from drf_spectacular.utils import extend_schema
 from ...serializers.login import LoginRequestSerializer
 from ...serializers.public import PublicUserSerializer
-from ...utils import create_knox_token
+from ...utils.knox import create_knox_token
 
 from accounts.serializers import AuthResponseSerializer
 

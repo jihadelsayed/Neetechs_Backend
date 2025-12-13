@@ -15,7 +15,7 @@ from rest_framework.response import Response
 
 from ..twilio_utils import send_sms_otp
 from ..serializers.auth import SendPhoneOTPSerializer, VerifyPhoneOTPSerializer
-from ..utils import create_knox_token
+from ..utils.knox import create_knox_token
 from drf_spectacular.utils import extend_schema
 
 logger = logging.getLogger(__name__)

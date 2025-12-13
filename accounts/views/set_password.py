@@ -7,7 +7,7 @@ from knox.models import AuthToken
 
 from ..serializers.auth import SetPasswordSerializer
 from ..serializers.public import PublicUserSerializer
-from ..utils import create_knox_token
+from ..utils.knox import create_knox_token
 from drf_spectacular.utils import extend_schema
 
 @extend_schema(tags=["accounts-security"])

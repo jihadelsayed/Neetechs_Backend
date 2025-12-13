@@ -106,10 +106,9 @@ def stripe_webhook(request):
 
     return HttpResponse(status=200)
 
-
+@extend_schema(tags=["payments"])
 @api_view(["POST"])
 @permission_classes([AllowAny])
-@extend_schema(tags=["payments"])
 def create_checkout_session(request):
     """
     Create Stripe Checkout session for a single digital product.

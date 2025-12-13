@@ -11,7 +11,7 @@ from allauth.account.utils import complete_signup
 
 from accounts.serializers import AuthResponseSerializer
 
-from ...utils import create_knox_token
+from ...utils.knox import create_knox_token
 from ...serializers.register import RegisterRequestSerializer
 from drf_spectacular.utils import extend_schema
 

@@ -8,7 +8,7 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from accounts.serializers import AuthResponseSerializer
 
 from ...serializers.public import PublicUserSerializer
-from ...utils import create_knox_token
+from ...utils.knox import create_knox_token
 from drf_spectacular.utils import extend_schema
 
 @extend_schema(
