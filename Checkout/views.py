@@ -79,7 +79,7 @@ def api_order_service_view(request):
 @extend_schema(request=None,
                
                tags=["order-service"],
-               esponses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
+               responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['PATCH'])
 @permission_classes((IsAuthenticated,))
 def api_confirm_order_service_view(request):
@@ -137,7 +137,7 @@ def api_confirm_order_service_view(request):
 
 @extend_schema(request=None,
                tags=["order-service"],
-               esponses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
+               responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['PATCH'])
 @permission_classes((IsAuthenticated,))
 def api_canceled_order_service_view(request):
@@ -277,7 +277,7 @@ def api_pawn_Money_view(request):
 
 @extend_schema(request=None, 
                tags=["order-service"],
-               esponses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
+               responses={200: OpenApiResponse(OpenApiTypes.OBJECT)})
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def api_renew_service_view(request):
