@@ -201,6 +201,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     member_since = models.DateTimeField(default=timezone.now, null=True, blank=True)
     upload_avatar = upload_avatar_28
+    def upload_avatar_28(instance, filename: str) -> str:
+      return _avatar_upload_path(instance, filename, variant="28")
+
+    # Backwards-compat for old migrations
+    def upload_avatar(instance, filename: str) -> str:
+        return upload_avatar_28(instance, filename)
 
     # AVATARS (imagekit)
     picture = ProcessedImageField(
