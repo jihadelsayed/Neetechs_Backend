@@ -16,12 +16,19 @@ from django.utils.translation import gettext_lazy as _
 
 from imagekit.models.fields import ProcessedImageField
 from imagekit.processors import ResizeToFill
-
+import re
+from django.utils.text import slugify
 
 def generate_site_id(length: int = 10) -> str:
   chars = string.ascii_letters + string.digits
   return "".join(random.SystemRandom().choice(chars) for _ in range(length))
 
+def generate_username(seed: str = "user", length: int = 6) -> str:
+  # safe base (letters/digits/_ only)
+  base = slugify(seed).replace("-", "_")
+  base = re.sub(r"[^a-zA-Z0-9_]", "", base) or "user"
+  suffix = generate_site_id(length).lower()
+  return f"{base}_{suffix}"
 
 def upload_avatar(instance, filename: str) -> str:
   ext = filename.split(".")[-1].lower()
@@ -116,7 +123,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     unique=True,
     db_index=True,
   )
-
+  handle = models.SlugField(
+      _("handle"),
+      max_length=40,
+      unique=True,
+      null=True,
+      blank=True,
+      db_index=True,
+      help_text=_("Public @handle. Optional. Letters/numbers/hyphen/underscore."),
+    )
   # FLAGS / STATUS
   is_staff = models.BooleanField(_("staff status"), default=False)
   is_active = models.BooleanField(_("active"), default=True)
@@ -211,9 +226,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     default="The user did not put anything yet",
   )
 
-  # OTP (phone verification etc.)
-  phone_otp = models.CharField(max_length=6, blank=True, null=True)
-  otp_created_at = models.DateTimeField(blank=True, null=True)
+  # OTP (store hash only)
+  phone_otp_hash = models.CharField(max_length=64, blank=True, null=True)  # sha256 hex
+  otp_expires_at = models.DateTimeField(blank=True, null=True)
+
 
   USERNAME_FIELD = "email"          # login by email
   REQUIRED_FIELDS = ["username"]    # when creating superuser via CLI

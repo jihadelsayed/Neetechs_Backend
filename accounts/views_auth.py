@@ -44,32 +44,31 @@ class KnoxRegisterView(RegisterView):
     def perform_create(self, serializer):
         phone_number = self.request.data.get("phone")
         customer_email = self.request.data.get("email") or (
-            f"no-email-{phone_number}@neetechs.com" if phone_number else f"no-email-anonymous@{getattr(settings,'DEFAULT_DOMAIN','neetechs.com')}"
+            f"no-email-{phone_number}@neetechs.com"
+            if phone_number
+            else f"no-email-anonymous@{getattr(settings,'DEFAULT_DOMAIN','neetechs.com')}"
         )
 
-        customer = stripe.Customer.create(
-            email=customer_email,
-            payment_method="pm_card_visa",
-            invoice_settings={"default_payment_method": "pm_card_visa"},
-        )
+        customer = stripe.Customer.create(email=customer_email)
 
         user = serializer.save(self.request)
+
+        user.stripe_customer_id = customer.id
+        user.save(update_fields=["stripe_customer_id"])
+
         token = create_knox_token(None, user, None)
 
-        identifier = self.request.data.get("email") or self.request.data.get("phone")
-        instance = User.objects.filter(email=identifier).first() or User.objects.filter(phone=identifier).first()
+        complete_signup(
+            self.request._request,
+            user,
+            allauth_settings.EMAIL_VERIFICATION,
+            None,
+            signal_kwargs={"sociallogin": None},
+        )
 
-        profile_data = self.request.data.copy()
-        profile_data["stripeCustomerId"] = customer.id
-
-        if instance:
-            ps = ProfileSerializer(instance, data=profile_data, partial=True)
-            if ps.is_valid():
-                ps.save()
-
-        complete_signup(self.request._request, user, allauth_settings.EMAIL_VERIFICATION, None, signal_kwargs={"sociallogin": None})
         self.token = (None, token)
         return user
+
 
 
 class SocialLoginView_(SocialLoginView):
