@@ -1,13 +1,12 @@
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
 from ..serializers.public import PublicUserSerializer
 
 
-class MeView(GenericAPIView):
+class MeView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = PublicUserSerializer
 
-    def get(self, request):
-        return Response(self.get_serializer(request.user).data, status=200)
+    def get_object(self):
+        return self.request.user

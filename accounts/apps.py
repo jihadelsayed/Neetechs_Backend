@@ -1,11 +1,11 @@
-
 from django.apps import AppConfig
 
 
-class KnoxAllauthConfig(AppConfig):
+class AccountsConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "accounts"
-    verbose_name = "Knox + Allauth"
+    verbose_name = "Accounts"
 
     def ready(self):
-        import accounts.signals  # noqa: F401
+        # Ensure signal handlers are registered
+        from . import signals  # noqa: F401

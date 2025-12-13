@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import path
 
 from .views.otp import SendPhoneOTP, VerifyPhoneOTP
@@ -11,14 +12,6 @@ from .views.auth import (
     FacebookLogin,
     GoogleLogin,
     EmailConfirmation,
-)
-
-# WebAuthn (keep but I strongly recommend gating it in views)
-from .views.webauthn import (
-    begin_registration,
-    complete_registration,
-    begin_authentication,
-    complete_authentication,
 )
 
 app_name = "accounts"
@@ -40,13 +33,23 @@ urlpatterns = [
     # Set password (after OTP login)
     path("auth/password/set/", SetPasswordView.as_view(), name="auth_password_set"),
 
-    # WebAuthn (passkeys) - still experimental
-    path("auth/webauthn/register/begin/", begin_registration, name="webauthn_register_begin"),
-    path("auth/webauthn/register/finish/", complete_registration, name="webauthn_register_finish"),
-    path("auth/webauthn/login/begin/", begin_authentication, name="webauthn_login_begin"),
-    path("auth/webauthn/login/finish/", complete_authentication, name="webauthn_login_finish"),
-
     # Current user
     path("me/", MeView.as_view(), name="me"),
     path("me/handle/", SetHandleView.as_view(), name="me_handle"),
 ]
+
+# WebAuthn (passkeys) — gated so it can’t accidentally be exposed in prod
+if getattr(settings, "WEBAUTHN_ENABLED", False):
+    from .views.webauthn import (
+        begin_registration,
+        complete_registration,
+        begin_authentication,
+        complete_authentication,
+    )
+
+    urlpatterns += [
+        path("auth/webauthn/register/begin/", begin_registration, name="webauthn_register_begin"),
+        path("auth/webauthn/register/finish/", complete_registration, name="webauthn_register_finish"),
+        path("auth/webauthn/login/begin/", begin_authentication, name="webauthn_login_begin"),
+        path("auth/webauthn/login/finish/", complete_authentication, name="webauthn_login_finish"),
+    ]

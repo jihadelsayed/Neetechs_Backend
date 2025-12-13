@@ -1,4 +1,3 @@
-
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 
@@ -20,6 +19,7 @@ class PhoneOrEmailRegisterSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         email = (attrs.get("email") or "").strip()
         phone = (attrs.get("phone") or "").strip()
+        name = (attrs.get("name") or "").strip()
 
         if not email and not phone:
             raise serializers.ValidationError({"detail": "Provide either email or phone."})
@@ -32,11 +32,23 @@ class PhoneOrEmailRegisterSerializer(serializers.ModelSerializer):
 
         attrs["email"] = email or None
         attrs["phone"] = phone or None
+        attrs["name"] = name or None
         return attrs
 
     def create(self, validated_data):
         password = validated_data.pop("password")
+
         email = validated_data.get("email")
-        name = validated_data.get("name")
         phone = validated_data.get("phone")
-        return User.objects.create_user(email=email, password=password, name=name, phone=phone)
+        name = validated_data.pop("name", None)
+
+        # Map legacy "name" into the real field
+        if name:
+            validated_data["display_name"] = name
+
+        return User.objects.create_user(
+            email=email,
+            password=password,
+            phone=phone,
+            **validated_data,
+        )

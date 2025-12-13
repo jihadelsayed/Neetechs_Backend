@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from .models import User as User
+from .models import User
 from .forms import UserCreationForm, UserChangeForm
 
 
@@ -12,7 +12,6 @@ class UserAdmin(DjangoUserAdmin):
     form = UserChangeForm
     model = User
 
-    # Which fields are shown on the user edit page
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         (
@@ -20,6 +19,7 @@ class UserAdmin(DjangoUserAdmin):
             {
                 "fields": (
                     "username",
+                    "handle",
                     "display_name",
                     "first_name",
                     "last_name",
@@ -69,13 +69,9 @@ class UserAdmin(DjangoUserAdmin):
                 )
             },
         ),
-        (
-            _("Important dates"),
-            {"fields": ("last_login", "date_joined")},
-        ),
+        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
 
-    # Fields shown on the "Add user" page in admin
     add_fieldsets = (
         (
             None,
@@ -84,6 +80,7 @@ class UserAdmin(DjangoUserAdmin):
                 "fields": (
                     "email",
                     "username",
+                    "handle",
                     "display_name",
                     "phone",
                     "password1",
@@ -97,14 +94,17 @@ class UserAdmin(DjangoUserAdmin):
 
     list_display = (
         "email",
-        "username"
-        , "handle", "display_name",
+        "username",
+        "handle",
+        "display_name",
+        "phone",
         "is_staff",
         "is_active",
         "is_superuser",
         "is_creator",
         "subscription_type",
     )
+
     list_filter = (
         "is_staff",
         "is_superuser",
@@ -112,9 +112,21 @@ class UserAdmin(DjangoUserAdmin):
         "is_admin",
         "is_creator",
         "subscription_type",
-        "country","handle", "display_name",
+        "country",
     )
-    search_fields = ("email", "username", "display_name", "phone", "site_id")
-    ordering = ("email",)
 
+    search_fields = (
+        "email",
+        "username",
+        "handle",
+        "display_name",
+        "first_name",
+        "last_name",
+        "phone",
+        "site_id",
+    )
+
+    ordering = ("email",)
     readonly_fields = ("site_id", "date_joined", "last_login", "member_since")
+
+    list_per_page = 50

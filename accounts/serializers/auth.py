@@ -1,19 +1,12 @@
-"""Serializers used by authentication API views."""
-from rest_framework import serializers
-
-from Profile.serializer import ProfileSerializer
+"""Serializers used by authentication / accounts API views."""
 from django.contrib.auth import get_user_model
+from rest_framework import serializers
 
 User = get_user_model()
 
+
 class EmailConfirmationSerializer(serializers.Serializer):
     email = serializers.EmailField()
-
-
-class CurrentUserSerializer(ProfileSerializer):
-    class Meta(ProfileSerializer.Meta):
-        ref_name = "CurrentUser"
-        fields = ProfileSerializer.Meta.fields
 
 
 class SendPhoneOTPSerializer(serializers.Serializer):
@@ -32,17 +25,27 @@ class SetPasswordSerializer(serializers.Serializer):
         style={"input_type": "password"},
     )
 
+
 class SetHandleSerializer(serializers.Serializer):
     handle = serializers.SlugField(min_length=3, max_length=40)
 
-    def validate_handle(self, value):
-        value = value.lower()
+    def validate_handle(self, value: str) -> str:
+        value = (value or "").strip().lower()
 
-        reserved = {"admin", "support", "api", "auth", "login", "register", "me"}
+        reserved = {
+            "admin", "support", "api", "auth",
+            "login", "register", "me",
+            "accounts", "payments", "checkout",
+            "digital-products",
+        }
         if value in reserved:
             raise serializers.ValidationError("This handle is reserved.")
 
-        user = self.context["request"].user
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if not user or not getattr(user, "id", None):
+            raise serializers.ValidationError("Authentication required.")
+
         if User.objects.filter(handle=value).exclude(id=user.id).exists():
             raise serializers.ValidationError("Handle already taken.")
 

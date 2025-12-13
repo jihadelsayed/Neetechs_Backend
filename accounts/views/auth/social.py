@@ -6,15 +6,17 @@ from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 
 from ...serializers.public import PublicUserSerializer
+from ...utils import create_knox_token
 
 
 class SocialLoginView_(SocialLoginView):
     permission_classes = [AllowAny]
 
     def get_response(self):
+        token = create_knox_token(None, self.user, None)
         return Response(
             {
-                "token": self.token[1],
+                "token": token,
                 "user": PublicUserSerializer(self.user, context={"request": self.request}).data,
             },
             status=200,

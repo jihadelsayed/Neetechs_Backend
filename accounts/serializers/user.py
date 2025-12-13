@@ -1,44 +1,27 @@
-
 from rest_framework import serializers
-from django.utils import timezone
-
 from allauth.account.models import EmailAddress
 
-from ..models import User as User
-
-# Optional imports from other apps (guarded so this file doesn't explode if they aren't installed yet)
-try:
-    from Profile.serializer import (
-        ExperienceSerializer,
-        InterestSerializer,
-        CompetenceCertificateSerializer,
-        StudySerializer,
-    )
-    from Profile.models import (
-        Experience,
-        Interest,
-        CompetenceCertificate,
-        Study,
-    )
-except Exception:
-    ExperienceSerializer = InterestSerializer = CompetenceCertificateSerializer = StudySerializer = None
-    Experience = Interest = CompetenceCertificate = Study = None
-
-try:
-    from Service.models import ModelCategory, ModelSubCategory
-    from Service.api.serializers import ServiceCategorySerializer, SubCategorySerializer
-except Exception:
-    ModelCategory = ModelSubCategory = None
-    ServiceCategorySerializer = SubCategorySerializer = None
+from ..models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # Derived / related data
+    """
+    Legacy-compatible user serializer.
+
+    IMPORTANT:
+    - This stays inside accounts ONLY for backwards compatibility.
+    - Cross-app Profile/Service aggregation does NOT belong here.
+    - If you need the "full profile payload", build it in the Profile app instead.
+    """
+
+    # Keep legacy keys so old clients don't break
     emailConfirmed = serializers.SerializerMethodField()
+
     Interest = serializers.SerializerMethodField()
     CompetenceCertificate = serializers.SerializerMethodField()
     Study = serializers.SerializerMethodField()
     Experience = serializers.SerializerMethodField()
+
     Categories = serializers.SerializerMethodField()
     subCategories = serializers.SerializerMethodField()
     CategoryLastupdate = serializers.SerializerMethodField()
@@ -46,14 +29,17 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        depth = 1
+        # NOTE: depth=1 removed on purpose (slow + unpredictable)
         fields = (
             "id",
             "email",
             "emailConfirmed",
             "name",
             "first_name",
+            "last_name",
             "phone",
+            "username",
+            "handle",
             "site_id",
             "is_creator",
             "bio",
@@ -82,7 +68,7 @@ class UserSerializer(serializers.ModelSerializer):
             "stripe_customer_id",
             "subscription_type",
             "about",
-            # related/derived
+            # legacy aggregates (kept but now safe)
             "Interest",
             "CompetenceCertificate",
             "Study",
@@ -100,59 +86,52 @@ class UserSerializer(serializers.ModelSerializer):
             "earning",
             "member_since",
             "site_id",
+            "username",
+            "handle",
+            "stripe_customer_id",
         )
 
     # ---- Derived fields ----
     def get_emailConfirmed(self, obj):
-        return EmailAddress.objects.filter(email__iexact=obj.email, verified=True).exists() if obj.email else False
+        # Safe, single query
+        return (
+            EmailAddress.objects.filter(email__iexact=obj.email, verified=True).exists()
+            if obj.email
+            else False
+        )
 
+    # ---- Legacy aggregate stubs ----
+    # These used to pull data from other apps. That does not belong in accounts.
+    # Keep keys for compatibility; return empty/None to avoid slow cross-app coupling.
     def get_Interest(self, obj):
-        if not (Interest and InterestSerializer):
-            return []
-        qs = Interest.objects.filter(username=obj.id)
-        return InterestSerializer(qs, many=True).data
+        return []
 
     def get_CompetenceCertificate(self, obj):
-        if not (CompetenceCertificate and CompetenceCertificateSerializer):
-            return []
-        qs = CompetenceCertificate.objects.filter(username=obj.id)
-        return CompetenceCertificateSerializer(qs, many=True).data
+        return []
 
     def get_Study(self, obj):
-        if not (Study and StudySerializer):
-            return []
-        qs = Study.objects.filter(username=obj.id)
-        return StudySerializer(qs, many=True).data
+        return []
 
     def get_Experience(self, obj):
-        if not (Experience and ExperienceSerializer):
-            return []
-        qs = Experience.objects.filter(username=obj.id)
-        return ExperienceSerializer(qs, many=True).data
+        return []
 
     def get_Categories(self, obj):
-        if not (ModelCategory and ServiceCategorySerializer):
-            return []
-        qs = ModelCategory.objects.all()
-        return ServiceCategorySerializer(qs, many=True).data
+        return []
 
     def get_subCategories(self, obj):
-        if not (ModelSubCategory and SubCategorySerializer):
-            return []
-        qs = ModelSubCategory.objects.all()
-        return SubCategorySerializer(qs, many=True).data
+        return []
 
     def get_CategoryLastupdate(self, obj):
-        if not ModelCategory or not ModelCategory.objects.exists():
-            return None
-        return ModelCategory.objects.latest("updatedAt").updatedAt
+        return None
 
     def get_SubcategoryLastupdate(self, obj):
-        if not ModelSubCategory or not ModelSubCategory.objects.exists():
-            return None
-        return ModelSubCategory.objects.latest("updatedAt").updatedAt
+        return None
 
 
 class KnoxSerializer(serializers.Serializer):
+    """
+    Legacy wrapper. Prefer using PublicUserSerializer + explicit auth responses.
+    Kept so older code importing KnoxSerializer doesn't break.
+    """
     token = serializers.CharField()
     user = UserSerializer()

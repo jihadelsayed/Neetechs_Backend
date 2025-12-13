@@ -1,9 +1,13 @@
-
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from knox.models import AuthToken
+
 from ..serializers.auth import SetPasswordSerializer
+from ..serializers.public import PublicUserSerializer
+from ..utils import create_knox_token
+
 
 class SetPasswordView(GenericAPIView):
     permission_classes = [IsAuthenticated]
@@ -18,4 +22,17 @@ class SetPasswordView(GenericAPIView):
         user.set_password(password)
         user.save(update_fields=["password"])
 
-        return Response({"detail": "Password set successfully."}, status=200)
+        # Invalidate all existing tokens (critical)
+        AuthToken.objects.filter(user=user).delete()
+
+        # Issue a fresh token so the client keeps a valid session
+        token = create_knox_token(None, user, None)
+
+        return Response(
+            {
+                "detail": "Password set successfully.",
+                "token": token,
+                "user": PublicUserSerializer(user, context={"request": request}).data,
+            },
+            status=200,
+        )

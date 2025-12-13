@@ -1,36 +1,35 @@
 from django.dispatch import receiver
-from django.contrib.auth import get_user_model
 
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from allauth.socialaccount.models import SocialAccount
-
-User = get_user_model()
 
 
 def _extract_name(extra: dict) -> str | None:
+    if not isinstance(extra, dict):
+        return None
+
     full = extra.get("name")
     if full:
-        return str(full)
+        return str(full).strip() or None
 
     given = extra.get("given_name") or extra.get("first_name")
     family = extra.get("family_name") or extra.get("last_name")
     if given or family:
-        return " ".join([p for p in [given, family] if p]).strip()
+        combined = " ".join([p for p in [given, family] if p]).strip()
+        return combined or None
 
     display = extra.get("displayName") or extra.get("localizedFirstName")
     if display:
-        return str(display)
+        return str(display).strip() or None
 
     return None
 
 
-def _populate_user_name_from_social(user, account: SocialAccount | None = None):
-    acct = account or SocialAccount.objects.filter(user=user).first()
-    if not acct:
+def _populate_user_name_from_social(user, account=None):
+    if not account:
         return
 
-    extra = acct.extra_data or {}
+    extra = getattr(account, "extra_data", None) or {}
     full_name = _extract_name(extra)
     if not full_name:
         return
@@ -59,7 +58,10 @@ def _populate_user_name_from_social(user, account: SocialAccount | None = None):
 
 @receiver(user_signed_up)
 def handle_user_signed_up(request, user, **kwargs):
-    _populate_user_name_from_social(user)
+    # If signup happened via social login, allauth provides sociallogin in kwargs
+    sociallogin = kwargs.get("sociallogin")
+    if sociallogin and getattr(sociallogin, "account", None):
+        _populate_user_name_from_social(user, sociallogin.account)
 
 
 @receiver(social_account_added)

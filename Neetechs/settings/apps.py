@@ -10,6 +10,7 @@ INSTALLED_APPS = [
     #"imagekit",
     "payments",
  
+    "accounts.apps.AccountsConfig",
 
     "rest_framework","rest_framework.authtoken","drf_spectacular","django_filters",
     "channels","knox",

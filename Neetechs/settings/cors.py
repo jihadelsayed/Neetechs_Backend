@@ -29,3 +29,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+WEBAUTHN_ENABLED = False
+WEBAUTHN_RP_ID = "neetechs.com"
+WEBAUTHN_RP_NAME = "Neetechs"
+TWILIO_OTP_MESSAGE_TEMPLATE = "🔐 Your Neetechs verification code is: {code}"

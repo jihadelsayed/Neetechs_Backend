@@ -6,20 +6,21 @@ from datetime import timedelta
 from django.conf import settings
 from django.utils import timezone
 from django.core.cache import cache
+from django.contrib.auth import get_user_model
 
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-
 from ..twilio_utils import send_sms_otp
 from ..serializers.auth import SendPhoneOTPSerializer, VerifyPhoneOTPSerializer
+from ..utils import create_knox_token
 
 logger = logging.getLogger(__name__)
 
-from django.contrib.auth import get_user_model
 User = get_user_model()
+
 OTP_TTL_SECONDS = 5 * 60          # 5 minutes
 OTP_COOLDOWN_SECONDS = 60         # 60s before resend
 OTP_MAX_ATTEMPTS = 5              # per phone+ip+device
@@ -37,9 +38,13 @@ def get_client_ip(request) -> str:
     """
     xff = request.META.get("HTTP_X_FORWARDED_FOR")
     if xff:
-        # left-most is original client in standard setups
         return xff.split(",")[0].strip()
     return request.META.get("REMOTE_ADDR") or ""
+
+
+def _placeholder_email_for_phone(phone: str) -> str:
+    # Safe + consistent placeholder domain (never a real domain)
+    return f"{_sha256_hex(phone)[:10]}@phone.neetechs.invalid"
 
 
 class SendPhoneOTP(GenericAPIView):
@@ -51,7 +56,6 @@ class SendPhoneOTP(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         phone = serializer.validated_data["phone"].strip()
 
-        # cooldown per phone
         cooldown_key = f"otp:cooldown:{phone}"
         if cache.get(cooldown_key):
             return Response(
@@ -59,20 +63,21 @@ class SendPhoneOTP(GenericAPIView):
                 status=status.HTTP_429_TOO_MANY_REQUESTS,
             )
 
-        # create/get user for this phone
-        # keep your placeholder email approach for now (we can improve later)
-        placeholder_email = f"{_sha256_hex(phone)[:10]}@neetechs.sms"
+        # Create/get user for this phone
         user, _ = User.objects.get_or_create(
             phone=phone,
-            defaults={"email": placeholder_email, "username": (_sha256_hex(phone)[:12])},
+            defaults={
+                "email": _placeholder_email_for_phone(phone),
+                "username": _sha256_hex(phone)[:12],
+            },
         )
 
         otp = f"{random.randint(100000, 999999)}"
-        user.phone_otp_hash = _sha256_hex(f"{phone}:{otp}:{getattr(settings,'SECRET_KEY','')}")
+        user.phone_otp_hash = _sha256_hex(f"{phone}:{otp}:{getattr(settings, 'SECRET_KEY', '')}")
         user.otp_expires_at = timezone.now() + timedelta(seconds=OTP_TTL_SECONDS)
         user.save(update_fields=["phone_otp_hash", "otp_expires_at"])
 
-        # start cooldown
+        # Start cooldown
         cache.set(cooldown_key, 1, timeout=OTP_COOLDOWN_SECONDS)
 
         if getattr(settings, "DEBUG", False):
@@ -80,7 +85,6 @@ class SendPhoneOTP(GenericAPIView):
         else:
             sid = send_sms_otp(phone, otp)
             if not sid:
-                # If Twilio failed, allow retry sooner (don’t punish user)
                 cache.delete(cooldown_key)
                 return Response(
                     {"detail": "Failed to send OTP. Try again."},
@@ -97,13 +101,13 @@ class VerifyPhoneOTP(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         phone = serializer.validated_data["phone"].strip()
         otp = serializer.validated_data["otp"].strip()
 
         ip = get_client_ip(request)
-        device_id = (request.headers.get("X-Device-ID") or "").strip()[:64]  # cap size
+        device_id = (request.headers.get("X-Device-ID") or "").strip()[:64]
 
-        # lock + attempts key
         lock_key = f"otp:lock:{phone}:{ip}:{device_id}"
         if cache.get(lock_key):
             return Response(
@@ -125,25 +129,31 @@ class VerifyPhoneOTP(GenericAPIView):
         try:
             user = User.objects.get(phone=phone)
         except User.DoesNotExist:
+            # keep this generic if you want to avoid enumeration; leaving as-is for now
             return Response({"detail": "User not found."}, status=404)
 
         if not user.phone_otp_hash or not user.otp_expires_at:
-            cache.set(attempts_key, attempts + 1, timeout=OTP_LOCK_SECONDS)
+            # Attempts should expire with OTP window, not 1 hour
+            cache.set(attempts_key, attempts + 1, timeout=OTP_TTL_SECONDS)
             return Response({"detail": "Invalid OTP."}, status=400)
 
         if timezone.now() > user.otp_expires_at:
-            # expire & force resend
+            # Expired: clear OTP + allow immediate resend by clearing cooldown
             user.phone_otp_hash = None
             user.otp_expires_at = None
             user.save(update_fields=["phone_otp_hash", "otp_expires_at"])
+
+            cache.delete(f"otp:cooldown:{phone}")
+            cache.delete(attempts_key)
+
             return Response({"detail": "OTP expired."}, status=400)
 
-        expected = _sha256_hex(f"{phone}:{otp}:{getattr(settings,'SECRET_KEY','')}")
+        expected = _sha256_hex(f"{phone}:{otp}:{getattr(settings, 'SECRET_KEY', '')}")
         if expected != user.phone_otp_hash:
-            cache.set(attempts_key, attempts + 1, timeout=OTP_LOCK_SECONDS)
+            cache.set(attempts_key, attempts + 1, timeout=OTP_TTL_SECONDS)
             return Response({"detail": "Invalid OTP."}, status=400)
 
-        # success: clear otp + attempts
+        # Success: clear otp + attempts/lock
         cache.delete(attempts_key)
         cache.delete(lock_key)
 
@@ -151,9 +161,7 @@ class VerifyPhoneOTP(GenericAPIView):
         user.otp_expires_at = None
         user.save(update_fields=["phone_otp_hash", "otp_expires_at"])
 
-        # use Knox, not knox.models.AuthToken directly if you want consistent token style
-        from knox.models import AuthToken
-        token = AuthToken.objects.create(user)[1]
+        token = create_knox_token(None, user, None)
 
         return Response(
             {
@@ -164,6 +172,7 @@ class VerifyPhoneOTP(GenericAPIView):
                     "email": user.email,
                     "display_name": user.display_name,
                     "username": user.username,
+                    "handle": user.handle,
                 },
                 "has_password": user.has_usable_password(),
             },

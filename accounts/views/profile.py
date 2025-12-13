@@ -3,6 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from ..serializers.auth import SetHandleSerializer
+from ..serializers.public import PublicUserSerializer
+
 
 class SetHandleView(GenericAPIView):
     permission_classes = [IsAuthenticated]
@@ -15,4 +17,10 @@ class SetHandleView(GenericAPIView):
         request.user.handle = s.validated_data["handle"]
         request.user.save(update_fields=["handle"])
 
-        return Response({"detail": "Handle updated", "handle": request.user.handle}, status=200)
+        return Response(
+            {
+                "detail": "Handle updated",
+                "user": PublicUserSerializer(request.user, context={"request": request}).data,
+            },
+            status=200,
+        )

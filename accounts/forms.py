@@ -1,57 +1,84 @@
+import hashlib
+
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserCreationForm as DjangoUserCreationForm
+from django.contrib.auth.forms import UserChangeForm as DjangoUserChangeForm
 from django.core.exceptions import ValidationError
 
 from .models import User
 
 
-class UserCreationForm(UserCreationForm):
+def _placeholder_email_for_phone(phone: str) -> str:
+    return f"{hashlib.sha256(phone.encode('utf-8')).hexdigest()[:10]}@phone.neetechs.invalid"
+
+
+class UserCreationForm(DjangoUserCreationForm):
     """
-    Used in admin when adding a new user.
+    Admin "Add user" form.
+    Allows email OR phone (to match your actual signup rules).
+    Username is optional (auto-generated if missing).
     """
 
-    class Meta(UserCreationForm.Meta):
+    class Meta(DjangoUserCreationForm.Meta):
         model = User
-        # What the admin “Add user” form will ask for
-        fields = ("email", "username", "display_name", "phone")
+        fields = ("email", "phone", "username", "handle", "display_name")
+
+    def clean(self):
+        cleaned = super().clean()
+        email = (cleaned.get("email") or "").strip()
+        phone = (cleaned.get("phone") or "").strip()
+
+        if not email and not phone:
+            raise ValidationError("Provide either email or phone.")
+
+        # normalize blanks -> None
+        cleaned["email"] = email or None
+        cleaned["phone"] = phone or None
+
+        # If phone-only, set a safe placeholder email so model constraint (unique email) is satisfied.
+        if not cleaned["email"] and cleaned["phone"]:
+            cleaned["email"] = _placeholder_email_for_phone(cleaned["phone"])
+
+        return cleaned
 
     def clean_email(self):
-        email = self.cleaned_data.get("email")
+        email = (self.cleaned_data.get("email") or "").strip()
         if email and User.objects.filter(email__iexact=email).exists():
             raise ValidationError("A user with this email already exists.")
         return email
 
-    def clean_username(self):
-        username = self.cleaned_data.get("username")
-        if username and User.objects.filter(username__iexact=username).exists():
-            raise ValidationError("A user with this username already exists.")
-        return username
-
     def clean_phone(self):
-        phone = self.cleaned_data.get("phone")
+        phone = (self.cleaned_data.get("phone") or "").strip()
         if phone and User.objects.filter(phone=phone).exists():
             raise ValidationError("A user with this phone already exists.")
         return phone
 
+    def clean_handle(self):
+        handle = (self.cleaned_data.get("handle") or "").strip().lower()
+        if not handle:
+            return None
+        if User.objects.filter(handle=handle).exists():
+            raise ValidationError("Handle already taken.")
+        return handle
 
-class UserChangeForm(UserChangeForm):
+
+class UserChangeForm(DjangoUserChangeForm):
     """
-    Used in admin when editing an existing user.
-    We don’t expose the raw password field; DjangoUserAdmin will still
-    handle password change via the built-in “Change password” form.
+    Admin "Change user" form.
     """
 
-    password = None  # hide the hashed password field on the main edit form
+    password = None  # hide hashed password field on main edit form
 
     class Meta:
         model = User
         fields = (
             "email",
+            "phone",
             "username",
+            "handle",
             "display_name",
             "first_name",
             "last_name",
-            "phone",
             "site_id",
             "is_admin",
             "is_creator",
@@ -81,6 +108,7 @@ class UserChangeForm(UserChangeForm):
             "followers",
             "earning",
             "rating",
+            "member_since",
             "is_active",
             "is_staff",
             "is_superuser",
@@ -90,6 +118,5 @@ class UserChangeForm(UserChangeForm):
 
 
 class UserLoginForm(forms.Form):
-    # This one can stay as-is; depends on how your login view works
     identifier = forms.CharField(label="Email or Phone")
     password = forms.CharField(widget=forms.PasswordInput)

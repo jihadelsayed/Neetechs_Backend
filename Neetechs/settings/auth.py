@@ -20,7 +20,7 @@ DJ_REST_AUTH = {
 }
 
 AUTHENTICATION_BACKENDS = [
-    "accounts.backends.EmailOrPhoneBackend",  # handles email, username, phone
+    "accounts.backends.EmailOrPhoneBackend",
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
