@@ -13,6 +13,7 @@ from .views.auth import (
     GoogleLogin,
     EmailConfirmation,
 )
+from .views.auth import ConfirmEmailView
 
 app_name = "accounts"
 
@@ -24,6 +25,8 @@ urlpatterns = [
     path("auth/social/google/", GoogleLogin.as_view(), name="auth_google"),
 
     # Email verify (resend)
+    # Email verify (confirm + resend)
+    path("auth/email/confirm/<str:key>/", ConfirmEmailView.as_view(), name="auth_email_confirm"),
     path("auth/email/resend/", EmailConfirmation.as_view(), name="auth_email_resend"),
 
     # OTP

@@ -19,7 +19,7 @@ class SocialLoginView_(SocialLoginView):
     permission_classes = [AllowAny]
 
     def get_response(self):
-        token = create_knox_token(None, self.user, None)
+        token = create_knox_token(self.user)
         return Response(
             {
                 "token": token,

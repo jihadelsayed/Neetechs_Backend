@@ -21,7 +21,6 @@ from drf_spectacular.utils import extend_schema
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
-@extend_schema(tags=["payments"])
 @csrf_exempt
 def stripe_webhook(request):
     """
@@ -165,10 +164,10 @@ def create_checkout_session(request):
 
     return Response({"checkout_url": session.url})
 
+@extend_schema(tags=["payments"])
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
-@extend_schema(tags=["payments"])
 def create_bundle_checkout_session(request):
     """
     Create Stripe Checkout session for a bundle.
@@ -224,10 +223,10 @@ def create_bundle_checkout_session(request):
     )
 
     return Response({"checkout_url": session.url})
+@extend_schema(tags=["payments"])
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
-@extend_schema(tags=["payments"])
 def checkout_session_detail(request, session_id):
     """
     Public endpoint:

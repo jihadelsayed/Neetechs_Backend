@@ -8,11 +8,28 @@ from rest_framework.response import Response
 from allauth.account.models import EmailAddress
 from allauth.account.utils import send_email_confirmation
 from drf_spectacular.utils import extend_schema
-
+from allauth.account.models import EmailConfirmationHMAC
+from rest_framework.views import APIView
 
 from ...serializers.auth import EmailConfirmationSerializer
 
 User = get_user_model()
+
+
+@extend_schema(tags=["accounts-security"])
+class ConfirmEmailView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, key: str):
+        confirmation = EmailConfirmationHMAC.from_key(key)
+        if not confirmation:
+            return Response(
+                {"detail": "Invalid or expired key"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        confirmation.confirm(request)
+        return Response({"detail": "Email confirmed"}, status=status.HTTP_200_OK)
 
 @extend_schema(tags=["accounts-security"])
 class EmailConfirmation(GenericAPIView):

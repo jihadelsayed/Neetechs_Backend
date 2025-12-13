@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from dj_rest_auth.views import LoginView
 
 from drf_spectacular.utils import extend_schema
+
+from accounts.throttles import LoginThrottle
 from ...serializers.login import LoginRequestSerializer
 from ...serializers.public import PublicUserSerializer
 from ...utils.knox import create_knox_token
@@ -21,9 +23,10 @@ from accounts.serializers import AuthResponseSerializer
 class KnoxLoginView(LoginView):
     permission_classes = [AllowAny]
     serializer_class = LoginRequestSerializer  # IMPORTANT: help spectacular
+    throttle_classes = [LoginThrottle]
 
     def get_response(self):
-        token = create_knox_token(None, self.user, None)
+        token = create_knox_token(self.user)
         return Response(
             {"token": token, "user": PublicUserSerializer(self.user, context={"request": self.request}).data},
             status=200,

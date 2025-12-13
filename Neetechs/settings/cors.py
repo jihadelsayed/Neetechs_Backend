@@ -34,3 +34,8 @@ WEBAUTHN_ENABLED = False
 WEBAUTHN_RP_ID = "neetechs.com"
 WEBAUTHN_RP_NAME = "Neetechs"
 TWILIO_OTP_MESSAGE_TEMPLATE = "🔐 Your Neetechs verification code is: {code}"
+
+
+ACCOUNT_ADAPTER = "accounts.adapters.AccountAdapter"
+#FRONTEND_URL = "http://localhost:4200"  # dev
+FRONTEND_URL = "https://neetechs.com"  # prod

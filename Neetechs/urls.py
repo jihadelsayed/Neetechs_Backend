@@ -22,6 +22,8 @@ urlpatterns = [
 
     # API v1 (single public surface)
     path("api/v1/accounts/", include(("accounts.urls", "accounts"), namespace="accounts")),
+    # path("accounts/", include("allauth.urls")),
+
     path("api/v1/payments/", include(("payments.urls", "payments"), namespace="payments")),
     path("api/v1/checkout/", include(("Checkout.urls", "checkout"), namespace="checkout")),
 

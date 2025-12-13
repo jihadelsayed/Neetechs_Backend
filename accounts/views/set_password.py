@@ -28,7 +28,7 @@ class SetPasswordView(GenericAPIView):
         AuthToken.objects.filter(user=user).delete()
 
         # Issue a fresh token so the client keeps a valid session
-        token = create_knox_token(None, user, None)
+        token = create_knox_token(user)
 
         return Response(
             {
