@@ -23,9 +23,9 @@ REST_FRAMEWORK = {
 
 }
 REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"].update({
-    "login": "10/min",
-    "register": "5/min",
-    "otp": "3/min",
+  "login": "10/min",
+  "register": "5/min",
+  "otp": "3/min",
 })
 
 REST_KNOX = {"TOKEN_TTL": timedelta(hours=100)}
