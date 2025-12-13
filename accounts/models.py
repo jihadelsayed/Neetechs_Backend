@@ -3,6 +3,7 @@
 import os
 import random
 import string
+import hashlib
 from binascii import hexlify
 from datetime import date
 
@@ -30,23 +31,52 @@ def generate_username(seed: str = "user", length: int = 6) -> str:
   suffix = generate_site_id(length).lower()
   return f"{base}_{suffix}"
 
-def upload_avatar(instance, filename: str) -> str:
-  ext = filename.split(".")[-1].lower()
-  return f"pictures/{instance.site_id}.{ext or 'png'}"
+def _avatar_upload_path(instance, filename: str, *, variant: str) -> str:
+  """Return a stable, non-colliding upload path for each avatar variant.
+
+  IMPORTANT: Each ProcessedImageField MUST write to a unique path; otherwise the
+  different sizes overwrite each other.
+  """
+  ext = (filename.rsplit(".", 1)[-1] if "." in filename else "png").lower() or "png"
+  return f"pictures/{instance.site_id}/avatar_{variant}.{ext}"
+
+
+def upload_avatar_512(instance, filename: str) -> str:
+  return _avatar_upload_path(instance, filename, variant="512")
+
+
+def upload_avatar_256(instance, filename: str) -> str:
+  return _avatar_upload_path(instance, filename, variant="256")
+
+
+def upload_avatar_128(instance, filename: str) -> str:
+  return _avatar_upload_path(instance, filename, variant="128")
+
+
+def upload_avatar_28(instance, filename: str) -> str:
+  return _avatar_upload_path(instance, filename, variant="28")
+
 
 
 class UserManager(BaseUserManager):
   """
-  Email as login, username required, no magic auto-usernames.
+  Email/phone login. Username is auto-generated if missing.
+
+  Note: Email is always stored (phone-only signups get a stable placeholder email).
   """
 
   use_in_migrations = True
 
   def _create_user(self, email, password, **extra_fields):
+    # Phone-only accounts are allowed. If email is missing, generate a stable placeholder.
     if not email:
-      raise ValueError("The email address must be set")
+      phone = (extra_fields.get("phone") or "").strip()
+      if not phone:
+        raise ValueError("Provide at least an email or a phone number.")
+      email = f"{hashlib.sha256(phone.encode('utf-8')).hexdigest()[:10]}@phone.neetechs.invalid"
 
     email = self.normalize_email(email)
+
     extra_fields.setdefault("is_staff", False)
     extra_fields.setdefault("is_superuser", False)
 
@@ -116,6 +146,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     max_length=20,
     blank=True,
     null=True,
+    unique=True,
+    db_index=True,
     help_text=_("E.164 phone number (+15551234567)."),
   )
 
@@ -168,7 +200,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     format="PNG",
     processors=[ResizeToFill(512, 512)],
     options={"quality": 70},
-    upload_to=upload_avatar,
+    upload_to=upload_avatar_512,
     blank=True,
     null=True,
     default="ProfileDefaultImage.png",
@@ -177,7 +209,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     format="PNG",
     processors=[ResizeToFill(256, 256)],
     options={"quality": 70},
-    upload_to=upload_avatar,
+    upload_to=upload_avatar_256,
     blank=True,
     null=True,
     default="ProfileDefaultImage.png",
@@ -186,7 +218,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     format="PNG",
     processors=[ResizeToFill(128, 128)],
     options={"quality": 70},
-    upload_to=upload_avatar,
+    upload_to=upload_avatar_128,
     blank=True,
     null=True,
     default="ProfileDefaultImage.png",
@@ -195,7 +227,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     format="PNG",
     processors=[ResizeToFill(28, 28)],
     options={"quality": 70},
-    upload_to=upload_avatar,
+    upload_to=upload_avatar_28,
     blank=True,
     null=True,
     default="ProfileDefaultImage.png",
