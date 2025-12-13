@@ -15,11 +15,11 @@ from allauth.account.utils import complete_signup, send_email_confirmation
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 
-from .models import User
-from .utils import create_knox_token
-from .serializers.user import KnoxSerializer
-from .serializers.register import PhoneOrEmailRegisterSerializer
-from .serializers.auth import (
+from ..models import User
+from ..utils import create_knox_token
+from ..serializers.user import KnoxSerializer
+from ..serializers.register import PhoneOrEmailRegisterSerializer
+from ..serializers.auth import (
     CurrentUserSerializer,
     EmailConfirmationSerializer,
 )

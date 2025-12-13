@@ -3,7 +3,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .serializers.auth import SetPasswordSerializer
+from ..serializers.auth import SetPasswordSerializer
 
 class SetPasswordView(GenericAPIView):
     permission_classes = [IsAuthenticated]

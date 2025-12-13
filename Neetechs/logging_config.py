@@ -16,7 +16,7 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
-        'accounts.views_otp': {
+        'accounts.views.otp': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,

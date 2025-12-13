@@ -12,9 +12,9 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from .models import User
-from .twilio_utils import send_sms_otp
-from .serializers.auth import SendPhoneOTPSerializer, VerifyPhoneOTPSerializer
+from ..models import User
+from ..twilio_utils import send_sms_otp
+from ..serializers.auth import SendPhoneOTPSerializer, VerifyPhoneOTPSerializer
 
 logger = logging.getLogger(__name__)
 
