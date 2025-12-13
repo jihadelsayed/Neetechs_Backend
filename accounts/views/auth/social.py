@@ -10,7 +10,8 @@ from accounts.serializers import AuthResponseSerializer
 from ...serializers.public import PublicUserSerializer
 from ...utils.knox import create_knox_token
 from drf_spectacular.utils import extend_schema
-
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import status
 @extend_schema(
     responses={200: AuthResponseSerializer},
     tags=["accounts-auth"],
@@ -19,7 +20,14 @@ class SocialLoginView_(SocialLoginView):
     permission_classes = [AllowAny]
 
     def get_response(self):
-        token = create_knox_token(self.user)
+        try:
+            token = create_knox_token(self.user)
+        except ObjectDoesNotExist:
+            return Response(
+                {"detail": "Social login provider not configured (missing SocialApp/Site)."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
         return Response(
             {
                 "token": token,
