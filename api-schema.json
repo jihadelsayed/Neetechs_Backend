@@ -287,13 +287,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PhoneOrEmailRegister'
+              $ref: '#/components/schemas/RegisterRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PhoneOrEmailRegister'
+              $ref: '#/components/schemas/RegisterRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PhoneOrEmailRegister'
+              $ref: '#/components/schemas/RegisterRequest'
         required: true
       security:
       - knoxApiToken: []
@@ -303,7 +303,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PhoneOrEmailRegister'
+                $ref: '#/components/schemas/RegisterRequest'
           description: ''
   /api/v1/categories/:
     get:
@@ -3648,13 +3648,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PhoneOrEmailRegister'
+              $ref: '#/components/schemas/RegisterRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PhoneOrEmailRegister'
+              $ref: '#/components/schemas/RegisterRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PhoneOrEmailRegister'
+              $ref: '#/components/schemas/RegisterRequest'
         required: true
       security:
       - knoxApiToken: []
@@ -3664,7 +3664,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PhoneOrEmailRegister'
+                $ref: '#/components/schemas/RegisterRequest'
           description: ''
   /auth/user/:
     get:
@@ -5387,7 +5387,7 @@ components:
         last_name:
           type: string
           maxLength: 150
-    PhoneOrEmailRegister:
+    RegisterRequest:
       type: object
       properties:
         email:

@@ -5,6 +5,7 @@ from django.core.cache import cache
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from drf_spectacular.utils import extend_schema
 
 from webauthn import (
     generate_registration_options,
@@ -51,6 +52,7 @@ def _client_key(request) -> str:
     # Absolute fallback (not great but prevents crashing)
     return "anon"
 
+@extend_schema(tags=["accounts-security"])
 
 @csrf_exempt
 @require_POST
@@ -86,6 +88,7 @@ def begin_registration(request):
     cache.set(f"webauthn:register_challenge:{_client_key(request)}", options.challenge, timeout=CHALLENGE_TTL_SECONDS)
     return JsonResponse(options.model_dump())
 
+@extend_schema(tags=["accounts-security"])
 
 @csrf_exempt
 @require_POST
@@ -122,6 +125,7 @@ def complete_registration(request):
 
     return JsonResponse({"status": "ok"})
 
+@extend_schema(tags=["accounts-security"])
 
 @csrf_exempt
 @require_POST
@@ -148,6 +152,7 @@ def begin_authentication(request):
     cache.set(f"webauthn:auth_challenge:{_client_key(request)}", options.challenge, timeout=CHALLENGE_TTL_SECONDS)
     return JsonResponse(options.model_dump())
 
+@extend_schema(tags=["accounts-security"])
 
 @csrf_exempt
 @require_POST

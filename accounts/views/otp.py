@@ -47,8 +47,7 @@ def _placeholder_email_for_phone(phone: str) -> str:
     # Safe + consistent placeholder domain (never a real domain)
     return f"{_sha256_hex(phone)[:10]}@phone.neetechs.invalid"
 
-@extend_schema(tags=["accounts-auth"])
-
+@extend_schema(tags=["accounts-security"])
 class SendPhoneOTP(GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = SendPhoneOTPSerializer
@@ -96,8 +95,7 @@ class SendPhoneOTP(GenericAPIView):
 
         return Response({"detail": "OTP sent successfully."}, status=200)
 
-@extend_schema(tags=["accounts-auth"])
-
+@extend_schema(tags=["accounts-security"])
 class VerifyPhoneOTP(GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = VerifyPhoneOTPSerializer

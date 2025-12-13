@@ -12,7 +12,7 @@ from allauth.account.utils import complete_signup
 from accounts.serializers import AuthResponseSerializer
 
 from ...utils import create_knox_token
-from ...serializers.register import PhoneOrEmailRegisterSerializer
+from ...serializers.register import RegisterRequestSerializer
 from drf_spectacular.utils import extend_schema
 
 
@@ -41,13 +41,13 @@ def _stable_placeholder_email(*, email: str | None, phone: str | None) -> str:
 
 
 @extend_schema(
-    request=PhoneOrEmailRegisterSerializer,
+    request=RegisterRequestSerializer,
     responses={200: AuthResponseSerializer},
     tags=["accounts-auth"],
 )
 class KnoxRegisterView(RegisterView):
     permission_classes = [AllowAny]
-    serializer_class = PhoneOrEmailRegisterSerializer
+    serializer_class = RegisterRequestSerializer
 
     @transaction.atomic
     def perform_create(self, serializer):

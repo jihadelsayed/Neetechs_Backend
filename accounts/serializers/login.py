@@ -6,7 +6,7 @@ from allauth.account.models import EmailAddress
 from ..models import User
 
 
-class PhoneOrEmailLoginSerializer(serializers.Serializer):
+class LoginRequestSerializer(serializers.Serializer):
     identifier = serializers.CharField()
     password = serializers.CharField()
 

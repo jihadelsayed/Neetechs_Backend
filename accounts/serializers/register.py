@@ -4,7 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from ..models import User
 
 
-class PhoneOrEmailRegisterSerializer(serializers.ModelSerializer):
+class RegisterRequestSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
 
     # IMPORTANT: "name" is NOT a model field, so define it explicitly
