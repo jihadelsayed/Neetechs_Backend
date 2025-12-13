@@ -2,12 +2,18 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views.auth import KnoxLoginView, KnoxRegisterView, FacebookLogin, GoogleLogin, EmailConfirmation
 from .views.otp import SendPhoneOTP, VerifyPhoneOTP
 from .views.set_password import SetPasswordView
 from .views.webauthn import begin_registration, complete_registration, begin_authentication, complete_authentication
 from .views.profile import SetHandleView
 from .views.me import MeView
+from .views.auth import (
+    KnoxLoginView,
+    KnoxRegisterView,
+    FacebookLogin,
+    GoogleLogin,
+    EmailConfirmation,
+)
 
 app_name = "accounts"
 
