@@ -7,8 +7,9 @@ from ...serializers.login import PhoneOrEmailLoginSerializer
 from ...serializers.public import PublicUserSerializer
 from ...utils import create_knox_token
 
+from accounts.serializers import AuthResponseSerializer
 
-from ...serializers.auth_response import AuthResponseSerializer
+
 
 
 

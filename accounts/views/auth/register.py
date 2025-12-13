@@ -9,7 +9,7 @@ from dj_rest_auth.registration.views import RegisterView
 from allauth.account import app_settings as allauth_settings
 from allauth.account.utils import complete_signup
 
-from ...serializers.auth_response import AuthResponseSerializer
+from accounts.serializers import AuthResponseSerializer
 
 from ...utils import create_knox_token
 from ...serializers.register import PhoneOrEmailRegisterSerializer

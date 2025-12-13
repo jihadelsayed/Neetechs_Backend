@@ -16,6 +16,7 @@ from rest_framework.response import Response
 from ..twilio_utils import send_sms_otp
 from ..serializers.auth import SendPhoneOTPSerializer, VerifyPhoneOTPSerializer
 from ..utils import create_knox_token
+from drf_spectacular.utils import extend_schema
 
 logger = logging.getLogger(__name__)
 
@@ -46,10 +47,12 @@ def _placeholder_email_for_phone(phone: str) -> str:
     # Safe + consistent placeholder domain (never a real domain)
     return f"{_sha256_hex(phone)[:10]}@phone.neetechs.invalid"
 
+@extend_schema(tags=["accounts-auth"])
 
 class SendPhoneOTP(GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = SendPhoneOTPSerializer
+    authentication_classes = []
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -93,6 +96,7 @@ class SendPhoneOTP(GenericAPIView):
 
         return Response({"detail": "OTP sent successfully."}, status=200)
 
+@extend_schema(tags=["accounts-auth"])
 
 class VerifyPhoneOTP(GenericAPIView):
     permission_classes = [AllowAny]

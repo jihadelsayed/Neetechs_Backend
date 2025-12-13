@@ -5,7 +5,7 @@ from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 
-from ...serializers.auth_response import AuthResponseSerializer
+from accounts.serializers import AuthResponseSerializer
 
 from ...serializers.public import PublicUserSerializer
 from ...utils import create_knox_token

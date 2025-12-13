@@ -4,3 +4,6 @@ from .auth import (
     SetPasswordSerializer,
     VerifyPhoneOTPSerializer,
 )
+from .responses import AuthResponseSerializer
+
+__all__ = ["AuthResponseSerializer"]

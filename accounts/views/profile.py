@@ -5,7 +5,9 @@ from rest_framework.response import Response
 from ..serializers.auth import SetHandleSerializer
 from ..serializers.public import PublicUserSerializer
 
+from drf_spectacular.utils import extend_schema
 
+@extend_schema(tags=["accounts-me"])
 class SetHandleView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = SetHandleSerializer
