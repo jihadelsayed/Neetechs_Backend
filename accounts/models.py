@@ -43,6 +43,9 @@ def _avatar_upload_path(instance, filename: str, *, variant: str) -> str:
     ext = (filename.rsplit(".", 1)[-1] if "." in filename else "png").lower() or "png"
     return f"pictures/{instance.site_id}/avatar_{variant}.{ext}"
 
+# Backwards-compat for old migrations that reference accounts.models.upload_avatar
+def upload_avatar(instance, filename: str) -> str:
+    return upload_avatar_512(instance, filename)
 
 def upload_avatar_512(instance, filename: str) -> str:
     return _avatar_upload_path(instance, filename, variant="512")
@@ -200,14 +203,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     location = models.CharField(max_length=100, blank=True, null=True)
 
     member_since = models.DateTimeField(default=timezone.now, null=True, blank=True)
-    upload_avatar = upload_avatar_28
-    def upload_avatar_28(instance, filename: str) -> str:
-      return _avatar_upload_path(instance, filename, variant="28")
-
-    # Backwards-compat for old migrations
-    def upload_avatar(instance, filename: str) -> str:
-        return upload_avatar_28(instance, filename)
-
+    
     # AVATARS (imagekit)
     picture = ProcessedImageField(
         format="PNG",
