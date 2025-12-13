@@ -9,8 +9,11 @@ from dj_rest_auth.registration.views import RegisterView
 from allauth.account import app_settings as allauth_settings
 from allauth.account.utils import complete_signup
 
+from ...serializers.auth_response import AuthResponseSerializer
+
 from ...utils import create_knox_token
 from ...serializers.register import PhoneOrEmailRegisterSerializer
+from drf_spectacular.utils import extend_schema
 
 
 def _stripe_customer_create(email: str):
@@ -37,6 +40,11 @@ def _stable_placeholder_email(*, email: str | None, phone: str | None) -> str:
     return f"no-email-anonymous@neetechs.invalid"
 
 
+@extend_schema(
+    request=PhoneOrEmailRegisterSerializer,
+    responses={200: AuthResponseSerializer},
+    tags=["accounts-auth"],
+)
 class KnoxRegisterView(RegisterView):
     permission_classes = [AllowAny]
     serializer_class = PhoneOrEmailRegisterSerializer

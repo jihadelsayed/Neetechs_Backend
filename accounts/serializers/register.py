@@ -7,19 +7,20 @@ from ..models import User
 class PhoneOrEmailRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
 
+    # IMPORTANT: "name" is NOT a model field, so define it explicitly
+    name = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+
     class Meta:
         model = User
         fields = ["email", "phone", "password", "name"]
         extra_kwargs = {
             "email": {"required": False, "allow_null": True, "allow_blank": True},
             "phone": {"required": False, "allow_null": True, "allow_blank": True},
-            "name": {"required": False, "allow_null": True, "allow_blank": True},
         }
 
     def validate(self, attrs):
         email = (attrs.get("email") or "").strip()
         phone = (attrs.get("phone") or "").strip()
-        name = (attrs.get("name") or "").strip()
 
         if not email and not phone:
             raise serializers.ValidationError({"detail": "Provide either email or phone."})
@@ -32,23 +33,14 @@ class PhoneOrEmailRegisterSerializer(serializers.ModelSerializer):
 
         attrs["email"] = email or None
         attrs["phone"] = phone or None
-        attrs["name"] = name or None
         return attrs
 
     def create(self, validated_data):
         password = validated_data.pop("password")
+        name = (validated_data.pop("name", None) or "").strip() or None
 
-        email = validated_data.get("email")
-        phone = validated_data.get("phone")
-        name = validated_data.pop("name", None)
-
-        # Map legacy "name" into the real field
+        # map "name" -> display_name
         if name:
             validated_data["display_name"] = name
 
-        return User.objects.create_user(
-            email=email,
-            password=password,
-            phone=phone,
-            **validated_data,
-        )
+        return User.objects.create_user(password=password, **validated_data)
