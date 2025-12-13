@@ -97,8 +97,8 @@ class UserAdmin(DjangoUserAdmin):
 
     list_display = (
         "email",
-        "username",
-        "display_name",
+        "username"
+        , "handle", "display_name",
         "is_staff",
         "is_active",
         "is_superuser",
@@ -112,7 +112,7 @@ class UserAdmin(DjangoUserAdmin):
         "is_admin",
         "is_creator",
         "subscription_type",
-        "country",
+        "country","handle", "display_name",
     )
     search_fields = ("email", "username", "display_name", "phone", "site_id")
     ordering = ("email",)

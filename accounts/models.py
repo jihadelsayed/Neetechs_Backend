@@ -53,6 +53,9 @@ class UserManager(BaseUserManager):
     # ensure site_id
     site_id = extra_fields.get("site_id") or generate_site_id()
     extra_fields["site_id"] = site_id
+    if not extra_fields.get("username"):
+      seed = email.split("@")[0] if email else "user"
+      extra_fields["username"] = generate_username(seed)
 
     user = self.model(email=email, **extra_fields)
     user.set_password(password)
@@ -123,15 +126,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     unique=True,
     db_index=True,
   )
+    # Public, user-editable handle (optional)
   handle = models.SlugField(
-      _("handle"),
-      max_length=40,
-      unique=True,
-      null=True,
-      blank=True,
-      db_index=True,
-      help_text=_("Public @handle. Optional. Letters/numbers/hyphen/underscore."),
-    )
+    _("handle"),
+    max_length=40,
+    unique=True,
+    null=True,
+    blank=True,
+    db_index=True,
+    help_text=_("Public @handle. Optional."),
+  )
+
   # FLAGS / STATUS
   is_staff = models.BooleanField(_("staff status"), default=False)
   is_active = models.BooleanField(_("active"), default=True)
@@ -231,8 +236,8 @@ class User(AbstractBaseUser, PermissionsMixin):
   otp_expires_at = models.DateTimeField(blank=True, null=True)
 
 
-  USERNAME_FIELD = "email"          # login by email
-  REQUIRED_FIELDS = ["username"]    # when creating superuser via CLI
+  USERNAME_FIELD = "email"         # login by email
+  REQUIRED_FIELDS = []    # when creating superuser via CLI
 
   objects = UserManager()
 
