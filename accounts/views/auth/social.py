@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from accounts.serializers import AuthResponseSerializer
 
 from ...serializers.public import PublicUserSerializer
@@ -43,3 +43,5 @@ class FacebookLogin(SocialLoginView_):
 
 class GoogleLogin(SocialLoginView_):
     adapter_class = GoogleOAuth2Adapter
+    client_class = OAuth2Client
+    callback_url = "https://neetechs.com"  # or your exact redirect URI
