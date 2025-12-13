@@ -200,6 +200,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     location = models.CharField(max_length=100, blank=True, null=True)
 
     member_since = models.DateTimeField(default=timezone.now, null=True, blank=True)
+    upload_avatar = upload_avatar_28
 
     # AVATARS (imagekit)
     picture = ProcessedImageField(
