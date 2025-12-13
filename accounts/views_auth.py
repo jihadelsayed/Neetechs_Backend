@@ -7,6 +7,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from accounts.serializers.public import PublicUserSerializer
 from dj_rest_auth.registration.views import RegisterView, SocialLoginView
 from dj_rest_auth.views import LoginView
 from allauth.account import app_settings as allauth_settings
@@ -31,10 +32,13 @@ class KnoxLoginView(LoginView):
     permission_classes = [AllowAny]
 
     def get_response(self):
-        serializer_class = KnoxSerializer
-        data = {"user": self.user, "token": self.token[1]}
-        serializer = serializer_class(instance=data, context={"request": self.request})
-        return Response(serializer.data, status=200)
+        return Response(
+            {
+                "token": self.token[1],
+                "user": PublicUserSerializer(self.user, context={"request": self.request}).data,
+            },
+            status=200,
+        )
 
 
 class KnoxRegisterView(RegisterView):
@@ -75,10 +79,13 @@ class SocialLoginView_(SocialLoginView):
     permission_classes = [AllowAny]
 
     def get_response(self):
-        serializer_class = KnoxSerializer
-        data = {"user": self.user, "token": self.token[1]}
-        serializer = serializer_class(instance=data, context={"request": self.request})
-        return Response(serializer.data, status=200)
+        return Response(
+            {
+                "token": self.token[1],
+                "user": PublicUserSerializer(self.user, context={"request": self.request}).data,
+            },
+            status=200,
+        )
 
 
 class FacebookLogin(SocialLoginView_):

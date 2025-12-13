@@ -7,6 +7,7 @@ from .views_otp import SendPhoneOTP, VerifyPhoneOTP
 from .views_set_password import SetPasswordView
 from .webauthn_view import begin_registration, complete_registration, begin_authentication, complete_authentication
 from .views_profile import SetHandleView
+from .views_me import MeView
 
 app_name = "accounts"
 
@@ -36,7 +37,8 @@ urlpatterns = [
 
     # set password (after OTP login)
     path("auth/password/set/", SetPasswordView.as_view(), name="auth_password_set"),
-    
+        path("me/", MeView.as_view(), name="me"),
+
     path("me/handle/", SetHandleView.as_view(), name="me_handle"),
 
 ]
