@@ -5,9 +5,9 @@ from django.conf.urls.static import static
 from .views.auth import KnoxLoginView, KnoxRegisterView, FacebookLogin, GoogleLogin, EmailConfirmation
 from .views.otp import SendPhoneOTP, VerifyPhoneOTP
 from .views.set_password import SetPasswordView
-from .views.webauthn_view import begin_registration, complete_registration, begin_authentication, complete_authentication
-from .profile import SetHandleView
-from .me import MeView
+from .views.webauthn import begin_registration, complete_registration, begin_authentication, complete_authentication
+from .views.profile import SetHandleView
+from .views.me import MeView
 
 app_name = "accounts"
 
@@ -37,10 +37,10 @@ urlpatterns = [
 
     # set password (after OTP login)
     path("auth/password/set/", SetPasswordView.as_view(), name="auth_password_set"),
-        path("me/", MeView.as_view(), name="me"),
 
+    # current user
+    path("me/", MeView.as_view(), name="me"),
     path("me/handle/", SetHandleView.as_view(), name="me_handle"),
-
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

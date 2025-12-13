@@ -2,7 +2,8 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ..serializers import PublicUserSerializer
+from ..serializers.public import PublicUserSerializer
+
 
 class MeView(GenericAPIView):
     permission_classes = [IsAuthenticated]

@@ -12,12 +12,14 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from ..models import User
+
 from ..twilio_utils import send_sms_otp
 from ..serializers.auth import SendPhoneOTPSerializer, VerifyPhoneOTPSerializer
 
 logger = logging.getLogger(__name__)
 
+from django.contrib.auth import get_user_model
+User = get_user_model()
 OTP_TTL_SECONDS = 5 * 60          # 5 minutes
 OTP_COOLDOWN_SECONDS = 60         # 60s before resend
 OTP_MAX_ATTEMPTS = 5              # per phone+ip+device
